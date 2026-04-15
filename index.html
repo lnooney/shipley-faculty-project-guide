@@ -1,0 +1,1575 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Shipley Academic Innovation Project Guide</title>
+<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+  --navy:#1a2744;
+  --navy2:#243258;
+  --gold:#c8922a;
+  --gold-light:#f5e6c8;
+  --gold-pale:#fdf8ef;
+  --red:#cc3b2f;
+  --red-light:#fdf0ee;
+  --bg:#f7f5f0;
+  --bg2:#eeeae0;
+  --card:#ffffff;
+  --text:#1a1916;
+  --text2:#4a4840;
+  --text3:#8a8680;
+  --border:rgba(26,39,68,0.1);
+  --border2:rgba(26,39,68,0.18);
+  --green:#2d6b3a;
+  --green-bg:#eaf4ed;
+  --green-text:#235430;
+  --blue:#1a5fa8;
+  --blue-bg:#e8f1fb;
+  --blue-text:#154d8a;
+  --amber:#8c5a10;
+  --amber-bg:#fdf3e0;
+  --amber-text:#724808;
+  --radius:10px;
+  --radius-lg:16px;
+  --shadow:0 1px 4px rgba(0,0,0,0.07);
+  --shadow-md:0 4px 16px rgba(0,0,0,0.1);
+  --serif:'Libre Baskerville',Georgia,serif;
+  --sans:'DM Sans',system-ui,sans-serif;
+}
+
+body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:100vh;font-size:15px;line-height:1.6}
+
+/* ── HEADER ── */
+.site-header{
+  background:var(--navy);
+  padding:1.25rem 2rem;
+  display:flex;align-items:center;gap:16px;
+  border-bottom:3px solid var(--gold);
+}
+.header-mark{
+  width:44px;height:44px;background:var(--gold);border-radius:10px;
+  display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;
+}
+.header-text h1{
+  font-family:var(--serif);font-size:18px;font-weight:400;
+  color:#ffffff;letter-spacing:0.01em;
+}
+.header-text p{font-size:12px;color:rgba(255,255,255,0.55);margin-top:2px;}
+.project-name-badge{
+  margin-left:auto;font-size:13px;font-weight:500;
+  color:var(--gold);font-family:var(--serif);font-style:italic;
+  max-width:280px;text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+
+/* ── TABS ── */
+.tabs{
+  background:var(--navy2);display:flex;overflow-x:auto;
+  padding:0 2rem;border-bottom:1px solid rgba(255,255,255,0.08);
+}
+.tab{
+  padding:13px 18px;font-size:13px;font-weight:500;
+  color:rgba(255,255,255,0.5);background:none;border:none;
+  border-bottom:2px solid transparent;cursor:pointer;white-space:nowrap;
+  font-family:var(--sans);transition:color 0.15s;
+}
+.tab:hover{color:rgba(255,255,255,0.8);}
+.tab.active{color:#ffffff;border-bottom-color:var(--gold);}
+.tab .tab-check{font-size:10px;margin-left:5px;color:var(--gold);opacity:0;}
+.tab.complete .tab-check{opacity:1;}
+
+/* ── LAYOUT ── */
+.main{max-width:900px;margin:0 auto;padding:2rem 1.5rem;}
+.panel{display:none;}
+.panel.active{display:block;}
+
+/* ── WELCOME / SETUP ── */
+.welcome-card{
+  background:var(--navy);border-radius:var(--radius-lg);
+  padding:2.5rem;margin-bottom:1.5rem;position:relative;overflow:hidden;
+}
+.welcome-card::before{
+  content:'';position:absolute;top:-60px;right:-60px;
+  width:200px;height:200px;border-radius:50%;
+  background:rgba(200,146,42,0.08);
+}
+.welcome-card h2{
+  font-family:var(--serif);font-size:26px;font-weight:400;
+  color:#ffffff;margin-bottom:10px;
+}
+.welcome-card p{font-size:14px;color:rgba(255,255,255,0.65);line-height:1.7;max-width:600px;}
+.welcome-card .gold-line{width:40px;height:2px;background:var(--gold);margin:16px 0;}
+
+/* ── CARDS ── */
+.card{
+  background:var(--card);border:0.5px solid var(--border);
+  border-radius:var(--radius-lg);padding:1.5rem;margin-bottom:16px;
+  box-shadow:var(--shadow);
+}
+.card-header{
+  display:flex;align-items:flex-start;gap:12px;margin-bottom:16px;
+  padding-bottom:14px;border-bottom:0.5px solid var(--border);
+}
+.card-icon{
+  width:36px;height:36px;border-radius:8px;
+  background:var(--gold-pale);display:flex;align-items:center;justify-content:center;
+  font-size:17px;flex-shrink:0;
+}
+.card-title{font-family:var(--serif);font-size:17px;font-weight:400;color:var(--navy);}
+.card-sub{font-size:13px;color:var(--text3);margin-top:2px;}
+.section-label{
+  font-size:11px;font-weight:600;color:var(--text3);
+  text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px;
+}
+
+/* ── FORMS ── */
+input,select,textarea,button{
+  font-family:var(--sans);font-size:14px;color:var(--text);
+  background:var(--bg);border:0.5px solid var(--border2);
+  border-radius:var(--radius);padding:10px 13px;outline:none;
+  transition:border-color 0.15s,box-shadow 0.15s;
+}
+input:focus,textarea:focus,select:focus{
+  border-color:var(--navy);box-shadow:0 0 0 2px rgba(26,39,68,0.12);background:#fff;
+}
+button{cursor:pointer;background:none;padding:10px 20px;font-weight:500;transition:all 0.12s;}
+button:hover{background:var(--bg2);}
+button:active{transform:scale(0.98);}
+
+.btn-primary{background:var(--navy);color:#fff;border-color:var(--navy);}
+.btn-primary:hover{background:var(--navy2);}
+.btn-gold{background:var(--gold);color:#fff;border-color:var(--gold);}
+.btn-gold:hover{background:#b8821e;}
+
+.field{margin-bottom:14px;}
+.field label{display:block;font-size:13px;color:var(--text2);margin-bottom:5px;font-weight:500;}
+.field .hint{font-size:12px;color:var(--text3);margin-top:4px;line-height:1.5;}
+
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;}
+
+/* ── AI OUTPUT ── */
+.ai-response{
+  background:var(--gold-pale);border-radius:var(--radius-lg);
+  padding:1.25rem 1.5rem;margin-bottom:14px;
+  font-size:14px;line-height:1.75;white-space:pre-wrap;
+  border-left:3px solid var(--gold);color:var(--text);
+}
+.thinking{
+  display:flex;align-items:center;gap:8px;
+  font-size:13px;color:var(--text3);padding:12px 0;
+}
+.dots span{
+  display:inline-block;width:5px;height:5px;border-radius:50%;
+  background:var(--gold);animation:bounce 1.2s infinite;margin-right:3px;
+}
+.dots span:nth-child(2){animation-delay:.2s;}
+.dots span:nth-child(3){animation-delay:.4s;}
+@keyframes bounce{0%,80%,100%{transform:translateY(0)}40%{transform:translateY(-5px)}}
+
+/* ── ALERT BOXES ── */
+.alert{border-radius:var(--radius);padding:12px 16px;margin-bottom:14px;font-size:13px;line-height:1.6;}
+.alert-amber{background:var(--amber-bg);border-left:3px solid var(--amber);color:var(--amber-text);}
+.alert-blue{background:var(--blue-bg);border-left:3px solid var(--blue);color:var(--blue-text);}
+.alert-green{background:var(--green-bg);border-left:3px solid var(--green);color:var(--green-text);}
+.alert-navy{background:rgba(26,39,68,0.06);border-left:3px solid var(--navy);color:var(--navy);}
+.alert strong{font-weight:600;}
+
+/* ── IMPACT FRAMEWORK ── */
+.framework-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:0;border:0.5px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;}
+.fw-col{border-right:0.5px solid var(--border);}
+.fw-col:last-child{border-right:none;}
+.fw-header{
+  background:var(--navy);color:#fff;padding:10px 12px;
+  font-size:11px;font-weight:600;text-align:center;min-height:60px;
+  display:flex;align-items:center;justify-content:center;text-align:center;
+  line-height:1.3;
+}
+.fw-header.gold{background:var(--gold);}
+.fw-header.teal{background:#0f6b58;}
+.fw-body{padding:10px;background:#fff;}
+.fw-body textarea{
+  width:100%;min-height:140px;font-size:12px;resize:vertical;
+  background:var(--bg);border:0.5px solid var(--border);
+  border-radius:6px;padding:8px;line-height:1.5;
+}
+.fw-body textarea:focus{border-color:var(--navy);background:#fff;}
+.fw-question{font-size:11px;color:var(--text3);margin-bottom:6px;line-height:1.4;font-style:italic;}
+
+/* ── MILESTONES ── */
+.milestone{
+  border:0.5px solid var(--border);border-radius:var(--radius-lg);
+  margin-bottom:14px;overflow:hidden;
+}
+.milestone-header{
+  background:var(--navy);color:#fff;padding:14px 18px;
+  display:flex;align-items:center;gap:12px;cursor:pointer;
+}
+.milestone-num{
+  width:28px;height:28px;border-radius:50%;background:var(--gold);
+  display:flex;align-items:center;justify-content:center;
+  font-size:13px;font-weight:600;color:#fff;flex-shrink:0;
+}
+.milestone-title{font-family:var(--serif);font-size:16px;font-weight:400;}
+.milestone-status{margin-left:auto;font-size:12px;color:rgba(255,255,255,0.6);}
+.milestone-body{padding:16px;background:#fff;}
+
+.task-row{
+  display:flex;align-items:flex-start;gap:10px;
+  padding:10px 0;border-bottom:0.5px solid var(--border);
+}
+.task-row:last-child{border-bottom:none;}
+.task-check{
+  width:20px;height:20px;border-radius:4px;border:1.5px solid var(--border2);
+  flex-shrink:0;cursor:pointer;background:none;padding:0;
+  display:flex;align-items:center;justify-content:center;transition:all .15s;margin-top:1px;
+}
+.task-check.done{background:var(--green-bg);border-color:var(--green);}
+.task-check.done::after{
+  content:'';width:10px;height:6px;
+  border-left:2px solid var(--green);border-bottom:2px solid var(--green);
+  transform:rotate(-45deg) translateY(-1px);display:block;
+}
+.task-body{flex:1;}
+.task-name{font-size:14px;color:var(--text);}
+.task-name.done{color:var(--text3);text-decoration:line-through;}
+.task-lead{font-size:12px;color:var(--text3);margin-top:2px;}
+.task-blocker{
+  font-size:12px;color:var(--amber-text);background:var(--amber-bg);
+  padding:3px 8px;border-radius:4px;margin-top:4px;display:inline-block;
+}
+
+/* ── BUDGET ── */
+.budget-table{width:100%;border-collapse:collapse;font-size:13px;}
+.budget-table th{
+  background:var(--navy);color:#fff;padding:10px 12px;
+  text-align:left;font-weight:500;font-size:12px;
+}
+.budget-table td{padding:10px 12px;border-bottom:0.5px solid var(--border);vertical-align:middle;}
+.budget-table tr:last-child td{border-bottom:none;}
+.budget-table input{
+  width:100%;background:transparent;border:none;padding:0;font-size:13px;
+  border-bottom:1px dashed var(--border2);border-radius:0;
+}
+.budget-table input:focus{border-bottom-color:var(--navy);background:transparent;box-shadow:none;}
+.budget-total{
+  background:var(--navy);color:#fff;padding:12px 16px;
+  border-radius:0 0 var(--radius) var(--radius);
+  display:flex;justify-content:space-between;align-items:center;
+  font-size:14px;font-weight:500;
+}
+.budget-remaining{
+  padding:10px 16px;background:var(--gold-pale);
+  border-radius:0;display:flex;justify-content:space-between;
+  font-size:13px;color:var(--amber-text);
+}
+.budget-over{color:var(--red)!important;background:var(--red-light)!important;}
+
+/* ── REPORT ── */
+.report-section{margin-bottom:20px;}
+.report-section h3{
+  font-family:var(--serif);font-size:16px;font-weight:400;
+  color:var(--navy);margin-bottom:6px;
+}
+.report-section .prompt{
+  font-size:13px;color:var(--text3);font-style:italic;margin-bottom:8px;line-height:1.5;
+}
+.report-section textarea{width:100%;min-height:90px;resize:vertical;}
+
+/* ── GUIDE CHAT ── */
+.guide-chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px;}
+.chip{
+  font-size:12px;padding:6px 14px;border-radius:999px;
+  border:0.5px solid var(--border2);cursor:pointer;background:none;
+  color:var(--text2);transition:all .12s;
+}
+.chip:hover{background:var(--gold-pale);border-color:var(--gold);color:var(--navy);}
+
+/* ── PROGRESS BAR ── */
+.progress-bar{height:4px;background:var(--bg2);border-radius:2px;margin-bottom:1.5rem;overflow:hidden;}
+.progress-fill{height:100%;background:var(--gold);border-radius:2px;transition:width .4s ease;}
+
+/* ── BADGES ── */
+.badge{font-size:11px;font-weight:600;padding:3px 9px;border-radius:999px;display:inline-block;}
+.b-green{background:var(--green-bg);color:var(--green-text);}
+.b-amber{background:var(--amber-bg);color:var(--amber-text);}
+.b-blue{background:var(--blue-bg);color:var(--blue-text);}
+.b-navy{background:rgba(26,39,68,0.1);color:var(--navy);}
+.b-red{background:var(--red-light);color:#9b2d23;}
+
+/* ── SAVE INDICATOR ── */
+.save-bar{
+  position:fixed;bottom:20px;right:20px;
+  background:var(--navy);color:#fff;font-size:12px;
+  padding:8px 16px;border-radius:999px;opacity:0;
+  transition:opacity .3s;pointer-events:none;
+  box-shadow:var(--shadow-md);
+}
+.save-bar.show{opacity:1;}
+
+/* ── IRB SECTION ── */
+.irb-options{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:14px;}
+.irb-option{
+  border:1.5px solid var(--border2);border-radius:var(--radius);
+  padding:14px;cursor:pointer;transition:all .15s;text-align:center;
+}
+.irb-option:hover{border-color:var(--navy);}
+.irb-option.selected{border-color:var(--navy);background:rgba(26,39,68,0.05);}
+.irb-option .opt-icon{font-size:22px;margin-bottom:6px;}
+.irb-option .opt-label{font-size:13px;font-weight:500;color:var(--text);}
+.irb-option .opt-desc{font-size:11px;color:var(--text3);margin-top:3px;line-height:1.4;}
+
+/* ── RESPONSIVE ── */
+@media(max-width:700px){
+  .grid2,.grid3{grid-template-columns:1fr;}
+  .framework-grid{grid-template-columns:1fr;}
+  .fw-col{border-right:none;border-bottom:0.5px solid var(--border);}
+  .irb-options{grid-template-columns:1fr;}
+  .main{padding:1rem;}
+  .welcome-card{padding:1.5rem;}
+  .tabs{padding:0 1rem;}
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="site-header">
+  <div class="header-mark">🎓</div>
+  <div class="header-text">
+    <h1>Shipley Academic Innovation Project Guide</h1>
+    <p>Boston University Institute for Excellence in Teaching & Learning</p>
+  </div>
+  <div class="project-name-badge" id="header-project-name">No project loaded</div>
+</header>
+
+<!-- TABS -->
+<nav class="tabs">
+  <button class="tab active" onclick="switchTab('setup',this)">Project Setup</button>
+  <button class="tab" onclick="switchTab('impact',this)">Impact Framework <span class="tab-check">✓</span></button>
+  <button class="tab" onclick="switchTab('milestones',this)">Milestones <span class="tab-check">✓</span></button>
+  <button class="tab" onclick="switchTab('budget',this)">Budget <span class="tab-check">✓</span></button>
+  <button class="tab" onclick="switchTab('report',this)">Project Report <span class="tab-check">✓</span></button>
+  <button class="tab" onclick="switchTab('guide',this)">Ask Your Guide</button>
+</nav>
+
+<div class="main">
+
+<!-- ══════════════════════════════════════════════
+     TAB 1: PROJECT SETUP
+══════════════════════════════════════════════ -->
+<div id="tab-setup" class="panel active">
+
+  <div class="welcome-card">
+    <h2>Welcome to your Project Guide.</h2>
+    <div class="gold-line"></div>
+    <p>This guide will walk you through every stage of your Shipley Academic Innovation project — from initial scoping through impact reporting. Each section builds on the last. Start by telling us about your project, and your guide will personalize everything to your work.</p>
+  </div>
+
+  <!-- Project Identity -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-icon">📌</div>
+      <div><div class="card-title">Project Identity</div><div class="card-sub">Name your project and introduce your team</div></div>
+    </div>
+
+    <div class="field">
+      <label>Project title</label>
+      <input type="text" id="s-title" placeholder="e.g. Active Learning Integration in Introductory Biology" style="width:100%;" oninput="updateProjectName()"/>
+    </div>
+    <div class="grid2">
+      <div class="field">
+        <label>Faculty lead name</label>
+        <input type="text" id="s-lead" placeholder="Your name" style="width:100%;"/>
+      </div>
+      <div class="field">
+        <label>Department / School / College</label>
+        <input type="text" id="s-dept" placeholder="e.g. College of Arts & Sciences" style="width:100%;"/>
+      </div>
+    </div>
+    <div class="field">
+      <label>Other team members and their roles</label>
+      <textarea id="s-team" placeholder="e.g. Dr. Jane Smith (co-investigator), Michael Chen (graduate research assistant), Prof. Ana Rivera (collaborating instructor)" style="width:100%;min-height:70px;"></textarea>
+    </div>
+    <div class="grid2">
+      <div class="field">
+        <label>Project start date</label>
+        <input type="date" id="s-start" style="width:100%;"/>
+      </div>
+      <div class="field">
+        <label>Anticipated end date</label>
+        <input type="date" id="s-end" style="width:100%;"/>
+      </div>
+    </div>
+    <div class="field">
+      <label>Total grant amount</label>
+      <input type="number" id="s-grant" placeholder="e.g. 15000" style="width:200px;" oninput="updateBudgetTotal()"/>
+      <div class="hint">This will carry over to your budget tracker.</div>
+    </div>
+  </div>
+
+  <!-- Vision & Goals -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-icon">🎯</div>
+      <div><div class="card-title">Vision & Goals</div><div class="card-sub">Adapted from Shipley project scoping questions</div></div>
+    </div>
+
+    <div class="field">
+      <label>What teaching or learning challenge are you trying to address?</label>
+      <textarea id="s-challenge" placeholder="Describe the problem you've observed in your teaching or your students' learning. What isn't working the way you'd like? What gap exists between where students are and where you want them to be?" style="width:100%;min-height:80px;"></textarea>
+    </div>
+    <div class="field">
+      <label>What is your vision? In an ideal world, what would success look like?</label>
+      <textarea id="s-vision" placeholder="Describe what you're trying to achieve. What would be different for students if this project succeeds?" style="width:100%;min-height:70px;"></textarea>
+    </div>
+    <div class="field">
+      <label>Who is the target audience for this project?</label>
+      <textarea id="s-audience" placeholder="e.g. Undergraduate students in introductory biology courses; approximately 120 students per semester across 3 sections" style="width:100%;min-height:60px;"></textarea>
+    </div>
+    <div class="field">
+      <label>Have you done anything like this before? What did or didn't work?</label>
+      <textarea id="s-prior" placeholder="Any prior experience with similar interventions, even informally, is useful context." style="width:100%;min-height:60px;"></textarea>
+    </div>
+  </div>
+
+  <!-- IRB -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-icon">⚖️</div>
+      <div>
+        <div class="card-title">IRB Consideration — Do you need ethics approval?</div>
+        <div class="card-sub">Required reading before your project begins</div>
+      </div>
+    </div>
+
+    <div class="alert alert-amber">
+      <strong>What is IRB?</strong> The Institutional Review Board (IRB) is the university body that reviews research involving human subjects to ensure it is conducted ethically. You may be required to obtain IRB approval before collecting any data from students — even surveys.
+    </div>
+
+    <div class="alert alert-blue">
+      <strong>Why this matters for teaching projects:</strong> Many faculty don't realize that projects in the Scholarship of Teaching and Learning (SoTL) and Educational Research often require IRB approval — even when the intent is to improve teaching rather than conduct traditional research. If you plan to collect, analyze, or publish findings from student data (surveys, grades, work samples, interviews), IRB review is likely required. Starting data collection before approval can invalidate your findings entirely and put you and your students at risk.
+    </div>
+
+    <div class="section-label" style="margin-bottom:10px;">Where does your project likely fall?</div>
+    <div class="irb-options">
+      <div class="irb-option" id="irb-opt-yes" onclick="selectIRB('yes')">
+        <div class="opt-icon">📋</div>
+        <div class="opt-label">IRB likely needed</div>
+        <div class="opt-desc">I plan to collect student data and analyze or publish findings</div>
+      </div>
+      <div class="irb-option" id="irb-opt-maybe" onclick="selectIRB('maybe')">
+        <div class="opt-icon">🤔</div>
+        <div class="opt-label">Not sure</div>
+        <div class="opt-desc">I'm uncertain whether my data collection requires approval</div>
+      </div>
+      <div class="irb-option" id="irb-opt-no" onclick="selectIRB('no')">
+        <div class="opt-icon">✅</div>
+        <div class="opt-label">IRB not needed</div>
+        <div class="opt-desc">This is purely a teaching improvement project with no data collection for research purposes</div>
+      </div>
+    </div>
+
+    <div id="irb-guidance" style="display:none;"></div>
+
+    <div class="field" style="margin-top:10px;">
+      <label>IRB status / notes</label>
+      <input type="text" id="s-irb-notes" placeholder="e.g. Application submitted Oct 2024, awaiting approval; or: Exempt determination received Nov 2024" style="width:100%;"/>
+    </div>
+
+    <div style="margin-top:6px;">
+      <a href="https://www.bu.edu/research/ethics-compliance/human-subjects/" target="_blank" style="font-size:13px;color:var(--blue);">BU IRB Office → bu.edu/research/ethics-compliance/human-subjects/</a>
+    </div>
+  </div>
+
+  <!-- Support Needs -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-icon">🛠️</div>
+      <div><div class="card-title">Project Support Needs & Capacity</div><div class="card-sub">Think through what your project will require</div></div>
+    </div>
+
+    <div class="alert alert-navy">
+      Answer honestly — these questions help you identify gaps early, before they become mid-project blockers.
+    </div>
+
+    <div class="section-label">Media & Content Production</div>
+    <div class="field">
+      <label>Will your project require creating videos, graphics, or other media?</label>
+      <select id="s-media" style="width:100%;" onchange="showMediaNote()">
+        <option value="">— Select —</option>
+        <option value="yes">Yes — video, animation, graphics, or other media</option>
+        <option value="maybe">Possibly — still determining scope</option>
+        <option value="no">No — no media production needed</option>
+      </select>
+      <div id="media-note" class="hint" style="display:none;color:var(--amber-text);">Media production involves real costs and lead time. Budget for this early — production support, licensing stock footage or music, accessibility requirements (captions, audio descriptions) can all add up. Factor this into your timeline.</div>
+    </div>
+
+    <div class="section-label" style="margin-top:14px;">Data & Analytics</div>
+    <div class="field">
+      <label>Will you need to analyze learning data (grades, LMS data, survey results)?</label>
+      <select id="s-data" style="width:100%;" onchange="showDataNote()">
+        <option value="">— Select —</option>
+        <option value="yes-support">Yes — and I will need analytical support</option>
+        <option value="yes-self">Yes — and my team can handle the analysis</option>
+        <option value="maybe">Possibly — still determining scope</option>
+        <option value="no">No data analysis anticipated</option>
+      </select>
+      <div id="data-note" class="hint" style="display:none;color:var(--amber-text);">If you need data analysis support, plan for this well in advance. Options include hiring a graduate student with quantitative skills, collaborating with a colleague who has that expertise, or consulting with BU's Institutional Research office. This should be factored into your budget and timeline from the start.</div>
+    </div>
+
+    <div class="section-label" style="margin-top:14px;">Technology</div>
+    <div class="field">
+      <label>Will your project require technology tools, platforms, or software?</label>
+      <textarea id="s-tech" placeholder="List any tools, platforms, apps, or software you plan to use or are considering. Include tools you already have access to and any you would need to acquire." style="width:100%;min-height:60px;"></textarea>
+    </div>
+    <div id="tech-checklist" class="alert alert-amber" style="margin-top:8px;">
+      <strong>Technology checklist:</strong> For any new technology tools, your project should consider: (1) <strong>Accessibility</strong> — does it meet WCAG standards and work with screen readers? (2) <strong>Privacy</strong> — does it comply with FERPA for student data? (3) <strong>Security</strong> — does it meet BU's data security requirements? (4) <strong>Cost</strong> — licenses, per-seat fees, renewal costs. (5) <strong>Vendor contracts</strong> — some tools require a formal Statement of Work reviewed by BU's legal team, which takes time. Do not assume a tool is approved for use simply because it is popular.
+    </div>
+
+    <div class="section-label" style="margin-top:14px;">Student Workers</div>
+    <div class="field">
+      <label>Do you plan to hire student workers (undergraduate or graduate)?</label>
+      <select id="s-workers" style="width:100%;" onchange="showWorkerNote()">
+        <option value="">— Select —</option>
+        <option value="yes-grad">Yes — graduate student(s)</option>
+        <option value="yes-undergrad">Yes — undergraduate student(s)</option>
+        <option value="yes-both">Yes — both graduate and undergraduate</option>
+        <option value="no">No student workers planned</option>
+      </select>
+      <div id="worker-note" class="hint" style="display:none;color:var(--amber-text);">Hiring student workers involves administrative steps that take longer than most faculty expect. You will need to post positions, conduct interviews, complete HR onboarding paperwork, and set up payroll — plan for 4–6 weeks minimum before a student worker can begin paid work. If your project depends on student worker contributions early in the semester, begin this process before the semester starts. Also confirm with your department whether a stipend or hourly employment is more appropriate for your project.</div>
+    </div>
+
+    <div class="section-label" style="margin-top:14px;">Time & Availability</div>
+    <div class="field">
+      <label>What are your team's significant availability constraints?</label>
+      <textarea id="s-availability" placeholder="e.g. Faculty lead on sabbatical spring semester; co-investigator on 9-month contract (unavailable July-August without stipend); teaching 3 courses fall semester; service commitments on two major committees" style="width:100%;min-height:70px;"></textarea>
+      <div class="hint">Be specific. A realistic picture of availability is essential for building a workable timeline. If team members are on 9-month contracts and the grant does not include summer stipends, project work may need to pause or slow significantly during summer months.</div>
+    </div>
+
+    <div class="section-label" style="margin-top:14px;">Prioritization</div>
+    <div class="field">
+      <label>What elements of this project are must-have vs. nice-to-have?</label>
+      <textarea id="s-priorities" placeholder="e.g. Must-have: redesigned assignment sequence, pre/post survey. Nice-to-have: student interviews, video documentation of process" style="width:100%;min-height:60px;"></textarea>
+    </div>
+  </div>
+
+  <div style="display:flex;gap:10px;justify-content:flex-end;">
+    <button onclick="saveSetup()" class="btn-primary">Save project setup</button>
+    <button onclick="aiScopeReview()" class="btn-gold">Get scoping feedback ↗</button>
+  </div>
+  <div id="scope-output" style="margin-top:16px;"></div>
+
+</div><!-- end setup -->
+
+
+<!-- ══════════════════════════════════════════════
+     TAB 2: IMPACT EVALUATION FRAMEWORK
+══════════════════════════════════════════════ -->
+<div id="tab-impact" class="panel">
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-icon">📊</div>
+      <div>
+        <div class="card-title">Impact Evaluation Framework</div>
+        <div class="card-sub">Boston University Institute for Excellence in Teaching & Learning</div>
+      </div>
+    </div>
+    <p style="font-size:14px;color:var(--text2);line-height:1.7;margin-bottom:16px;">
+      This framework is the backbone of your project's impact measurement. Work through each column from left to right — each one builds on the last. Use the guided conversation below to think through your responses before filling in the framework. You can return to this and refine it as your project evolves.
+    </p>
+    <div class="alert alert-blue">
+      <strong>How to use this:</strong> Start with the AI conversation below to talk through your thinking. Then fill in the framework columns. Your entries are saved automatically and will inform your survey design, data collection plan, and final report.
+    </div>
+  </div>
+
+  <!-- Guided AI Conversation -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-icon">💬</div>
+      <div><div class="card-title">Guided Framework Conversation</div><div class="card-sub">Talk through your thinking before filling in the framework</div></div>
+    </div>
+    <div class="guide-chips">
+      <button class="chip" onclick="impactChip(this)">Help me identify my core objectives</button>
+      <button class="chip" onclick="impactChip(this)">What learning outcomes should I be measuring?</button>
+      <button class="chip" onclick="impactChip(this)">Help me think through what data to collect</button>
+      <button class="chip" onclick="impactChip(this)">What does a good survey question look like for this?</button>
+      <button class="chip" onclick="impactChip(this)">How do I set realistic targets?</button>
+      <button class="chip" onclick="impactChip(this)">Review my framework entries and give feedback</button>
+    </div>
+    <div class="field">
+      <textarea id="impact-input" placeholder="Describe your project's pedagogical goals or ask a specific question about measuring impact…" style="width:100%;min-height:65px;"></textarea>
+    </div>
+    <div style="display:flex;gap:8px;">
+      <button class="btn-primary" onclick="askImpact()">Ask your guide ↗</button>
+      <button onclick="document.getElementById('impact-input').value='';document.getElementById('impact-output').innerHTML='';">Clear</button>
+    </div>
+    <div id="impact-output" style="margin-top:14px;"></div>
+  </div>
+
+  <!-- The Framework Grid -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-icon">🗂️</div>
+      <div><div class="card-title">Your Framework</div><div class="card-sub">Fill in each column — save often</div></div>
+    </div>
+
+    <div style="overflow-x:auto;">
+      <div class="framework-grid" style="min-width:700px;">
+        <div class="fw-col">
+          <div class="fw-header">Problems<br/><span style="font-weight:300;font-size:10px;">What major learning/pedagogical challenges?</span></div>
+          <div class="fw-body">
+            <div class="fw-question">What specific problems are you observing in student learning or your teaching?</div>
+            <textarea id="fw-problems" placeholder="e.g. Students struggle to transfer conceptual understanding to novel problems; low engagement in large lecture format…" oninput="autoSaveFramework()"></textarea>
+          </div>
+        </div>
+        <div class="fw-col">
+          <div class="fw-header gold">Objectives<br/><span style="font-weight:300;font-size:10px;">Core objectives in addressing these challenges?</span></div>
+          <div class="fw-body">
+            <div class="fw-question">What do you want to achieve? Write specific, observable objectives.</div>
+            <textarea id="fw-objectives" placeholder="e.g. Students will demonstrate improved ability to apply concepts to unfamiliar contexts; increase active participation by 40%…" oninput="autoSaveFramework()"></textarea>
+          </div>
+        </div>
+        <div class="fw-col">
+          <div class="fw-header">Impacts<br/><span style="font-weight:300;font-size:10px;">What impacts/outcomes to measure?<br/>(Learning constructs & skills)</span></div>
+          <div class="fw-body">
+            <div class="fw-question">Given your objectives, what changes in student learning or behavior do you want to observe?</div>
+            <textarea id="fw-impacts" placeholder="e.g. Increased self-efficacy in problem-solving; improved critical thinking; greater sense of belonging in STEM…" oninput="autoSaveFramework()"></textarea>
+          </div>
+        </div>
+        <div class="fw-col">
+          <div class="fw-header gold">Measures & Targets<br/><span style="font-weight:300;font-size:10px;">What data points are good indicators? What targets to hit?</span></div>
+          <div class="fw-body">
+            <div class="fw-question">How will you know change has occurred? Set specific, measurable indicators and targets.</div>
+            <textarea id="fw-measures" placeholder="e.g. Pre/post survey (self-efficacy scale); exam performance on transfer questions; attendance; 75% of students score 3+ on rubric…" oninput="autoSaveFramework()"></textarea>
+          </div>
+        </div>
+        <div class="fw-col">
+          <div class="fw-header teal">Data Collection<br/><span style="font-weight:300;font-size:10px;">How to collect the data? Source & frequency?</span></div>
+          <div class="fw-body">
+            <div class="fw-question">Where will your data come from and how often will you collect it?</div>
+            <textarea id="fw-collection" placeholder="e.g. Qualtrics survey (pre: week 1, post: week 15); Blackboard grade exports; course observation notes (bi-weekly); student focus group (end of semester)…" oninput="autoSaveFramework()"></textarea>
+          </div>
+        </div>
+        <div class="fw-col">
+          <div class="fw-header">Data Analysis<br/><span style="font-weight:300;font-size:10px;">How to measure outcomes with collected data?</span></div>
+          <div class="fw-body">
+            <div class="fw-question">How will you analyze the data? Who will do it? Do you need analytical support?</div>
+            <textarea id="fw-analysis" placeholder="e.g. Paired t-test on pre/post scores; thematic coding of open-ended responses; descriptive statistics on participation rates; graduate student will lead analysis with faculty oversight…" oninput="autoSaveFramework()"></textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex;gap:10px;margin-top:16px;justify-content:flex-end;">
+      <button onclick="saveFramework()" class="btn-primary">Save framework</button>
+      <button onclick="reviewFramework()" class="btn-gold">Ask guide to review ↗</button>
+    </div>
+    <div id="framework-review" style="margin-top:14px;"></div>
+  </div>
+
+</div><!-- end impact -->
+
+
+<!-- ══════════════════════════════════════════════
+     TAB 3: MILESTONES & TIMELINE
+══════════════════════════════════════════════ -->
+<div id="tab-milestones" class="panel">
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-icon">🗓️</div>
+      <div><div class="card-title">Project Milestones & Timeline</div><div class="card-sub">Based on the Shipley project timeline structure</div></div>
+    </div>
+    <p style="font-size:14px;color:var(--text2);line-height:1.7;">
+      Shipley projects typically follow four milestones. Check off tasks as you complete them, add notes, and flag blockers. Use the guide to think through sequencing or troubleshoot delays.
+    </p>
+  </div>
+
+  <!-- Milestone 1 -->
+  <div class="milestone">
+    <div class="milestone-header" onclick="toggleMilestone('m1')">
+      <div class="milestone-num">1</div>
+      <div class="milestone-title">Prepare</div>
+      <div class="milestone-status" id="m1-status">0 of 8 complete</div>
+    </div>
+    <div class="milestone-body" id="m1-body">
+      <div class="alert alert-amber" style="margin-bottom:14px;">
+        <strong>Key blocker to watch:</strong> IRB approval and student worker hiring both take longer than expected. If your project depends on either, begin these processes immediately — before the semester starts if possible.
+      </div>
+      <div id="m1-tasks"></div>
+      <div style="margin-top:12px;">
+        <div class="section-label">Milestone 1 notes</div>
+        <textarea id="m1-notes" placeholder="Notes, blockers, or context for this milestone…" style="width:100%;min-height:60px;" oninput="saveMilestones()"></textarea>
+      </div>
+    </div>
+  </div>
+
+  <!-- Milestone 2 -->
+  <div class="milestone">
+    <div class="milestone-header" onclick="toggleMilestone('m2')">
+      <div class="milestone-num">2</div>
+      <div class="milestone-title">Conduct Courses & Gather Data</div>
+      <div class="milestone-status" id="m2-status">0 of 5 complete</div>
+    </div>
+    <div class="milestone-body" id="m2-body" style="display:none;">
+      <div class="alert alert-blue" style="margin-bottom:14px;">
+        <strong>Data collection reminder:</strong> Do not begin collecting data from students until IRB approval (if required) is confirmed. Make sure your survey instrument has been piloted before full deployment.
+      </div>
+      <div id="m2-tasks"></div>
+      <div style="margin-top:12px;">
+        <div class="section-label">Milestone 2 notes</div>
+        <textarea id="m2-notes" placeholder="Notes, blockers, or context for this milestone…" style="width:100%;min-height:60px;" oninput="saveMilestones()"></textarea>
+      </div>
+    </div>
+  </div>
+
+  <!-- Milestone 3 -->
+  <div class="milestone">
+    <div class="milestone-header" onclick="toggleMilestone('m3')">
+      <div class="milestone-num">3</div>
+      <div class="milestone-title">Analyze & Share Findings</div>
+      <div class="milestone-status" id="m3-status">0 of 5 complete</div>
+    </div>
+    <div class="milestone-body" id="m3-body" style="display:none;">
+      <div class="alert alert-green" style="margin-bottom:14px;">
+        <strong>Dissemination tip:</strong> The IETL Showcase is a key opportunity to share your work with the BU community. Conference submissions and journal articles reach broader audiences — your guide can help you identify appropriate venues for SoTL publication.
+      </div>
+      <div id="m3-tasks"></div>
+      <div style="margin-top:12px;">
+        <div class="section-label">Milestone 3 notes</div>
+        <textarea id="m3-notes" placeholder="Notes, blockers, or context for this milestone…" style="width:100%;min-height:60px;" oninput="saveMilestones()"></textarea>
+      </div>
+    </div>
+  </div>
+
+  <!-- Milestone 4 -->
+  <div class="milestone">
+    <div class="milestone-header" onclick="toggleMilestone('m4')">
+      <div class="milestone-num">4</div>
+      <div class="milestone-title">Reflect, Iterate & Scale</div>
+      <div class="milestone-status" id="m4-status">0 of 4 complete</div>
+    </div>
+    <div class="milestone-body" id="m4-body" style="display:none;">
+      <div id="m4-tasks"></div>
+      <div style="margin-top:12px;">
+        <div class="section-label">Milestone 4 notes</div>
+        <textarea id="m4-notes" placeholder="Notes, blockers, or context for this milestone…" style="width:100%;min-height:60px;" oninput="saveMilestones()"></textarea>
+      </div>
+    </div>
+  </div>
+
+  <!-- Custom Tasks -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-icon">➕</div>
+      <div><div class="card-title">Add a custom task</div><div class="card-sub">For project-specific steps not covered above</div></div>
+    </div>
+    <div class="grid2">
+      <div class="field">
+        <label>Task description</label>
+        <input type="text" id="ct-name" placeholder="e.g. Schedule vendor demo call" style="width:100%;"/>
+      </div>
+      <div class="field">
+        <label>Milestone</label>
+        <select id="ct-milestone" style="width:100%;">
+          <option value="m1">Milestone 1: Prepare</option>
+          <option value="m2">Milestone 2: Conduct & Gather</option>
+          <option value="m3">Milestone 3: Analyze & Share</option>
+          <option value="m4">Milestone 4: Iterate & Scale</option>
+        </select>
+      </div>
+    </div>
+    <div class="grid2">
+      <div class="field">
+        <label>Lead</label>
+        <input type="text" id="ct-lead" placeholder="e.g. Faculty lead" style="width:100%;"/>
+      </div>
+      <div class="field">
+        <label>Target date</label>
+        <input type="date" id="ct-date" style="width:100%;"/>
+      </div>
+    </div>
+    <button class="btn-primary" onclick="addCustomTask()">Add task</button>
+  </div>
+
+  <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:4px;">
+    <button onclick="aiTimelineHelp()" class="btn-gold">Ask guide about my timeline ↗</button>
+  </div>
+  <div id="timeline-output" style="margin-top:16px;"></div>
+
+</div><!-- end milestones -->
+
+
+<!-- ══════════════════════════════════════════════
+     TAB 4: BUDGET TRACKER
+══════════════════════════════════════════════ -->
+<div id="tab-budget" class="panel">
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-icon">💰</div>
+      <div><div class="card-title">Budget Tracker</div><div class="card-sub">Track spending against your grant award</div></div>
+    </div>
+    <div class="alert alert-amber">
+      <strong>Budget tips:</strong> Keep receipts and documentation for all expenditures. Some grant categories (especially personnel) have specific tax and HR implications. Contact your department's grants administrator before making large purchases or hiring decisions. Unspent funds may need to be returned at project close.
+    </div>
+
+    <div style="overflow-x:auto;margin-top:8px;">
+      <table class="budget-table" id="budget-table">
+        <thead>
+          <tr>
+            <th style="width:30%;">Line item</th>
+            <th style="width:20%;">Category</th>
+            <th style="width:15%;">Budgeted ($)</th>
+            <th style="width:15%;">Spent ($)</th>
+            <th style="width:18%;">Notes</th>
+            <th style="width:2%;"></th>
+          </tr>
+        </thead>
+        <tbody id="budget-body"></tbody>
+      </table>
+      <div class="budget-remaining" id="budget-remaining">
+        <span>Grant total: <strong id="br-total">$0</strong></span>
+        <span>Total budgeted: <strong id="br-budgeted">$0</strong></span>
+        <span>Total spent: <strong id="br-spent">$0</strong></span>
+      </div>
+      <div class="budget-total">
+        <span>Remaining (grant - spent)</span>
+        <span id="br-remaining">$0</span>
+      </div>
+    </div>
+
+    <div style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap;">
+      <button class="btn-primary" onclick="addBudgetRow()">+ Add line item</button>
+      <button onclick="saveBudget()">Save budget</button>
+      <button onclick="aibudgethelp()" class="btn-gold">Ask guide about budget ↗</button>
+    </div>
+    <div id="budget-output" style="margin-top:14px;"></div>
+  </div>
+
+</div><!-- end budget -->
+
+
+<!-- ══════════════════════════════════════════════
+     TAB 5: PROJECT REPORT
+══════════════════════════════════════════════ -->
+<div id="tab-report" class="panel">
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-icon">📄</div>
+      <div>
+        <div class="card-title">Project Report</div>
+        <div class="card-sub">Based on the Shipley Pilot Project Report Template</div>
+      </div>
+    </div>
+    <p style="font-size:14px;color:var(--text2);line-height:1.7;margin-bottom:12px;">
+      Build your report progressively throughout the project — don't wait until the end. Each section below maps directly to the Shipley report template. Your guide can help you draft any section.
+    </p>
+    <div class="alert alert-blue">
+      <strong>Dissemination goals:</strong> Beyond the project report, consider whether your findings are appropriate for conference presentation or journal publication. SoTL venues like the International Society for the Scholarship of Teaching and Learning (ISSOTL) and discipline-specific teaching journals are good starting points. Ask your guide for suggestions relevant to your field.
+    </div>
+  </div>
+
+  <div class="card">
+    <!-- Auto-populated title page info -->
+    <div id="report-title-preview" class="alert alert-navy" style="margin-bottom:16px;font-size:13px;line-height:1.8;"></div>
+
+    <div class="report-section">
+      <h3>Project Team and Roles</h3>
+      <div class="prompt">List all team members, their titles, and their roles within the project. Note any special contributions.</div>
+      <textarea id="r-team" placeholder="This will pre-populate from your Project Setup if you've filled it in." style="width:100%;min-height:80px;" oninput="saveReport()"></textarea>
+    </div>
+
+    <div class="report-section">
+      <h3>Project Goal and Objectives</h3>
+      <div class="prompt">Describe the need addressed, the target audience, and your theory of change — how does this intervention lead to improved learning?</div>
+      <textarea id="r-goals" placeholder="Draw from your project setup and impact evaluation framework." style="width:100%;min-height:90px;" oninput="saveReport()"></textarea>
+    </div>
+
+    <div class="report-section">
+      <h3>Milestones & Outcomes Achieved</h3>
+      <div class="prompt">List each milestone and outcome achieved. For anything not yet achieved or changed from the original plan, briefly explain why.</div>
+      <textarea id="r-milestones" placeholder="e.g. Milestone 1 (Prepare): Completed August 2024. IRB exempt determination received September 15. Student worker hired and onboarded October 1…" style="width:100%;min-height:100px;" oninput="saveReport()"></textarea>
+    </div>
+
+    <div class="report-section">
+      <h3>Impact</h3>
+      <div class="prompt">What changed as a result of this project? Describe changes observed by the course team or reported by students. Reference your Impact Evaluation Framework data.</div>
+      <textarea id="r-impact" placeholder="e.g. Pre/post survey results showed a statistically significant increase in student self-efficacy scores (mean increase 0.8 on a 5-point scale, p < .05). Students reported…" style="width:100%;min-height:100px;" oninput="saveReport()"></textarea>
+    </div>
+
+    <div class="report-section">
+      <h3>Challenges</h3>
+      <div class="prompt">What risks and challenges arose? How did you address them? What support would have been valuable?</div>
+      <textarea id="r-challenges" placeholder="e.g. Vendor contract negotiations took longer than anticipated, delaying technology implementation by 6 weeks. We addressed this by…" style="width:100%;min-height:90px;" oninput="saveReport()"></textarea>
+    </div>
+
+    <div class="report-section">
+      <h3>Lessons Learned</h3>
+      <div class="prompt">What did you learn from challenges, stakeholders, and the process itself? What emerged as best practices?</div>
+      <textarea id="r-lessons" placeholder="e.g. Starting IRB paperwork in the summer before the project semester is essential. Faculty collaborators need protected time built into the timeline…" style="width:100%;min-height:90px;" oninput="saveReport()"></textarea>
+    </div>
+
+    <div class="report-section">
+      <h3>Next Steps & Future Plans</h3>
+      <div class="prompt">If ongoing: what are the next milestones? If complete: how will the project's impact continue? Will it be scaled, adapted, or published?</div>
+      <textarea id="r-next" placeholder="e.g. We plan to submit findings to the Journal of Excellence in College Teaching. The revised assignment sequence will be adopted across all sections of BIO 101 beginning Spring 2026…" style="width:100%;min-height:90px;" oninput="saveReport()"></textarea>
+    </div>
+
+    <div style="display:flex;gap:10px;margin-top:8px;flex-wrap:wrap;">
+      <button onclick="saveReport()" class="btn-primary">Save report</button>
+      <button onclick="aiReportHelp()" class="btn-gold">Ask guide to help draft ↗</button>
+      <button onclick="prefillReport()">Pre-fill from my project data</button>
+    </div>
+    <div id="report-output" style="margin-top:14px;"></div>
+  </div>
+
+</div><!-- end report -->
+
+
+<!-- ══════════════════════════════════════════════
+     TAB 6: ASK YOUR GUIDE
+══════════════════════════════════════════════ -->
+<div id="tab-guide" class="panel">
+
+  <div class="welcome-card">
+    <h2>Your Guide</h2>
+    <div class="gold-line"></div>
+    <p>Ask anything about your project — planning, impact measurement, navigating blockers, drafting survey questions, thinking through your data, or preparing for dissemination. Your guide understands the Shipley project framework and will draw on your project details to give you relevant, specific advice.</p>
+  </div>
+
+  <div class="card">
+    <div class="guide-chips">
+      <button class="chip" onclick="guideChip(this)">How do I write a good survey for my project?</button>
+      <button class="chip" onclick="guideChip(this)">We're behind on our timeline — help me think through options</button>
+      <button class="chip" onclick="guideChip(this)">What SoTL journals should I consider for publication?</button>
+      <button class="chip" onclick="guideChip(this)">Help me think through my data analysis plan</button>
+      <button class="chip" onclick="guideChip(this)">We need to hire a graduate student — what should I know?</button>
+      <button class="chip" onclick="guideChip(this)">How do I approach a vendor contract at BU?</button>
+      <button class="chip" onclick="guideChip(this)">What accessibility requirements apply to my technology?</button>
+      <button class="chip" onclick="guideChip(this)">Help me think through incentivizing students to complete surveys</button>
+      <button class="chip" onclick="guideChip(this)">What should I present at the IETL Showcase?</button>
+    </div>
+    <div class="field">
+      <textarea id="guide-input" placeholder="Ask your guide anything about your project…" style="width:100%;min-height:80px;"></textarea>
+    </div>
+    <div style="display:flex;gap:8px;">
+      <button class="btn-primary" onclick="askGuide()">Ask ↗</button>
+      <button onclick="document.getElementById('guide-input').value='';document.getElementById('guide-output').innerHTML='';">Clear</button>
+    </div>
+    <div id="guide-output" style="margin-top:16px;"></div>
+  </div>
+
+</div><!-- end guide -->
+
+</div><!-- end main -->
+
+<!-- SAVE INDICATOR -->
+<div class="save-bar" id="save-bar">Saved ✓</div>
+
+<script>
+// ═══════════════════════════════════════════════════════
+// SYSTEM PROMPT
+// ═══════════════════════════════════════════════════════
+const SYSTEM = `You are the Shipley Academic Innovation Project Guide, a knowledgeable and collegial advisor for faculty teams at Boston University conducting pedagogical innovation projects funded by the Shipley Academic Innovation fund through the Institute for Excellence in Teaching & Learning (IETL).
+
+Your role: help faculty teams plan, execute, measure, and report on innovative teaching and learning projects. You are a peer — warm, direct, and expert — not a bureaucrat. You treat faculty as capable professionals who need specific guidance in areas outside their typical expertise: project management, impact measurement, data collection, and educational research methodology.
+
+Key knowledge you bring:
+- The Shipley project framework: four milestones (Prepare → Conduct & Gather Data → Analyze & Share Findings → Reflect/Iterate/Scale)
+- The Impact Evaluation Framework: Problems → Objectives → Impacts → Measures & Targets → Data Collection → Data Analysis
+- IRB requirements for Scholarship of Teaching and Learning (SoTL) and Educational Research — many faculty don't realize these projects may require IRB review
+- Common project blockers: student worker hiring takes 4-6 weeks; vendor contracts require BU legal review; technology tools need accessibility/privacy/security vetting; 9-month faculty contracts affect summer availability
+- Technology considerations: FERPA compliance for student data, WCAG accessibility standards, BU data security requirements
+- Survey design for educational research: validated scales, pre/post design, incentive strategies
+- Data analysis options: paired t-tests for pre/post, thematic coding for qualitative data, descriptive statistics
+- SoTL dissemination: ISSOTL, discipline-specific teaching journals, conference venues
+- BU context: IETL Showcase as a dissemination venue, BU IRB office, BU grants administration
+
+Tone: Collegial and direct. You are a knowledgeable colleague, not a help desk. Be specific. Don't hedge unnecessarily. When faculty describe a plan that has a real problem, name it clearly and helpfully.
+
+Always draw on the faculty's specific project context when available. Reference their project title, goals, team, and framework entries to give relevant, personalized advice.`;
+
+// ═══════════════════════════════════════════════════════
+// STORAGE
+// ═══════════════════════════════════════════════════════
+const KEY = 'shipley_guide_v1';
+
+function loadAll(){
+  try {
+    const raw = localStorage.getItem(KEY);
+    return raw ? JSON.parse(raw) : {};
+  } catch(e){ return {}; }
+}
+
+function saveAll(data){
+  try {
+    localStorage.setItem(KEY, JSON.stringify(data));
+    flashSave();
+  } catch(e){ console.error('Save failed',e); }
+}
+
+function flashSave(){
+  const bar = document.getElementById('save-bar');
+  bar.classList.add('show');
+  setTimeout(()=>bar.classList.remove('show'), 2000);
+}
+
+// ═══════════════════════════════════════════════════════
+// TABS
+// ═══════════════════════════════════════════════════════
+function switchTab(name, btn){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('tab-'+name).classList.add('active');
+}
+
+// ═══════════════════════════════════════════════════════
+// PROJECT NAME
+// ═══════════════════════════════════════════════════════
+function updateProjectName(){
+  const title = document.getElementById('s-title').value.trim();
+  document.getElementById('header-project-name').textContent = title || 'No project loaded';
+  updateReportTitlePreview();
+}
+
+// ═══════════════════════════════════════════════════════
+// IRB
+// ═══════════════════════════════════════════════════════
+function selectIRB(val){
+  ['yes','maybe','no'].forEach(v=>{
+    document.getElementById('irb-opt-'+v).classList.toggle('selected', v===val);
+  });
+  const g = document.getElementById('irb-guidance');
+  g.style.display='block';
+  const msgs = {
+    yes:`<div class="alert alert-amber"><strong>Action required before data collection:</strong> You should submit an IRB application before collecting any data from students. Visit the BU IRB office website to determine whether your study qualifies for exempt, expedited, or full board review. Exempt review (the most common for SoTL) is still a formal process — do not assume exemption without official confirmation. Plan for 4–8 weeks for the review process. Contact the BU IRB office: <a href="https://www.bu.edu/research/ethics-compliance/human-subjects/" target="_blank" style="color:var(--blue);">bu.edu/research/ethics-compliance/human-subjects</a></div>`,
+    maybe:`<div class="alert alert-amber"><strong>Seek clarification before proceeding:</strong> When in doubt, consult the BU IRB office. They can help you determine whether your project requires review. It is always safer to ask than to assume you don't need approval — collecting data without proper approval can invalidate your findings and create serious compliance issues. Contact: <a href="https://www.bu.edu/research/ethics-compliance/human-subjects/" target="_blank" style="color:var(--blue);">bu.edu/research/ethics-compliance/human-subjects</a></div>`,
+    no:`<div class="alert alert-green"><strong>Noted.</strong> If your project later evolves to include data collection for research or publication purposes, revisit this determination. Keep a brief note of why you determined IRB was not needed — this is good practice if questions arise later.</div>`
+  };
+  g.innerHTML = msgs[val]||'';
+  const data = loadAll();
+  data.irb_status = val;
+  saveAll(data);
+}
+
+// ═══════════════════════════════════════════════════════
+// CONDITIONAL NOTES
+// ═══════════════════════════════════════════════════════
+function showMediaNote(){
+  const v = document.getElementById('s-media').value;
+  document.getElementById('media-note').style.display = v==='yes'||v==='maybe' ? 'block':'none';
+}
+function showDataNote(){
+  const v = document.getElementById('s-data').value;
+  document.getElementById('data-note').style.display = v==='yes-support' ? 'block':'none';
+}
+function showWorkerNote(){
+  const v = document.getElementById('s-workers').value;
+  document.getElementById('worker-note').style.display = v&&v!=='no' ? 'block':'none';
+}
+
+// ═══════════════════════════════════════════════════════
+// SAVE / LOAD SETUP
+// ═══════════════════════════════════════════════════════
+function saveSetup(){
+  const data = loadAll();
+  data.setup = {
+    title: document.getElementById('s-title').value,
+    lead: document.getElementById('s-lead').value,
+    dept: document.getElementById('s-dept').value,
+    team: document.getElementById('s-team').value,
+    start: document.getElementById('s-start').value,
+    end: document.getElementById('s-end').value,
+    grant: document.getElementById('s-grant').value,
+    challenge: document.getElementById('s-challenge').value,
+    vision: document.getElementById('s-vision').value,
+    audience: document.getElementById('s-audience').value,
+    prior: document.getElementById('s-prior').value,
+    media: document.getElementById('s-media').value,
+    data_needs: document.getElementById('s-data').value,
+    tech: document.getElementById('s-tech').value,
+    workers: document.getElementById('s-workers').value,
+    availability: document.getElementById('s-availability').value,
+    priorities: document.getElementById('s-priorities').value,
+    irb_notes: document.getElementById('s-irb-notes').value,
+  };
+  saveAll(data);
+  updateBudgetTotal();
+  updateReportTitlePreview();
+}
+
+function loadSetup(){
+  const data = loadAll();
+  const s = data.setup;
+  if(!s) return;
+  const fields = ['title','lead','dept','team','start','end','grant','challenge','vision','audience','prior','tech','availability','priorities'];
+  fields.forEach(f=>{
+    const el = document.getElementById('s-'+f);
+    if(el && s[f] !== undefined) el.value = s[f];
+  });
+  ['media','data_needs','workers'].forEach(f=>{
+    const el = document.getElementById('s-'+f.replace('_needs',''));
+    if(el && s[f]) el.value = s[f];
+  });
+  if(s.irb_notes) document.getElementById('s-irb-notes').value = s.irb_notes;
+  if(s.irb_status) selectIRB(s.irb_status);
+  updateProjectName();
+}
+
+// ═══════════════════════════════════════════════════════
+// FRAMEWORK
+// ═══════════════════════════════════════════════════════
+let fwSaveTimer;
+function autoSaveFramework(){
+  clearTimeout(fwSaveTimer);
+  fwSaveTimer = setTimeout(saveFramework, 1500);
+}
+
+function saveFramework(){
+  const data = loadAll();
+  data.framework = {
+    problems: document.getElementById('fw-problems').value,
+    objectives: document.getElementById('fw-objectives').value,
+    impacts: document.getElementById('fw-impacts').value,
+    measures: document.getElementById('fw-measures').value,
+    collection: document.getElementById('fw-collection').value,
+    analysis: document.getElementById('fw-analysis').value,
+  };
+  saveAll(data);
+}
+
+function loadFramework(){
+  const data = loadAll();
+  const fw = data.framework;
+  if(!fw) return;
+  ['problems','objectives','impacts','measures','collection','analysis'].forEach(f=>{
+    const el = document.getElementById('fw-'+f);
+    if(el && fw[f]) el.value = fw[f];
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+// MILESTONES
+// ═══════════════════════════════════════════════════════
+const MILESTONE_TASKS = {
+  m1: [
+    {name:'Confirm project team and assign roles', lead:'Faculty lead', blocker:null},
+    {name:'Determine IRB status — submit application if required', lead:'Faculty lead', blocker:'IRB review can take 4–8 weeks. Do not collect data before approval.'},
+    {name:'Identify and vet any technology tools (accessibility, privacy, security)', lead:'Faculty lead', blocker:'Vendor contracts may require BU legal review — start early.'},
+    {name:'Post and hire student worker positions (if applicable)', lead:'Faculty lead', blocker:'Hiring and HR onboarding takes 4–6 weeks minimum.'},
+    {name:'Finalize vendor agreements / licenses (if applicable)', lead:'Faculty lead', blocker:null},
+    {name:'Complete Impact Evaluation Framework (Problems through Data Analysis)', lead:'Full team', blocker:null},
+    {name:'Develop data collection instruments (surveys, rubrics, observation protocols)', lead:'Full team', blocker:null},
+    {name:'Onboard and train student workers (if applicable)', lead:'Faculty lead', blocker:null},
+  ],
+  m2: [
+    {name:'Implement pedagogical intervention in course(s)', lead:'Piloting instructors', blocker:null},
+    {name:'Administer pre-intervention data collection (surveys, baseline measures)', lead:'Project team', blocker:null},
+    {name:'Collect ongoing data per your data collection plan', lead:'Project team', blocker:null},
+    {name:'Administer post-intervention data collection', lead:'Project team', blocker:null},
+    {name:'Collect teaching materials and artifacts for analysis', lead:'Project team', blocker:null},
+  ],
+  m3: [
+    {name:'Analyze collected data (quantitative and/or qualitative)', lead:'Project team', blocker:null},
+    {name:'Synthesize findings and draft impact narrative', lead:'Faculty lead', blocker:null},
+    {name:'Present at IETL Showcase or other campus venue', lead:'Faculty lead', blocker:null},
+    {name:'Complete project report', lead:'Faculty lead', blocker:null},
+    {name:'Identify and pursue publication or conference dissemination', lead:'Faculty lead', blocker:null},
+  ],
+  m4: [
+    {name:'Reflect on lessons learned — what would you do differently?', lead:'Full team', blocker:null},
+    {name:'Assess whether intervention should be adjusted for next iteration', lead:'Full team', blocker:null},
+    {name:'Develop plan to scale or sustain the intervention', lead:'Faculty lead', blocker:null},
+    {name:'Share resources and findings with IETL for broader dissemination', lead:'Faculty lead & IETL', blocker:null},
+  ]
+};
+
+let taskStates = {};
+let customTasks = [];
+
+function renderMilestones(){
+  const data = loadAll();
+  taskStates = data.task_states || {};
+  customTasks = data.custom_tasks || [];
+
+  ['m1','m2','m3','m4'].forEach(m=>{
+    const container = document.getElementById(m+'-tasks');
+    const tasks = MILESTONE_TASKS[m];
+    const custom = customTasks.filter(t=>t.milestone===m);
+    const allTasks = [...tasks.map((t,i)=>({...t,id:m+'_'+i,custom:false})), ...custom.map(t=>({...t,custom:true}))];
+
+    container.innerHTML = allTasks.map(t=>`
+      <div class="task-row">
+        <button class="task-check ${taskStates[t.id]?'done':''}" onclick="toggleMilestoneTask('${t.id}')"></button>
+        <div class="task-body">
+          <div class="task-name ${taskStates[t.id]?'done':''}">${t.name}</div>
+          <div class="task-lead">${t.lead||''}${t.date?' · Target: '+fmtDate(t.date):''}</div>
+          ${t.blocker?`<div class="task-blocker">⚠ ${t.blocker}</div>`:''}
+        </div>
+        ${t.custom?`<button class="task-check" style="border:none;font-size:13px;color:var(--text3);" onclick="removeCustomTask('${t.id}')">✕</button>`:''}
+      </div>`).join('');
+
+    const total = allTasks.length;
+    const done = allTasks.filter(t=>taskStates[t.id]).length;
+    document.getElementById(m+'-status').textContent = `${done} of ${total} complete`;
+  });
+
+  if(data.milestone_notes){
+    ['m1','m2','m3','m4'].forEach(m=>{
+      const el = document.getElementById(m+'-notes');
+      if(el && data.milestone_notes[m]) el.value = data.milestone_notes[m];
+    });
+  }
+}
+
+function toggleMilestoneTask(id){
+  taskStates[id] = !taskStates[id];
+  const data = loadAll();
+  data.task_states = taskStates;
+  saveAll(data);
+  renderMilestones();
+}
+
+function removeCustomTask(id){
+  customTasks = customTasks.filter(t=>t.id!==id);
+  const data = loadAll();
+  data.custom_tasks = customTasks;
+  saveAll(data);
+  renderMilestones();
+}
+
+function addCustomTask(){
+  const name = document.getElementById('ct-name').value.trim();
+  if(!name) return;
+  const id = 'custom_'+Date.now();
+  const task = {
+    id, name,
+    lead: document.getElementById('ct-lead').value,
+    date: document.getElementById('ct-date').value,
+    milestone: document.getElementById('ct-milestone').value,
+    custom: true
+  };
+  customTasks.push(task);
+  const data = loadAll();
+  data.custom_tasks = customTasks;
+  saveAll(data);
+  document.getElementById('ct-name').value = '';
+  document.getElementById('ct-lead').value = '';
+  document.getElementById('ct-date').value = '';
+  renderMilestones();
+}
+
+function saveMilestones(){
+  const data = loadAll();
+  data.milestone_notes = {
+    m1: document.getElementById('m1-notes').value,
+    m2: document.getElementById('m2-notes').value,
+    m3: document.getElementById('m3-notes').value,
+    m4: document.getElementById('m4-notes').value,
+  };
+  saveAll(data);
+}
+
+function toggleMilestone(id){
+  const body = document.getElementById(id+'-body');
+  body.style.display = body.style.display==='none' ? 'block':'none';
+}
+
+// ═══════════════════════════════════════════════════════
+// BUDGET
+// ═══════════════════════════════════════════════════════
+const BUDGET_CATS = ['Personnel — faculty stipend','Personnel — graduate student','Personnel — undergraduate student','Technology / software licenses','Vendor / contractor','Materials & supplies','Participant incentives','Travel & conference','Other'];
+let budgetRows = [];
+
+function updateBudgetTotal(){
+  const grant = parseFloat(document.getElementById('s-grant').value)||0;
+  const budgeted = budgetRows.reduce((s,r)=>s+(parseFloat(r.budgeted)||0),0);
+  const spent = budgetRows.reduce((s,r)=>s+(parseFloat(r.spent)||0),0);
+  const remaining = grant - spent;
+
+  document.getElementById('br-total').textContent = '$'+grant.toFixed(2);
+  document.getElementById('br-budgeted').textContent = '$'+budgeted.toFixed(2);
+  document.getElementById('br-spent').textContent = '$'+spent.toFixed(2);
+  document.getElementById('br-remaining').textContent = '$'+remaining.toFixed(2);
+
+  const remEl = document.getElementById('budget-remaining');
+  remEl.classList.toggle('budget-over', remaining<0);
+}
+
+function renderBudget(){
+  const tbody = document.getElementById('budget-body');
+  tbody.innerHTML = budgetRows.map((r,i)=>`
+    <tr>
+      <td><input type="text" value="${r.name||''}" placeholder="Line item description" onchange="budgetRows[${i}].name=this.value;saveBudget();"/></td>
+      <td>
+        <select onchange="budgetRows[${i}].cat=this.value;saveBudget();" style="width:100%;font-size:12px;padding:6px 8px;">
+          ${BUDGET_CATS.map(c=>`<option ${r.cat===c?'selected':''}>${c}</option>`).join('')}
+        </select>
+      </td>
+      <td><input type="number" value="${r.budgeted||''}" placeholder="0.00" onchange="budgetRows[${i}].budgeted=this.value;updateBudgetTotal();saveBudget();" style="text-align:right;"/></td>
+      <td><input type="number" value="${r.spent||''}" placeholder="0.00" onchange="budgetRows[${i}].spent=this.value;updateBudgetTotal();saveBudget();" style="text-align:right;"/></td>
+      <td><input type="text" value="${r.notes||''}" placeholder="Notes" onchange="budgetRows[${i}].notes=this.value;saveBudget();"/></td>
+      <td><button class="icon-btn" onclick="removeBudgetRow(${i})" style="border:none;background:none;cursor:pointer;color:var(--text3);font-size:13px;">✕</button></td>
+    </tr>`).join('');
+  updateBudgetTotal();
+}
+
+function addBudgetRow(){
+  budgetRows.push({name:'',cat:BUDGET_CATS[0],budgeted:'',spent:'',notes:''});
+  renderBudget();
+}
+
+function removeBudgetRow(i){
+  budgetRows.splice(i,1);
+  renderBudget();
+  saveBudget();
+}
+
+function saveBudget(){
+  const data = loadAll();
+  data.budget = budgetRows;
+  saveAll(data);
+}
+
+function loadBudget(){
+  const data = loadAll();
+  if(data.budget) budgetRows = data.budget;
+  renderBudget();
+}
+
+// ═══════════════════════════════════════════════════════
+// REPORT
+// ═══════════════════════════════════════════════════════
+function updateReportTitlePreview(){
+  const s = {
+    title: document.getElementById('s-title').value,
+    lead: document.getElementById('s-lead').value,
+    dept: document.getElementById('s-dept').value,
+    start: document.getElementById('s-start').value,
+    end: document.getElementById('s-end').value,
+  };
+  const el = document.getElementById('report-title-preview');
+  el.innerHTML = `<strong>${s.title||'[Project title]'}</strong><br/>
+    ${s.dept||'[Department]'} · Faculty lead: ${s.lead||'[Name]'}<br/>
+    Project period: ${s.start ? fmtDate(s.start) : '[Start]'} – ${s.end ? fmtDate(s.end) : '[End]'}<br/>
+    <span style="color:var(--text3);font-size:12px;">Report generated: ${new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'})}</span>`;
+}
+
+function saveReport(){
+  const data = loadAll();
+  data.report = {
+    team: document.getElementById('r-team').value,
+    goals: document.getElementById('r-goals').value,
+    milestones: document.getElementById('r-milestones').value,
+    impact: document.getElementById('r-impact').value,
+    challenges: document.getElementById('r-challenges').value,
+    lessons: document.getElementById('r-lessons').value,
+    next: document.getElementById('r-next').value,
+  };
+  saveAll(data);
+}
+
+function loadReport(){
+  const data = loadAll();
+  const r = data.report;
+  if(!r) return;
+  ['team','goals','milestones','impact','challenges','lessons','next'].forEach(f=>{
+    const el = document.getElementById('r-'+f);
+    if(el && r[f]) el.value = r[f];
+  });
+}
+
+function prefillReport(){
+  const data = loadAll();
+  const s = data.setup || {};
+  const fw = data.framework || {};
+
+  if(s.team && !document.getElementById('r-team').value)
+    document.getElementById('r-team').value = s.team;
+
+  if((s.vision || fw.objectives) && !document.getElementById('r-goals').value){
+    let goals = '';
+    if(s.challenge) goals += `Challenge addressed: ${s.challenge}\n\n`;
+    if(s.vision) goals += `Vision: ${s.vision}\n\n`;
+    if(fw.objectives) goals += `Objectives: ${fw.objectives}`;
+    document.getElementById('r-goals').value = goals.trim();
+  }
+  saveReport();
+  flashSave();
+}
+
+// ═══════════════════════════════════════════════════════
+// CLAUDE API
+// ═══════════════════════════════════════════════════════
+async function callGuide(userMsg){
+  const data = loadAll();
+  const s = data.setup || {};
+  const fw = data.framework || {};
+  const ctx = s.title ? `\n\nProject context:\nTitle: ${s.title}\nFaculty lead: ${s.lead||'not specified'}\nDept: ${s.dept||'not specified'}\nChallenge: ${s.challenge||'not specified'}\nVision: ${s.vision||'not specified'}\nAudience: ${s.audience||'not specified'}\nMedia needs: ${s.media||'not specified'}\nData analysis needs: ${s.data_needs||'not specified'}\nTechnology: ${s.tech||'not specified'}\nStudent workers: ${s.workers||'not specified'}\nAvailability constraints: ${s.availability||'not specified'}\n\nImpact Framework:\nProblems: ${fw.problems||'not yet filled'}\nObjectives: ${fw.objectives||'not yet filled'}\nImpacts: ${fw.impacts||'not yet filled'}\nMeasures: ${fw.measures||'not yet filled'}\nData collection: ${fw.collection||'not yet filled'}\nData analysis: ${fw.analysis||'not yet filled'}` : '';
+
+  const res = await fetch('https://api.anthropic.com/v1/messages',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({
+      model:'claude-sonnet-4-20250514',
+      max_tokens:1000,
+      system: SYSTEM,
+      messages:[{role:'user',content: userMsg + ctx}]
+    })
+  });
+  const d = await res.json();
+  return d.content.map(b=>b.text||'').join('');
+}
+
+function showThinking(el){
+  el.innerHTML=`<div class="thinking"><span>Your guide is thinking</span><div class="dots"><span></span><span></span><span></span></div></div>`;
+}
+
+async function aiScopeReview(){
+  const out = document.getElementById('scope-output');
+  showThinking(out);
+  saveSetup();
+  const data = loadAll();
+  const s = data.setup || {};
+  const prompt = `Please review my project scoping information and give me collegial, specific feedback. Flag any gaps, risks, or things I should think through more carefully. Be direct.\n\nProject: ${s.title||'untitled'}\nChallenge: ${s.challenge||'not specified'}\nVision: ${s.vision||'not specified'}\nAudience: ${s.audience||'not specified'}\nMedia needs: ${s.media||'not specified'}\nData analysis: ${s.data_needs||'not specified'}\nTechnology: ${s.tech||'not specified'}\nStudent workers: ${s.workers||'not specified'}\nAvailability: ${s.availability||'not specified'}\nPriorities: ${s.priorities||'not specified'}`;
+  try{
+    const r = await callGuide(prompt);
+    out.innerHTML=`<div class="ai-response">${r}</div>`;
+  }catch(e){
+    out.innerHTML=`<div class="ai-response" style="border-left-color:var(--red);">Something went wrong — please try again.</div>`;
+  }
+}
+
+async function askImpact(){
+  const input = document.getElementById('impact-input').value.trim();
+  if(!input) return;
+  const out = document.getElementById('impact-output');
+  showThinking(out);
+  try{
+    const r = await callGuide(input + '\n\nContext: I am working on my Impact Evaluation Framework for my Shipley project.');
+    out.innerHTML=`<div class="ai-response">${r}</div>`;
+  }catch(e){
+    out.innerHTML=`<div class="ai-response" style="border-left-color:var(--red);">Something went wrong.</div>`;
+  }
+}
+
+function impactChip(el){ document.getElementById('impact-input').value = el.textContent.trim(); }
+
+async function reviewFramework(){
+  const out = document.getElementById('framework-review');
+  showThinking(out);
+  saveFramework();
+  const data = loadAll();
+  const fw = data.framework || {};
+  const prompt = `Please review my Impact Evaluation Framework entries and give me specific, direct feedback. Are the objectives measurable? Do the measures align with the impacts? Is the data collection plan realistic? What's missing or underdeveloped?\n\nProblems: ${fw.problems||'empty'}\nObjectives: ${fw.objectives||'empty'}\nImpacts: ${fw.impacts||'empty'}\nMeasures & Targets: ${fw.measures||'empty'}\nData Collection: ${fw.collection||'empty'}\nData Analysis: ${fw.analysis||'empty'}`;
+  try{
+    const r = await callGuide(prompt);
+    out.innerHTML=`<div class="ai-response">${r}</div>`;
+  }catch(e){
+    out.innerHTML=`<div class="ai-response" style="border-left-color:var(--red);">Something went wrong.</div>`;
+  }
+}
+
+async function aiTimelineHelp(){
+  const out = document.getElementById('timeline-output');
+  showThinking(out);
+  const data = loadAll();
+  const done = Object.values(data.task_states||{}).filter(Boolean).length;
+  const notes = data.milestone_notes || {};
+  const prompt = `I have ${done} tasks completed across my project milestones. Here are my milestone notes:\nM1: ${notes.m1||'none'}\nM2: ${notes.m2||'none'}\nM3: ${notes.m3||'none'}\nM4: ${notes.m4||'none'}\n\nCan you help me think through my timeline and any risks I should be aware of?`;
+  try{
+    const r = await callGuide(prompt);
+    out.innerHTML=`<div class="ai-response">${r}</div>`;
+  }catch(e){
+    out.innerHTML=`<div class="ai-response" style="border-left-color:var(--red);">Something went wrong.</div>`;
+  }
+}
+
+async function aibudgethelp(){
+  const out = document.getElementById('budget-output');
+  showThinking(out);
+  const data = loadAll();
+  const grant = parseFloat(document.getElementById('s-grant').value)||0;
+  const budgeted = budgetRows.reduce((s,r)=>s+(parseFloat(r.budgeted)||0),0);
+  const spent = budgetRows.reduce((s,r)=>s+(parseFloat(r.spent)||0),0);
+  const items = budgetRows.map(r=>`${r.name} (${r.cat}): budgeted $${r.budgeted||0}, spent $${r.spent||0}`).join('; ');
+  const prompt = `My grant total is $${grant}. I have budgeted $${budgeted} and spent $${spent} so far. Line items: ${items||'none entered yet'}. Can you give me feedback on my budget and flag any common pitfalls I should watch for?`;
+  try{
+    const r = await callGuide(prompt);
+    out.innerHTML=`<div class="ai-response">${r}</div>`;
+  }catch(e){
+    out.innerHTML=`<div class="ai-response" style="border-left-color:var(--red);">Something went wrong.</div>`;
+  }
+}
+
+async function aiReportHelp(){
+  const out = document.getElementById('report-output');
+  showThinking(out);
+  const prompt = `Help me draft or improve my project report. I'll share what I have:\n\nTeam: ${document.getElementById('r-team').value||'not yet written'}\nGoals: ${document.getElementById('r-goals').value||'not yet written'}\nMilestones: ${document.getElementById('r-milestones').value||'not yet written'}\nImpact: ${document.getElementById('r-impact').value||'not yet written'}\nChallenges: ${document.getElementById('r-challenges').value||'not yet written'}\nLessons: ${document.getElementById('r-lessons').value||'not yet written'}\nNext steps: ${document.getElementById('r-next').value||'not yet written'}\n\nWhich sections need the most work? Help me strengthen the weakest parts.`;
+  try{
+    const r = await callGuide(prompt);
+    out.innerHTML=`<div class="ai-response">${r}</div>`;
+  }catch(e){
+    out.innerHTML=`<div class="ai-response" style="border-left-color:var(--red);">Something went wrong.</div>`;
+  }
+}
+
+async function askGuide(){
+  const input = document.getElementById('guide-input').value.trim();
+  if(!input) return;
+  const out = document.getElementById('guide-output');
+  showThinking(out);
+  try{
+    const r = await callGuide(input);
+    out.innerHTML=`<div class="ai-response">${r}</div>`;
+  }catch(e){
+    out.innerHTML=`<div class="ai-response" style="border-left-color:var(--red);">Something went wrong — please try again.</div>`;
+  }
+}
+
+function guideChip(el){ document.getElementById('guide-input').value = el.textContent.trim(); }
+
+// ═══════════════════════════════════════════════════════
+// UTILITIES
+// ═══════════════════════════════════════════════════════
+function fmtDate(s){
+  if(!s) return '';
+  try{ return new Date(s+'T00:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}); }
+  catch(e){ return s; }
+}
+
+// ═══════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════
+window.addEventListener('DOMContentLoaded',()=>{
+  loadSetup();
+  loadFramework();
+  loadBudget();
+  loadReport();
+  renderMilestones();
+  updateReportTitlePreview();
+
+  // Add default budget rows if empty
+  const data = loadAll();
+  if(!data.budget || data.budget.length===0){
+    budgetRows = [
+      {name:'Faculty stipend',cat:'Personnel — faculty stipend',budgeted:'',spent:'',notes:''},
+      {name:'Graduate student worker',cat:'Personnel — graduate student',budgeted:'',spent:'',notes:''},
+      {name:'Undergraduate student worker',cat:'Personnel — undergraduate student',budgeted:'',spent:'',notes:''},
+      {name:'Software / technology licenses',cat:'Technology / software licenses',budgeted:'',spent:'',notes:''},
+      {name:'Participant incentives (survey/interview)',cat:'Participant incentives',budgeted:'',spent:'',notes:''},
+    ];
+    renderBudget();
+  }
+});
+</script>
+</body>
+</html>
