@@ -5,34 +5,47 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Shipley Academic Innovation Project Guide</title>
 <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/mammoth@1.8.0/mammoth.browser.min.js"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 
 :root{
+  /* ── IETL brand palette ── */
   --navy:#1a2744;
   --navy2:#243258;
-  --gold:#c8922a;
-  --gold-light:#f5e6c8;
-  --gold-pale:#fdf8ef;
-  --red:#cc3b2f;
-  --red-light:#fdf0ee;
-  --bg:#f7f5f0;
-  --bg2:#eeeae0;
+  --orange:#ed974f;
+  --orange-light:#fde8cc;
+  --orange-pale:#fff7ed;
+  --coral:#e77975;
+  --coral-light:#fef0ef;
+  --mint:#77db89;
+  --blue:#70a3f3;
+  --purple:#a38cf3;
+
+  /* ── semantic aliases (used by components) ── */
+  --gold:var(--orange);
+  --gold-light:var(--orange-light);
+  --gold-pale:var(--orange-pale);
+  --red:var(--coral);
+  --red-light:var(--coral-light);
+  --bg:var(--orange-pale);
+  --bg2:#f0e4d4;
   --card:#ffffff;
   --text:#1a1916;
   --text2:#4a4840;
   --text3:#8a8680;
   --border:rgba(26,39,68,0.1);
   --border2:rgba(26,39,68,0.18);
-  --green:#2d6b3a;
-  --green-bg:#eaf4ed;
-  --green-text:#235430;
-  --blue:#1a5fa8;
-  --blue-bg:#e8f1fb;
-  --blue-text:#154d8a;
-  --amber:#8c5a10;
-  --amber-bg:#fdf3e0;
-  --amber-text:#724808;
+  --green:#2a7a3b;
+  --green-bg:#edfaf0;
+  --green-text:#1e6b2e;
+  --blue-bg:#eaf2fd;
+  --blue-text:#2a5fbf;
+  --amber:#9b4a1a;
+  --amber-bg:#fff1e6;
+  --amber-text:#8a3d0f;
+  --purple-bg:#f0ecfd;
+  --purple-text:#5a3db0;
   --radius:10px;
   --radius-lg:16px;
   --shadow:0 1px 4px rgba(0,0,0,0.07);
@@ -45,24 +58,55 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
 
 /* ── HEADER ── */
 .site-header{
-  background:var(--navy);
-  padding:1.25rem 2rem;
-  display:flex;align-items:center;gap:16px;
-  border-bottom:3px solid var(--gold);
+  background:#ffffff;
+  border-bottom:3px solid var(--orange);
+  box-shadow:0 1px 6px rgba(0,0,0,0.06);
 }
-.header-mark{
-  width:44px;height:44px;background:var(--gold);border-radius:10px;
-  display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;
+.header-row1{
+  padding:0.9rem 2rem;
+  display:flex;align-items:center;
+  border-bottom:1px solid rgba(0,0,0,0.06);
 }
-.header-text h1{
+.header-row2{
+  padding:0.55rem 2rem;
+  display:flex;align-items:center;justify-content:space-between;gap:16px;
+  background:var(--orange-pale);
+}
+.ietl-logo{
+  display:flex;align-items:center;gap:14px;
+}
+.ietl-logo-mark{
+  width:30px;height:30px;background:#cc0000;border-radius:3px;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.ietl-logo-mark span{
+  font-family:var(--serif);font-size:14px;font-weight:700;
+  color:#ffffff;letter-spacing:-0.02em;line-height:1;
+}
+.ietl-logo-name{
+  font-family:var(--sans);font-size:13px;font-weight:400;
+  color:var(--text2);letter-spacing:-0.01em;line-height:1.25;
+}
+.header-app-title{
   font-family:var(--serif);font-size:18px;font-weight:400;
-  color:#ffffff;letter-spacing:0.01em;
+  color:var(--navy);letter-spacing:0.01em;white-space:nowrap;
+  flex-shrink:0;
 }
-.header-text p{font-size:12px;color:rgba(255,255,255,0.55);margin-top:2px;}
 .project-name-badge{
-  margin-left:auto;font-size:13px;font-weight:500;
-  color:var(--gold);font-family:var(--serif);font-style:italic;
-  max-width:280px;text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  font-size:12px;font-weight:500;
+  color:var(--amber);font-family:var(--serif);font-style:italic;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  max-width:100%;text-align:right;
+  background:#fff;padding:3px 12px;border-radius:999px;
+  border:1px solid var(--orange-light);
+}
+@media(max-width:700px){
+  .header-row1{padding:0.75rem 1rem;}
+  .header-row2{padding:0.5rem 1rem;flex-wrap:wrap;}
+  .ietl-logo-name{font-size:14px;line-height:1.2;}
+  .ietl-logo-mark{width:36px;height:36px;}
+  .ietl-logo-mark span{font-size:17px;}
+  .header-app-title{font-size:12px;}
 }
 
 /* ── TABS ── */
@@ -147,6 +191,10 @@ button:active{transform:scale(0.98);}
 .field{margin-bottom:14px;}
 .field label{display:block;font-size:13px;color:var(--text2);margin-bottom:5px;font-weight:500;}
 .field .hint{font-size:12px;color:var(--text3);margin-top:4px;line-height:1.5;}
+.radio-pill-group{display:flex;gap:10px;flex-wrap:wrap;margin-top:6px;}
+.radio-pill{display:flex;align-items:center;gap:6px;padding:7px 16px;border:1.5px solid var(--border);border-radius:20px;font-size:14px;font-weight:500;color:var(--navy);cursor:pointer;background:#fff;transition:border-color .15s,background .15s;}
+.radio-pill:has(input:checked){border-color:var(--orange);background:var(--orange-pale);color:var(--navy);}
+.radio-pill input[type="radio"]{accent-color:var(--orange);width:15px;height:15px;}
 
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
 .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;}
@@ -328,6 +376,50 @@ button:active{transform:scale(0.98);}
 .b-navy{background:rgba(26,39,68,0.1);color:var(--navy);}
 .b-red{background:var(--red-light);color:#9b2d23;}
 
+/* ── ACCESSIBILITY ── */
+/* Focus indicators */
+:focus-visible{outline:3px solid var(--navy);outline-offset:3px;border-radius:3px;}
+.tab:focus-visible{outline:3px solid var(--orange);outline-offset:-3px;}
+/* Fix btn-gold contrast: orange bg needs dark text to pass WCAG AA */
+.btn-gold{color:var(--navy)!important;}
+.btn-gold:hover{color:var(--navy)!important;}
+/* Skip-to-content link */
+.skip-link{
+  position:absolute;left:-999px;top:auto;width:1px;height:1px;overflow:hidden;
+  background:var(--navy);color:#fff;font-size:14px;padding:8px 16px;border-radius:4px;z-index:9999;
+}
+.skip-link:focus{left:8px;top:8px;width:auto;height:auto;}
+/* File upload drop zone */
+.upload-zone{
+  border:2px dashed var(--border2);border-radius:var(--radius-lg);
+  padding:2rem 1.5rem;text-align:center;cursor:pointer;
+  transition:all .15s;background:#fff;position:relative;
+}
+.upload-zone:hover,.upload-zone.drag-over{border-color:var(--orange);background:var(--orange-pale);}
+.upload-zone input[type="file"]{
+  position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;
+}
+.upload-zone .uz-icon{font-size:32px;margin-bottom:8px;}
+.upload-zone .uz-label{font-size:14px;font-weight:500;color:var(--navy);margin-bottom:4px;}
+.upload-zone .uz-sub{font-size:12px;color:var(--text3);}
+.upload-ready{
+  display:flex;align-items:center;gap:12px;
+  background:var(--green-bg);border:1px solid var(--green);
+  border-radius:var(--radius);padding:12px 16px;margin-top:12px;
+}
+.upload-ready .ur-name{font-size:13px;font-weight:600;color:var(--green-text);flex:1;}
+.upload-ready .ur-meta{font-size:12px;color:var(--green-text);opacity:0.8;}
+
+/* Support service learn-more links */
+.service-link{
+  font-size:11px;font-weight:500;color:var(--blue-text);
+  text-decoration:none;margin-left:8px;opacity:0.7;
+  border-bottom:1px dashed var(--blue);
+}
+.service-link:hover{opacity:1;}
+/* IRB options keyboard/screen-reader */
+.irb-option:focus-visible{outline:3px solid var(--navy);outline-offset:2px;}
+
 /* ── SAVE INDICATOR ── */
 .save-bar{
   position:fixed;bottom:20px;right:20px;
@@ -364,32 +456,37 @@ button:active{transform:scale(0.98);}
 </head>
 <body>
 
+<a href="#main-content" class="skip-link">Skip to main content</a>
 <!-- HEADER -->
 <header class="site-header">
-  <div class="header-mark">🎓</div>
-  <div class="header-text">
-    <h1>Shipley Academic Innovation Project Guide</h1>
-    <p>Boston University Institute for Excellence in Teaching & Learning</p>
+  <div class="header-row1">
+    <div class="ietl-logo">
+      <div class="ietl-logo-mark"><span>BU</span></div>
+      <span class="ietl-logo-name">Institute for Excellence in Teaching &amp; Learning</span>
+    </div>
   </div>
-  <div class="project-name-badge" id="header-project-name">No project loaded</div>
+  <div class="header-row2">
+    <span class="header-app-title">Shipley Academic Innovation Project Guide</span>
+    <div class="project-name-badge" id="header-project-name">No project loaded</div>
+  </div>
 </header>
 
 <!-- TABS -->
-<nav class="tabs">
-  <button class="tab active" onclick="switchTab('setup',this)">Project Setup</button>
-  <button class="tab" onclick="switchTab('impact',this)">Impact Framework <span class="tab-check">✓</span></button>
-  <button class="tab" onclick="switchTab('milestones',this)">Milestones <span class="tab-check">✓</span></button>
-  <button class="tab" onclick="switchTab('budget',this)">Budget <span class="tab-check">✓</span></button>
-  <button class="tab" onclick="switchTab('report',this)">Project Report <span class="tab-check">✓</span></button>
-  <button class="tab" onclick="switchTab('guide',this)">Ask Your Guide</button>
+<nav class="tabs" role="tablist" aria-label="Project sections">
+  <button class="tab active" role="tab" aria-selected="true" aria-controls="tab-setup" id="tab-btn-setup" onclick="switchTab('setup',this)">Project Setup</button>
+  <button class="tab" role="tab" aria-selected="false" aria-controls="tab-impact" id="tab-btn-impact" onclick="switchTab('impact',this)">Impact Framework <span class="tab-check" aria-hidden="true">✓</span></button>
+  <button class="tab" role="tab" aria-selected="false" aria-controls="tab-milestones" id="tab-btn-milestones" onclick="switchTab('milestones',this)">Milestones <span class="tab-check" aria-hidden="true">✓</span></button>
+  <button class="tab" role="tab" aria-selected="false" aria-controls="tab-budget" id="tab-btn-budget" onclick="switchTab('budget',this)">Budget <span class="tab-check" aria-hidden="true">✓</span></button>
+  <button class="tab" role="tab" aria-selected="false" aria-controls="tab-report" id="tab-btn-report" onclick="switchTab('report',this)">Project Report <span class="tab-check" aria-hidden="true">✓</span></button>
+  <button class="tab" role="tab" aria-selected="false" aria-controls="tab-guide" id="tab-btn-guide" onclick="switchTab('guide',this)">Ask Your Guide</button>
 </nav>
 
-<div class="main">
+<div class="main" id="main-content">
 
 <!-- ══════════════════════════════════════════════
      TAB 1: PROJECT SETUP
 ══════════════════════════════════════════════ -->
-<div id="tab-setup" class="panel active">
+<div id="tab-setup" class="panel active" role="tabpanel" aria-labelledby="tab-btn-setup">
 
   <div class="welcome-card">
     <h2>Welcome to your Project Guide.</h2>
@@ -397,11 +494,67 @@ button:active{transform:scale(0.98);}
     <p>This guide will walk you through every stage of your Shipley Academic Innovation project — from initial scoping through impact reporting. Each section builds on the last. Start by telling us about your project, and your guide will personalize everything to your work.</p>
   </div>
 
-  <!-- Project Identity -->
+  <!-- Proposal Import -->
+  <div class="card" id="import-card">
+    <div class="card-header">
+      <div class="card-icon" aria-hidden="true">📥</div>
+      <div>
+        <div class="card-title">Import from Proposal</div>
+        <div class="card-sub">Upload your proposal. The guide will pre-fill the tool with what it finds.</div>
+      </div>
+      <button onclick="toggleImportCard()" style="margin-left:auto;font-size:12px;color:var(--text3);border:none;background:none;cursor:pointer;padding:4px 8px;" aria-expanded="true" aria-controls="import-body" id="import-toggle">Collapse ▲</button>
+    </div>
+    <div id="import-body">
+      <div class="alert alert-blue" style="margin-bottom:14px;">
+        The guide will extract project details from your uploaded proposal, filling in fields throughout the tool. Be sure to review every field for accuracy.
+      </div>
+
+      <div class="upload-zone" id="upload-zone"
+        ondragover="event.preventDefault();this.classList.add('drag-over')"
+        ondragleave="this.classList.remove('drag-over')"
+        ondrop="handleFileDrop(event)">
+        <input type="file" id="import-file" accept=".docx,.txt,.text"
+          aria-label="Upload proposal document"
+          onchange="handleFileSelect(this.files[0])"/>
+        <div class="uz-icon" aria-hidden="true">📄</div>
+        <div class="uz-label">Click to upload or drag and drop</div>
+        <div class="uz-sub">Word document (.docx) or plain text (.txt)</div>
+      </div>
+
+      <div id="upload-ready" class="upload-ready" style="display:none;" role="status">
+        <span aria-hidden="true">✓</span>
+        <span class="ur-name" id="ur-filename"></span>
+        <span class="ur-meta" id="ur-wordcount"></span>
+        <button onclick="clearImportFile()" style="background:none;border:none;font-size:12px;color:var(--text3);cursor:pointer;padding:0;">Remove</button>
+      </div>
+
+      <div class="hint" style="margin-top:8px;">
+        For PDFs: open the file in Preview or your browser, select all text (⌘A), copy, then
+        <button onclick="togglePasteFallback()" style="background:none;border:none;color:var(--blue-text);font-size:12px;cursor:pointer;text-decoration:underline;padding:0;">paste it here instead</button>.
+      </div>
+
+      <div id="paste-fallback" style="display:none;margin-top:12px;">
+        <div class="field">
+          <label for="import-text">Paste proposal text</label>
+          <textarea id="import-text" placeholder="Paste your full proposal text here…" style="width:100%;min-height:100px;"
+            oninput="const btn=document.getElementById('import-btn');const has=this.value.trim().length>0;btn.disabled=!has;btn.style.opacity=has?'1':'0.5';btn.style.cursor=has?'pointer':'not-allowed';"></textarea>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap;">
+        <button class="btn-primary" onclick="runProposalImport()" id="import-btn" disabled
+          style="opacity:0.5;cursor:not-allowed;">Import from proposal ↗</button>
+        <button onclick="clearImportFile()">Clear</button>
+      </div>
+      <div id="import-output" style="margin-top:14px;" aria-live="polite"></div>
+    </div>
+  </div>
+
+  <!-- Project Basics -->
   <div class="card">
     <div class="card-header">
       <div class="card-icon">📌</div>
-      <div><div class="card-title">Project Identity</div><div class="card-sub">Name your project and introduce your team</div></div>
+      <div><div class="card-title">Project Basics</div><div class="card-sub">Name your project and introduce your team</div></div>
     </div>
 
     <div class="field">
@@ -433,9 +586,13 @@ button:active{transform:scale(0.98);}
       </div>
     </div>
     <div class="field">
-      <label>Total grant amount</label>
-      <input type="number" id="s-grant" placeholder="e.g. 15000" style="width:200px;" oninput="updateBudgetTotal()"/>
-      <div class="hint">This will carry over to your budget tracker.</div>
+      <label id="grant-amount-label">Grant award amount</label>
+      <div class="radio-pill-group" role="radiogroup" aria-labelledby="grant-amount-label">
+        <label class="radio-pill"><input type="radio" name="s-grant" value="5000" onchange="onGrantAmountChange(this)"/> $5,000</label>
+        <label class="radio-pill"><input type="radio" name="s-grant" value="10000" onchange="onGrantAmountChange(this)"/> $10,000</label>
+        <label class="radio-pill"><input type="radio" name="s-grant" value="25000" onchange="onGrantAmountChange(this)"/> $25,000</label>
+      </div>
+      <div class="hint">This selects your budget template.</div>
     </div>
   </div>
 
@@ -443,7 +600,7 @@ button:active{transform:scale(0.98);}
   <div class="card">
     <div class="card-header">
       <div class="card-icon">🎯</div>
-      <div><div class="card-title">Vision & Goals</div><div class="card-sub">Adapted from Shipley project scoping questions</div></div>
+      <div><div class="card-title">Vision & Goals</div><div class="card-sub">This is your opportunity to think big.</div></div>
     </div>
 
     <div class="field">
@@ -451,8 +608,8 @@ button:active{transform:scale(0.98);}
       <textarea id="s-challenge" placeholder="Describe the problem you've observed in your teaching or your students' learning. What isn't working the way you'd like? What gap exists between where students are and where you want them to be?" style="width:100%;min-height:80px;"></textarea>
     </div>
     <div class="field">
-      <label>What is your vision? In an ideal world, what would success look like?</label>
-      <textarea id="s-vision" placeholder="Describe what you're trying to achieve. What would be different for students if this project succeeds?" style="width:100%;min-height:70px;"></textarea>
+      <label>What is your vision? What would be true about your teaching and learning context if you were successful in addressing this learning challenge?</label>
+      <textarea id="s-vision" placeholder="Describe what would be different for you and for your students if your project successfully addresses your teaching or learning challenge." style="width:100%;min-height:70px;"></textarea>
     </div>
     <div class="field">
       <label>Who is the target audience for this project?</label>
@@ -479,23 +636,23 @@ button:active{transform:scale(0.98);}
     </div>
 
     <div class="alert alert-blue">
-      <strong>Why this matters for teaching projects:</strong> Many faculty don't realize that projects in the Scholarship of Teaching and Learning (SoTL) and Educational Research often require IRB approval — even when the intent is to improve teaching rather than conduct traditional research. If you plan to collect, analyze, or publish findings from student data (surveys, grades, work samples, interviews), IRB review is likely required. Starting data collection before approval can invalidate your findings entirely and put you and your students at risk.
+      Projects that research teaching and learning require IRB approval, even if many are deemed exempt. If you plan to collect, analyze, or publish findings from student data (surveys, grades, work samples, interviews), IRB review is required. You will need to complete <a href="https://www.bu.edu/research/ethics-compliance/human-subjects/human-subjects-training/" target="_blank" style="color:var(--blue);font-weight:600;">CITI Training</a> and receive certification as well. Starting data collection before approval can invalidate your findings entirely and put you and your students at risk.
     </div>
 
     <div class="section-label" style="margin-bottom:10px;">Where does your project likely fall?</div>
-    <div class="irb-options">
-      <div class="irb-option" id="irb-opt-yes" onclick="selectIRB('yes')">
-        <div class="opt-icon">📋</div>
+    <div class="irb-options" role="radiogroup" aria-label="IRB status">
+      <div class="irb-option" id="irb-opt-yes" role="radio" aria-checked="false" tabindex="0" onclick="selectIRB('yes')" onkeydown="if(event.key==='Enter'||event.key===' ')selectIRB('yes')">
+        <div class="opt-icon" aria-hidden="true">📋</div>
         <div class="opt-label">IRB likely needed</div>
         <div class="opt-desc">I plan to collect student data and analyze or publish findings</div>
       </div>
-      <div class="irb-option" id="irb-opt-maybe" onclick="selectIRB('maybe')">
-        <div class="opt-icon">🤔</div>
+      <div class="irb-option" id="irb-opt-maybe" role="radio" aria-checked="false" tabindex="0" onclick="selectIRB('maybe')" onkeydown="if(event.key==='Enter'||event.key===' ')selectIRB('maybe')">
+        <div class="opt-icon" aria-hidden="true">🤔</div>
         <div class="opt-label">Not sure</div>
         <div class="opt-desc">I'm uncertain whether my data collection requires approval</div>
       </div>
-      <div class="irb-option" id="irb-opt-no" onclick="selectIRB('no')">
-        <div class="opt-icon">✅</div>
+      <div class="irb-option" id="irb-opt-no" role="radio" aria-checked="false" tabindex="0" onclick="selectIRB('no')" onkeydown="if(event.key==='Enter'||event.key===' ')selectIRB('no')">
+        <div class="opt-icon" aria-hidden="true">✅</div>
         <div class="opt-label">IRB not needed</div>
         <div class="opt-desc">This is purely a teaching improvement project with no data collection for research purposes</div>
       </div>
@@ -524,7 +681,7 @@ button:active{transform:scale(0.98);}
       Answer honestly — these questions help you identify gaps early, before they become mid-project blockers.
     </div>
 
-    <div class="section-label">Media & Content Production</div>
+    <div class="section-label">Media &amp; Content Production <a href="#" class="service-link" aria-label="Learn more about media and content production support (link coming soon)" onclick="return false;" title="Link coming soon">Learn more ↗</a></div>
     <div class="field">
       <label>Will your project require creating videos, graphics, or other media?</label>
       <select id="s-media" style="width:100%;" onchange="showMediaNote()">
@@ -536,7 +693,7 @@ button:active{transform:scale(0.98);}
       <div id="media-note" class="hint" style="display:none;color:var(--amber-text);">Media production involves real costs and lead time. Budget for this early — production support, licensing stock footage or music, accessibility requirements (captions, audio descriptions) can all add up. Factor this into your timeline.</div>
     </div>
 
-    <div class="section-label" style="margin-top:14px;">Data & Analytics</div>
+    <div class="section-label" style="margin-top:14px;">Data &amp; Analytics <a href="#" class="service-link" aria-label="Learn more about data and analytics support (link coming soon)" onclick="return false;" title="Link coming soon">Learn more ↗</a></div>
     <div class="field">
       <label>Will you need to analyze learning data (grades, LMS data, survey results)?</label>
       <select id="s-data" style="width:100%;" onchange="showDataNote()">
@@ -549,13 +706,21 @@ button:active{transform:scale(0.98);}
       <div id="data-note" class="hint" style="display:none;color:var(--amber-text);">If you need data analysis support, plan for this well in advance. Options include hiring a graduate student with quantitative skills, collaborating with a colleague who has that expertise, or consulting with BU's Institutional Research office. This should be factored into your budget and timeline from the start.</div>
     </div>
 
-    <div class="section-label" style="margin-top:14px;">Technology</div>
+    <div class="section-label" style="margin-top:14px;">Technology <a href="#" class="service-link" aria-label="Learn more about technology support (link coming soon)" onclick="return false;" title="Link coming soon">Learn more ↗</a></div>
     <div class="field">
       <label>Will your project require technology tools, platforms, or software?</label>
       <textarea id="s-tech" placeholder="List any tools, platforms, apps, or software you plan to use or are considering. Include tools you already have access to and any you would need to acquire." style="width:100%;min-height:60px;"></textarea>
     </div>
     <div id="tech-checklist" class="alert alert-amber" style="margin-top:8px;">
-      <strong>Technology checklist:</strong> For any new technology tools, your project should consider: (1) <strong>Accessibility</strong> — does it meet WCAG standards and work with screen readers? (2) <strong>Privacy</strong> — does it comply with FERPA for student data? (3) <strong>Security</strong> — does it meet BU's data security requirements? (4) <strong>Cost</strong> — licenses, per-seat fees, renewal costs. (5) <strong>Vendor contracts</strong> — some tools require a formal Statement of Work reviewed by BU's legal team, which takes time. Do not assume a tool is approved for use simply because it is popular.
+      <strong>Technology checklist:</strong>
+      <ol style="margin:8px 0 4px 18px;padding:0;line-height:1.8;">
+        <li><strong>Accessibility</strong> — does it meet WCAG standards and work with screen readers?</li>
+        <li><strong>Privacy</strong> — does it comply with FERPA for student data?</li>
+        <li><strong>Security</strong> — does it meet BU's data security requirements?</li>
+        <li><strong>Cost</strong> — licenses, per-seat fees, renewal costs.</li>
+        <li><strong>Vendor contracts</strong> — some tools require a formal Statement of Work reviewed by BU's legal team, which takes time.</li>
+      </ol>
+      <strong>Do not assume a tool is approved for use simply because it is popular.</strong>
     </div>
 
     <div class="section-label" style="margin-top:14px;">Student Workers</div>
@@ -597,7 +762,7 @@ button:active{transform:scale(0.98);}
 <!-- ══════════════════════════════════════════════
      TAB 2: IMPACT EVALUATION FRAMEWORK
 ══════════════════════════════════════════════ -->
-<div id="tab-impact" class="panel">
+<div id="tab-impact" class="panel" role="tabpanel" aria-labelledby="tab-btn-impact">
 
   <div class="card">
     <div class="card-header">
@@ -706,7 +871,7 @@ button:active{transform:scale(0.98);}
 <!-- ══════════════════════════════════════════════
      TAB 3: MILESTONES & TIMELINE
 ══════════════════════════════════════════════ -->
-<div id="tab-milestones" class="panel">
+<div id="tab-milestones" class="panel" role="tabpanel" aria-labelledby="tab-btn-milestones">
 
   <div class="card">
     <div class="card-header">
@@ -853,7 +1018,7 @@ button:active{transform:scale(0.98);}
 <!-- ══════════════════════════════════════════════
      TAB 4: BUDGET BUILDER
 ══════════════════════════════════════════════ -->
-<div id="tab-budget" class="panel">
+<div id="tab-budget" class="panel" role="tabpanel" aria-labelledby="tab-btn-budget">
 
   <div class="card">
     <div class="card-header">
@@ -917,7 +1082,7 @@ button:active{transform:scale(0.98);}
 <!-- ══════════════════════════════════════════════
      TAB 5: PROJECT REPORT
 ══════════════════════════════════════════════ -->
-<div id="tab-report" class="panel">
+<div id="tab-report" class="panel" role="tabpanel" aria-labelledby="tab-btn-report">
 
   <div class="card">
     <div class="card-header">
@@ -995,7 +1160,7 @@ button:active{transform:scale(0.98);}
 <!-- ══════════════════════════════════════════════
      TAB 6: ASK YOUR GUIDE
 ══════════════════════════════════════════════ -->
-<div id="tab-guide" class="panel">
+<div id="tab-guide" class="panel" role="tabpanel" aria-labelledby="tab-btn-guide">
 
   <div class="welcome-card">
     <h2>Your Guide</h2>
@@ -1084,10 +1249,174 @@ function flashSave(){
 // TABS
 // ═══════════════════════════════════════════════════════
 function switchTab(name, btn){
-  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>{t.classList.remove('active');t.setAttribute('aria-selected','false');});
   document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
   btn.classList.add('active');
+  btn.setAttribute('aria-selected','true');
   document.getElementById('tab-'+name).classList.add('active');
+}
+
+// ═══════════════════════════════════════════════════════
+// PROPOSAL IMPORT
+// ═══════════════════════════════════════════════════════
+let importedText = '';
+
+function toggleImportCard(){
+  const body = document.getElementById('import-body');
+  const btn = document.getElementById('import-toggle');
+  const collapsed = body.style.display==='none';
+  body.style.display = collapsed ? 'block' : 'none';
+  btn.textContent = collapsed ? 'Collapse ▲' : 'Expand ▼';
+  btn.setAttribute('aria-expanded', collapsed ? 'true' : 'false');
+}
+
+function togglePasteFallback(){
+  const el = document.getElementById('paste-fallback');
+  el.style.display = el.style.display==='none' ? 'block' : 'none';
+}
+
+function handleFileDrop(e){
+  e.preventDefault();
+  document.getElementById('upload-zone').classList.remove('drag-over');
+  const file = e.dataTransfer.files[0];
+  if(file) handleFileSelect(file);
+}
+
+function handleFileSelect(file){
+  if(!file) return;
+  const ext = file.name.split('.').pop().toLowerCase();
+  if(ext==='txt'||ext==='text'){
+    const reader = new FileReader();
+    reader.onload = e => setImportReady(e.target.result, file.name);
+    reader.readAsText(file);
+  } else if(ext==='docx'){
+    const reader = new FileReader();
+    reader.onload = e => {
+      mammoth.extractRawText({arrayBuffer: e.target.result})
+        .then(r => setImportReady(r.value, file.name))
+        .catch(() => {
+          document.getElementById('import-output').innerHTML =
+            `<div class="alert alert-amber">Could not read this Word document. Try saving it as a .txt file from Word and uploading again, or use the paste option below.</div>`;
+        });
+    };
+    reader.readAsArrayBuffer(file);
+  } else {
+    document.getElementById('import-output').innerHTML =
+      `<div class="alert alert-amber">Unsupported file type. Please upload a .docx or .txt file.</div>`;
+  }
+}
+
+function setImportReady(text, filename){
+  importedText = text;
+  const wordCount = text.trim().split(/\s+/).length;
+  document.getElementById('ur-filename').textContent = filename;
+  document.getElementById('ur-wordcount').textContent = wordCount.toLocaleString()+' words';
+  document.getElementById('upload-ready').style.display = 'flex';
+  const btn = document.getElementById('import-btn');
+  btn.disabled = false; btn.style.opacity='1'; btn.style.cursor='pointer';
+}
+
+function clearImportFile(){
+  importedText = '';
+  document.getElementById('import-file').value = '';
+  document.getElementById('import-text').value = '';
+  document.getElementById('upload-ready').style.display = 'none';
+  document.getElementById('import-output').innerHTML = '';
+  const btn = document.getElementById('import-btn');
+  btn.disabled = true; btn.style.opacity='0.5'; btn.style.cursor='not-allowed';
+}
+
+async function runProposalImport(){
+  // Use uploaded file text, or fall back to pasted text
+  const text = importedText || document.getElementById('import-text').value.trim();
+  if(!text) return;
+  const out = document.getElementById('import-output');
+  showThinking(out);
+
+  const prompt = `A faculty member has pasted their Shipley Academic Innovation project proposal. Extract the following information and return it as a single valid JSON object. Only populate fields where you find clear information — use null for anything you cannot confidently extract. Dates must be in YYYY-MM-DD format. Grant amount should be a number only (no $ sign). Be conservative: do not guess or infer details not present in the text.
+
+Return ONLY the JSON object with no other text, explanation, or markdown.
+
+{
+  "title": null,
+  "lead": null,
+  "dept": null,
+  "team": null,
+  "start": null,
+  "end": null,
+  "grant": null,
+  "challenge": null,
+  "vision": null,
+  "audience": null,
+  "prior": null,
+  "budget_template": null,
+  "salary": {},
+  "op": {}
+}
+
+For budget_template: "10k" if grant ≤ $10,000; "25k" if grant ≤ $25,000; null if not found.
+For salary keys ($10K): "Summer Stipend (shared between PIs)", "Course Release / Adjunct", "Other Faculty (describe)", "Research Assistant (Hourly)"
+For salary keys ($25K): "Course Release / Adjunct", "Summer Salary", "Overbase", "Other Faculty (describe)", "PostDoc", "PhD Student", "Undergrad/Grad Student (Hourly)", "Temporary Employee, Exempt", "Temporary Employee, Non-Exempt"
+Salary values: {"0": amount_period1, "1": amount_period2, ...} — distribute total evenly if periods not specified.
+For op keys ($10K): "AI Tools & Software Licenses (e.g., ChatGPT Pro, Jutly)", "Supplies, Equipment, & Materials", "Meeting / Workshop Expense", "Other, please describe"
+For op keys ($25K): "AI Tools & Software Licenses", "Supplies, Equipment, & Materials", "Contracted Services", "Meeting / Workshop Expense", "Travel & Conference Registration", "Participant Incentives", "Other, please describe"
+Op values: total amount as a number.
+
+Proposal text:
+${text}`;
+
+  try{
+    const raw = await callGuide(prompt);
+    const jsonMatch = raw.match(/\{[\s\S]*\}/);
+    if(!jsonMatch) throw new Error('No JSON');
+    const data = JSON.parse(jsonMatch[0]);
+    applyProposalImport(data, out);
+  }catch(e){
+    out.innerHTML=`<div class="alert alert-amber"><strong>Heads up:</strong> The guide had trouble parsing the proposal automatically. Try pasting just the narrative sections (not tables or headers), or fill in the fields below manually.</div>`;
+  }
+}
+
+function applyProposalImport(data, out){
+  const fields = ['title','lead','dept','team','start','end','grant','challenge','vision','audience','prior'];
+  let filled=[];
+  fields.forEach(f=>{
+    if(data[f]!=null && data[f]!==''){
+      const el=document.getElementById('s-'+f);
+      if(el){el.value=data[f];filled.push(f);}
+    }
+  });
+
+  if(data.budget_template && BUDGET_DEFS[data.budget_template]){
+    selectBudgetTemplate(data.budget_template);
+    const def=BUDGET_DEFS[data.budget_template];
+    if(data.salary && Object.keys(data.salary).length){
+      def.salaryRows.forEach((row,ri)=>{
+        const amounts=data.salary[row.name];
+        if(amounts){
+          Object.keys(amounts).forEach(pi=>{
+            if(budgetState.salary[ri]) budgetState.salary[ri].amounts[parseInt(pi)]=parseFloat(amounts[pi])||0;
+          });
+        }
+      });
+    }
+    if(data.op && Object.keys(data.op).length){
+      def.opRows.forEach((row,ri)=>{
+        if(data.op[row.name]!=null && budgetState.op[ri])
+          budgetState.op[ri].amount=parseFloat(data.op[row.name])||0;
+      });
+    }
+    renderBudgetBuilder();
+    saveBudget();
+  }
+
+  updateProjectName();
+  saveSetup();
+  const count=filled.length;
+  out.innerHTML=`<div class="alert alert-green">
+    <strong>Import complete —</strong> ${count} field${count!==1?'s':''} pre-filled from your proposal.
+    Review each field below, then check the <strong>Budget tab</strong> if budget figures were found.
+    ${data.budget_template?'<br/>💰 Budget figures were detected and pre-filled.':''}
+  </div>`;
 }
 
 // ═══════════════════════════════════════════════════════
@@ -1104,7 +1433,9 @@ function updateProjectName(){
 // ═══════════════════════════════════════════════════════
 function selectIRB(val){
   ['yes','maybe','no'].forEach(v=>{
-    document.getElementById('irb-opt-'+v).classList.toggle('selected', v===val);
+    const el=document.getElementById('irb-opt-'+v);
+    el.classList.toggle('selected', v===val);
+    el.setAttribute('aria-checked', v===val ? 'true':'false');
   });
   const g = document.getElementById('irb-guidance');
   g.style.display='block';
@@ -1147,7 +1478,7 @@ function saveSetup(){
     team: document.getElementById('s-team').value,
     start: document.getElementById('s-start').value,
     end: document.getElementById('s-end').value,
-    grant: document.getElementById('s-grant').value,
+    grant: getGrantAmount(),
     challenge: document.getElementById('s-challenge').value,
     vision: document.getElementById('s-vision').value,
     audience: document.getElementById('s-audience').value,
@@ -1169,11 +1500,15 @@ function loadSetup(){
   const data = loadAll();
   const s = data.setup;
   if(!s) return;
-  const fields = ['title','lead','dept','team','start','end','grant','challenge','vision','audience','prior','tech','availability','priorities'];
+  const fields = ['title','lead','dept','team','start','end','challenge','vision','audience','prior','tech','availability','priorities'];
   fields.forEach(f=>{
     const el = document.getElementById('s-'+f);
     if(el && s[f] !== undefined) el.value = s[f];
   });
+  if(s.grant){
+    const r = document.querySelector(`input[name="s-grant"][value="${s.grant}"]`);
+    if(r) r.checked = true;
+  }
   ['media','data_needs','workers'].forEach(f=>{
     const el = document.getElementById('s-'+f.replace('_needs',''));
     if(el && s[f]) el.value = s[f];
@@ -1557,13 +1892,20 @@ function renderBudgetBuilder(){
     <div class="budget-status-bar ${statusCls}">${statusIcon} ${statusMsg}</div>`;
 }
 
+function getGrantAmount(){
+  const sel = document.querySelector('input[name="s-grant"]:checked');
+  return sel ? parseFloat(sel.value) : 0;
+}
+
+function onGrantAmountChange(radio){
+  const g = parseFloat(radio.value);
+  if(g===5000||g===10000) selectBudgetTemplate('10k');
+  else if(g===25000) selectBudgetTemplate('25k');
+  saveData();
+}
+
 function updateBudgetTotal(){
-  // Auto-select template from grant amount if none chosen yet
-  if(!budgetState.template){
-    const g=parseFloat(document.getElementById('s-grant').value)||0;
-    if(g===10000) selectBudgetTemplate('10k');
-    else if(g===25000) selectBudgetTemplate('25k');
-  }
+  // legacy no-op — grant amount now driven by radio buttons
 }
 
 function saveBudget(){
@@ -1578,8 +1920,8 @@ function loadBudget(){
     budgetState=data.budget_v2;
     selectBudgetTemplate(budgetState.template);
   } else {
-    const g=parseFloat(document.getElementById('s-grant').value)||0;
-    if(g===10000) selectBudgetTemplate('10k');
+    const g=getGrantAmount();
+    if(g===5000||g===10000) selectBudgetTemplate('10k');
     else if(g===25000) selectBudgetTemplate('25k');
   }
 }
@@ -1678,7 +2020,28 @@ async function aiScopeReview(){
   saveSetup();
   const data = loadAll();
   const s = data.setup || {};
-  const prompt = `Please review my project scoping information and give me collegial, specific feedback. Flag any gaps, risks, or things I should think through more carefully. Be direct.\n\nProject: ${s.title||'untitled'}\nChallenge: ${s.challenge||'not specified'}\nVision: ${s.vision||'not specified'}\nAudience: ${s.audience||'not specified'}\nMedia needs: ${s.media||'not specified'}\nData analysis: ${s.data_needs||'not specified'}\nTechnology: ${s.tech||'not specified'}\nStudent workers: ${s.workers||'not specified'}\nAvailability: ${s.availability||'not specified'}\nPriorities: ${s.priorities||'not specified'}`;
+  // Build context only from fields the faculty has actually filled in
+  const filled = [];
+  if(s.title)        filled.push(`Project title: ${s.title}`);
+  if(s.lead)         filled.push(`Faculty lead: ${s.lead}`);
+  if(s.dept)         filled.push(`Department: ${s.dept}`);
+  if(s.challenge)    filled.push(`Teaching/learning challenge: ${s.challenge}`);
+  if(s.vision)       filled.push(`Vision: ${s.vision}`);
+  if(s.audience)     filled.push(`Target audience: ${s.audience}`);
+  if(s.prior)        filled.push(`Prior work: ${s.prior}`);
+  if(s.media)        filled.push(`Media & content needs: ${s.media}`);
+  if(s.data_needs)   filled.push(`Data & analytics needs: ${s.data_needs}`);
+  if(s.tech)         filled.push(`Technology: ${s.tech}`);
+  if(s.workers)      filled.push(`Student workers: ${s.workers}`);
+  if(s.availability) filled.push(`Availability constraints: ${s.availability}`);
+  if(s.priorities)   filled.push(`Priorities: ${s.priorities}`);
+
+  if(filled.length === 0){
+    out.innerHTML = `<div class="alert alert-amber">Nothing to review yet — fill in some fields on this page first, then ask for feedback.</div>`;
+    return;
+  }
+
+  const prompt = `You are reviewing a faculty member's project scoping information. Only give feedback on what has actually been provided — do not reference or flag omissions for fields that weren't shared with you. Be collegial, specific, and direct. Flag any risks or things worth thinking through more carefully based only on what is here.\n\n${filled.join('\n')}`;
   try{
     const r = await callGuide(prompt);
     out.innerHTML=`<div class="ai-response">${r}</div>`;
