@@ -242,31 +242,59 @@ button:active{transform:scale(0.98);}
   padding:3px 8px;border-radius:4px;margin-top:4px;display:inline-block;
 }
 
-/* ── BUDGET ── */
-.budget-table{width:100%;border-collapse:collapse;font-size:13px;}
-.budget-table th{
-  background:var(--navy);color:#fff;padding:10px 12px;
-  text-align:left;font-weight:500;font-size:12px;
+/* ── BUDGET BUILDER ── */
+.budget-tpl-selector{display:flex;gap:14px;margin-bottom:6px;}
+.budget-tpl-card{
+  flex:1;border:2px solid var(--border2);border-radius:var(--radius-lg);
+  padding:1.25rem 1rem;cursor:pointer;text-align:center;transition:all .15s;
+  background:#fff;
 }
-.budget-table td{padding:10px 12px;border-bottom:0.5px solid var(--border);vertical-align:middle;}
-.budget-table tr:last-child td{border-bottom:none;}
-.budget-table input{
-  width:100%;background:transparent;border:none;padding:0;font-size:13px;
-  border-bottom:1px dashed var(--border2);border-radius:0;
+.budget-tpl-card:hover{border-color:var(--navy);}
+.budget-tpl-card.selected{border-color:var(--gold);background:var(--gold-pale);}
+.budget-tpl-card .tpl-amount{font-family:var(--serif);font-size:28px;color:var(--navy);font-weight:700;}
+.budget-tpl-card .tpl-label{font-size:13px;color:var(--text3);margin-top:3px;}
+.budget-tpl-card .tpl-periods{font-size:12px;color:var(--navy);margin-top:6px;font-weight:500;}
+
+.bgt-main-table{width:100%;border-collapse:collapse;font-size:13px;}
+.bgt-main-table th{background:var(--navy);color:#fff;padding:9px 12px;text-align:left;font-size:12px;font-weight:500;white-space:nowrap;}
+.bgt-main-table td{padding:7px 12px;border-bottom:0.5px solid var(--border);vertical-align:middle;}
+.bgt-period-header,.bgt-total-header{text-align:right;min-width:90px;}
+.bgt-fringe-header{text-align:center;min-width:70px;}
+.bgt-label-header{min-width:200px;}
+.bgt-section-header td{background:var(--navy2);color:#fff;font-size:11px;font-weight:600;padding:7px 12px;text-transform:uppercase;letter-spacing:0.07em;}
+.bgt-section-note td{background:rgba(26,39,68,0.04);font-size:12px;color:var(--text3);font-style:italic;padding:5px 12px;}
+.bgt-data-row:hover td{background:var(--gold-pale);}
+.bgt-label-cell{font-size:13px;color:var(--text);}
+.bgt-input-cell{text-align:right;min-width:90px;}
+.bgt-input-cell input{
+  width:100%;text-align:right;background:rgba(255,235,150,0.4);
+  border:1px dashed var(--gold);border-radius:4px;padding:4px 7px;font-size:13px;
 }
-.budget-table input:focus{border-bottom-color:var(--navy);background:transparent;box-shadow:none;}
-.budget-total{
-  background:var(--navy);color:#fff;padding:12px 16px;
-  border-radius:0 0 var(--radius) var(--radius);
-  display:flex;justify-content:space-between;align-items:center;
-  font-size:14px;font-weight:500;
-}
-.budget-remaining{
-  padding:10px 16px;background:var(--gold-pale);
-  border-radius:0;display:flex;justify-content:space-between;
-  font-size:13px;color:var(--amber-text);
-}
-.budget-over{color:var(--red)!important;background:var(--red-light)!important;}
+.bgt-input-cell input:focus{background:#fff;border-color:var(--navy);box-shadow:0 0 0 2px rgba(26,39,68,.1);}
+.bgt-calc-cell{text-align:right;color:var(--text2);font-weight:500;white-space:nowrap;}
+.bgt-na-cell{text-align:center;color:var(--text3);font-size:12px;}
+.bgt-fringe-cell{text-align:center;}
+.fringe-badge{font-size:11px;background:rgba(26,39,68,0.1);color:var(--navy);padding:2px 7px;border-radius:4px;font-weight:600;}
+.bgt-subtotal-row td{background:rgba(26,39,68,0.04);}
+.bgt-subtotal-label{font-size:12px;font-weight:600;color:var(--text2);}
+.bgt-subtotal-cell{text-align:right;font-weight:600;color:var(--text);white-space:nowrap;}
+.bgt-fringe-row td{background:rgba(26,39,68,0.03);}
+.bgt-bold-subtotal td{border-top:2px solid var(--border2)!important;}
+.bgt-grand-total-row td{background:var(--navy);color:#fff;}
+.bgt-grand-label{font-weight:600;font-size:14px;}
+.bgt-grand-total-cell{text-align:right;font-weight:700;font-size:15px;white-space:nowrap;}
+.bgt-total-cell{text-align:right;font-weight:600;white-space:nowrap;}
+.budget-status-bar{padding:12px 16px;font-size:13px;font-weight:600;border-radius:0 0 var(--radius) var(--radius);}
+.bgt-status-ok{background:var(--green-bg);color:var(--green-text);}
+.bgt-status-warn{background:var(--amber-bg);color:var(--amber-text);}
+.bgt-status-over{background:var(--red-light);color:#9b2d23;}
+.bgt-desc-input{margin-top:4px;}
+.bgt-desc-input input{background:rgba(255,235,150,0.3);border:1px dashed var(--gold);border-radius:4px;padding:3px 8px;font-size:12px;width:100%;}
+.bgt-period-config{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px;}
+.bgt-period-config .field{flex:1;min-width:140px;}
+.budget-fringe-ref{font-size:12px;color:var(--text3);margin-top:10px;padding:10px 14px;background:rgba(26,39,68,0.04);border-radius:var(--radius);}
+.budget-fringe-ref strong{color:var(--text2);}
+@media(max-width:700px){.budget-tpl-selector{flex-direction:column;}.bgt-main-table{font-size:12px;}}
 
 /* ── REPORT ── */
 .report-section{margin-bottom:20px;}
@@ -763,6 +791,22 @@ button:active{transform:scale(0.98);}
     </div>
   </div>
 
+  <!-- Milestone 5 -->
+  <div class="milestone">
+    <div class="milestone-header" onclick="toggleMilestone('m5')">
+      <div class="milestone-num">5</div>
+      <div class="milestone-title">Report & Close</div>
+      <div class="milestone-status" id="m5-status">0 of 4 complete</div>
+    </div>
+    <div class="milestone-body" id="m5-body" style="display:none;">
+      <div id="m5-tasks"></div>
+      <div style="margin-top:12px;">
+        <div class="section-label">Milestone 5 notes</div>
+        <textarea id="m5-notes" placeholder="Notes, blockers, or context for this milestone…" style="width:100%;min-height:60px;" oninput="saveMilestones()"></textarea>
+      </div>
+    </div>
+  </div>
+
   <!-- Custom Tasks -->
   <div class="card">
     <div class="card-header">
@@ -781,6 +825,7 @@ button:active{transform:scale(0.98);}
           <option value="m2">Milestone 2: Conduct & Gather</option>
           <option value="m3">Milestone 3: Analyze & Share</option>
           <option value="m4">Milestone 4: Iterate & Scale</option>
+          <option value="m5">Milestone 5: Report & Close</option>
         </select>
       </div>
     </div>
@@ -806,50 +851,64 @@ button:active{transform:scale(0.98);}
 
 
 <!-- ══════════════════════════════════════════════
-     TAB 4: BUDGET TRACKER
+     TAB 4: BUDGET BUILDER
 ══════════════════════════════════════════════ -->
 <div id="tab-budget" class="panel">
 
   <div class="card">
     <div class="card-header">
       <div class="card-icon">💰</div>
-      <div><div class="card-title">Budget Tracker</div><div class="card-sub">Track spending against your grant award</div></div>
+      <div><div class="card-title">Budget Builder</div><div class="card-sub">Based on official Shipley Award budget templates</div></div>
     </div>
-    <div class="alert alert-amber">
-      <strong>Budget tips:</strong> Keep receipts and documentation for all expenditures. Some grant categories (especially personnel) have specific tax and HR implications. Contact your department's grants administrator before making large purchases or hiring decisions. Unspent funds may need to be returned at project close.
-    </div>
-
-    <div style="overflow-x:auto;margin-top:8px;">
-      <table class="budget-table" id="budget-table">
-        <thead>
-          <tr>
-            <th style="width:30%;">Line item</th>
-            <th style="width:20%;">Category</th>
-            <th style="width:15%;">Budgeted ($)</th>
-            <th style="width:15%;">Spent ($)</th>
-            <th style="width:18%;">Notes</th>
-            <th style="width:2%;"></th>
-          </tr>
-        </thead>
-        <tbody id="budget-body"></tbody>
-      </table>
-      <div class="budget-remaining" id="budget-remaining">
-        <span>Grant total: <strong id="br-total">$0</strong></span>
-        <span>Total budgeted: <strong id="br-budgeted">$0</strong></span>
-        <span>Total spent: <strong id="br-spent">$0</strong></span>
-      </div>
-      <div class="budget-total">
-        <span>Remaining (grant - spent)</span>
-        <span id="br-remaining">$0</span>
-      </div>
+    <p style="font-size:14px;color:var(--text2);line-height:1.7;margin-bottom:14px;">
+      Select your grant award amount to load the appropriate template. Yellow cells are your input fields — salary fringe benefits calculate automatically. Period labels are editable if your project dates differ from the defaults.
+    </p>
+    <div class="alert alert-amber" style="margin-bottom:14px;">
+      <strong>Before you spend:</strong> Contact your department grants administrator before making large purchases or hiring decisions. Keep receipts for all expenditures. Unspent funds at project close may need to be returned.
     </div>
 
-    <div style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap;">
-      <button class="btn-primary" onclick="addBudgetRow()">+ Add line item</button>
-      <button onclick="saveBudget()">Save budget</button>
-      <button onclick="aibudgethelp()" class="btn-gold">Ask guide about budget ↗</button>
+    <div class="section-label">My Shipley award is:</div>
+    <div class="budget-tpl-selector">
+      <div class="budget-tpl-card" id="btpl-10k" onclick="selectBudgetTemplate('10k')">
+        <div class="tpl-amount">$10,000</div>
+        <div class="tpl-label">Standard award</div>
+        <div class="tpl-periods">2 periods · Fall + Spring</div>
+      </div>
+      <div class="budget-tpl-card" id="btpl-25k" onclick="selectBudgetTemplate('25k')">
+        <div class="tpl-amount">$25,000</div>
+        <div class="tpl-label">Expanded award</div>
+        <div class="tpl-periods">4 periods · Fall → Fall</div>
+      </div>
     </div>
-    <div id="budget-output" style="margin-top:14px;"></div>
+  </div>
+
+  <div id="budget-builder" style="display:none;">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon">📅</div>
+        <div><div class="card-title">Period Labels</div><div class="card-sub">Edit if your project schedule differs from the defaults</div></div>
+      </div>
+      <div class="bgt-period-config" id="budget-period-inputs"></div>
+      <div class="budget-fringe-ref">
+        <strong>Fringe Rate Reference:</strong>&ensp;
+        Faculty / PostDoc / Temp Exempt: <strong>31.0%</strong> &nbsp;·&nbsp;
+        PhD Student: <strong>12.5%</strong> &nbsp;·&nbsp;
+        Undergrad / Grad Student (Hourly): <strong>0%</strong> &nbsp;·&nbsp;
+        Temporary Employee, Non-Exempt: <strong>31.4%</strong>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon">📊</div>
+        <div><div class="card-title">Budget Summary</div><div class="card-sub">Enter amounts in yellow cells — totals calculate automatically</div></div>
+      </div>
+      <div id="budget-table-container" style="overflow-x:auto;"></div>
+      <div style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap;">
+        <button onclick="aibudgethelp()" class="btn-gold">Ask guide about my budget ↗</button>
+      </div>
+      <div id="budget-output" style="margin-top:14px;"></div>
+    </div>
   </div>
 
 </div><!-- end budget -->
@@ -1161,34 +1220,50 @@ function loadFramework(){
 // ═══════════════════════════════════════════════════════
 const MILESTONE_TASKS = {
   m1: [
-    {name:'Confirm project team and assign roles', lead:'Faculty lead', blocker:null},
-    {name:'Determine IRB status — submit application if required', lead:'Faculty lead', blocker:'IRB review can take 4–8 weeks. Do not collect data before approval.'},
-    {name:'Identify and vet any technology tools (accessibility, privacy, security)', lead:'Faculty lead', blocker:'Vendor contracts may require BU legal review — start early.'},
-    {name:'Post and hire student worker positions (if applicable)', lead:'Faculty lead', blocker:'Hiring and HR onboarding takes 4–6 weeks minimum.'},
-    {name:'Finalize vendor agreements / licenses (if applicable)', lead:'Faculty lead', blocker:null},
-    {name:'Complete Impact Evaluation Framework (Problems through Data Analysis)', lead:'Full team', blocker:null},
+    {name:'Identify project team and confirm roles', lead:'Faculty lead', blocker:null},
+    {name:'Hold project kickoff meeting with Shipley Center / IETL', lead:'Faculty lead & IETL', blocker:null},
+    {name:'Determine IRB status — submit application if required', lead:'Faculty lead', blocker:'IRB review takes 4–8 weeks. Do not collect data before formal approval.'},
+    {name:'Contact vendor / investigate technology platforms (accessibility, privacy, security)', lead:'Faculty lead & EdTech', blocker:'Vendor contracts may require BU legal review — start well in advance.'},
+    {name:'Post and hire student worker positions (if applicable)', lead:'Faculty lead', blocker:'Hiring and HR onboarding takes 4–6 weeks minimum. Begin before the semester starts.'},
+    {name:'Prepare and onboard student workers', lead:'Faculty lead', blocker:null},
+    {name:'Finalize vendor agreements and licenses', lead:'Faculty lead', blocker:null},
+    {name:'Plan learning analytics and data flow with data support team', lead:'Project team & data support', blocker:null},
+    {name:'Complete Impact Evaluation Framework (Problems → Data Analysis)', lead:'Full team', blocker:null},
     {name:'Develop data collection instruments (surveys, rubrics, observation protocols)', lead:'Full team', blocker:null},
-    {name:'Onboard and train student workers (if applicable)', lead:'Faculty lead', blocker:null},
+    {name:'Launch project page on IETL site (project team shares assets)', lead:'Project team & IETL', blocker:null},
   ],
   m2: [
+    {name:'Acquire / activate vendor licenses', lead:'Project team', blocker:null},
+    {name:'Devise and finalize data plan with data support team', lead:'Project team & data support', blocker:null},
     {name:'Implement pedagogical intervention in course(s)', lead:'Piloting instructors', blocker:null},
-    {name:'Administer pre-intervention data collection (surveys, baseline measures)', lead:'Project team', blocker:null},
+    {name:'Administer pre-intervention surveys and baseline measures', lead:'Project team', blocker:'Do not collect data until IRB approval is confirmed.'},
     {name:'Collect ongoing data per your data collection plan', lead:'Project team', blocker:null},
-    {name:'Administer post-intervention data collection', lead:'Project team', blocker:null},
+    {name:'Administer post-intervention surveys', lead:'Project team', blocker:null},
     {name:'Collect teaching materials and artifacts for analysis', lead:'Project team', blocker:null},
   ],
   m3: [
-    {name:'Analyze collected data (quantitative and/or qualitative)', lead:'Project team', blocker:null},
-    {name:'Synthesize findings and draft impact narrative', lead:'Faculty lead', blocker:null},
     {name:'Present at IETL Showcase or other campus venue', lead:'Faculty lead', blocker:null},
-    {name:'Complete project report', lead:'Faculty lead', blocker:null},
+    {name:'Analyze quantitative data (surveys, grades, LMS data)', lead:'Project team & data support', blocker:null},
+    {name:'Analyze qualitative data (artifacts, interviews, open-ended responses)', lead:'Project team', blocker:null},
+    {name:'Synthesize findings and draft impact narrative', lead:'Faculty lead', blocker:null},
+    {name:'Post selected resources to IETL site', lead:'IETL team', blocker:null},
+    {name:'Share findings via lightning talks or other information sessions', lead:'Project team & IETL', blocker:null},
     {name:'Identify and pursue publication or conference dissemination', lead:'Faculty lead', blocker:null},
   ],
   m4: [
+    {name:'Review data and assess plan for second iteration or scale', lead:'Full team', blocker:null},
+    {name:'Refine intervention based on findings and faculty feedback', lead:'Faculty lead', blocker:null},
+    {name:'Plan and implement second pilot (if applicable)', lead:'Piloting instructors', blocker:null},
+    {name:'Analyze second iteration data', lead:'Project team & data support', blocker:null},
+    {name:'Present findings to programs and broader BU community', lead:'Project team', blocker:null},
     {name:'Reflect on lessons learned — what would you do differently?', lead:'Full team', blocker:null},
-    {name:'Assess whether intervention should be adjusted for next iteration', lead:'Full team', blocker:null},
-    {name:'Develop plan to scale or sustain the intervention', lead:'Faculty lead', blocker:null},
-    {name:'Share resources and findings with IETL for broader dissemination', lead:'Faculty lead & IETL', blocker:null},
+    {name:'Develop plan to sustain or scale the intervention', lead:'Faculty lead', blocker:null},
+  ],
+  m5: [
+    {name:'Complete project report', lead:'Faculty lead', blocker:null},
+    {name:'Submit final report to IETL / Shipley Center', lead:'Faculty lead', blocker:null},
+    {name:'Share resources and final findings with IETL for broader dissemination', lead:'Faculty lead & IETL', blocker:null},
+    {name:'Document sustainability plan or handoff', lead:'Faculty lead', blocker:null},
   ]
 };
 
@@ -1200,7 +1275,7 @@ function renderMilestones(){
   taskStates = data.task_states || {};
   customTasks = data.custom_tasks || [];
 
-  ['m1','m2','m3','m4'].forEach(m=>{
+  ['m1','m2','m3','m4','m5'].forEach(m=>{
     const container = document.getElementById(m+'-tasks');
     const tasks = MILESTONE_TASKS[m];
     const custom = customTasks.filter(t=>t.milestone===m);
@@ -1223,7 +1298,7 @@ function renderMilestones(){
   });
 
   if(data.milestone_notes){
-    ['m1','m2','m3','m4'].forEach(m=>{
+    ['m1','m2','m3','m4','m5'].forEach(m=>{
       const el = document.getElementById(m+'-notes');
       if(el && data.milestone_notes[m]) el.value = data.milestone_notes[m];
     });
@@ -1274,6 +1349,7 @@ function saveMilestones(){
     m2: document.getElementById('m2-notes').value,
     m3: document.getElementById('m3-notes').value,
     m4: document.getElementById('m4-notes').value,
+    m5: document.getElementById('m5-notes').value,
   };
   saveAll(data);
 }
@@ -1284,65 +1360,228 @@ function toggleMilestone(id){
 }
 
 // ═══════════════════════════════════════════════════════
-// BUDGET
+// BUDGET BUILDER
 // ═══════════════════════════════════════════════════════
-const BUDGET_CATS = ['Personnel — faculty stipend','Personnel — graduate student','Personnel — undergraduate student','Technology / software licenses','Vendor / contractor','Materials & supplies','Participant incentives','Travel & conference','Other'];
-let budgetRows = [];
+const BUDGET_DEFS = {
+  '10k': {
+    max: 10000,
+    defaultPeriods: [
+      {label:'Fall 2026 (Sept–Dec)'},
+      {label:'Spring 2027 (Jan–May)'},
+    ],
+    salaryRows: [
+      {name:'Summer Stipend (shared between PIs)', fringeRate:0.31},
+      {name:'Course Release / Adjunct', fringeRate:0.31},
+      {name:'Other Faculty (describe)', fringeRate:0.31, hasDesc:true},
+      {name:'Research Assistant (Hourly)', fringeRate:0},
+    ],
+    opRows: [
+      {name:'AI Tools & Software Licenses (e.g., ChatGPT Pro, Jutly)'},
+      {name:'Supplies, Equipment, & Materials'},
+      {name:'Meeting / Workshop Expense'},
+      {name:'Other, please describe', hasDesc:true},
+    ]
+  },
+  '25k': {
+    max: 25000,
+    defaultPeriods: [
+      {label:'Fall 2026 (Sept–Dec)'},
+      {label:'Spring 2027 (Jan–May)'},
+      {label:'Summer 2027 (Jun–Aug)'},
+      {label:'Fall 2027 (Sept–Dec)'},
+    ],
+    salaryRows: [
+      {name:'Course Release / Adjunct', fringeRate:0.31},
+      {name:'Summer Salary', fringeRate:0.31},
+      {name:'Overbase', fringeRate:0.31},
+      {name:'Other Faculty (describe)', fringeRate:0.31, hasDesc:true},
+      {name:'PostDoc', fringeRate:0.31},
+      {name:'PhD Student', fringeRate:0.125},
+      {name:'Undergrad/Grad Student (Hourly)', fringeRate:0},
+      {name:'Temporary Employee, Exempt', fringeRate:0.31},
+      {name:'Temporary Employee, Non-Exempt', fringeRate:0.314},
+    ],
+    opRows: [
+      {name:'AI Tools & Software Licenses'},
+      {name:'Supplies, Equipment, & Materials'},
+      {name:'Contracted Services'},
+      {name:'Meeting / Workshop Expense'},
+      {name:'Travel & Conference Registration'},
+      {name:'Participant Incentives'},
+      {name:'Other, please describe', hasDesc:true},
+    ]
+  }
+};
 
-function updateBudgetTotal(){
-  const grant = parseFloat(document.getElementById('s-grant').value)||0;
-  const budgeted = budgetRows.reduce((s,r)=>s+(parseFloat(r.budgeted)||0),0);
-  const spent = budgetRows.reduce((s,r)=>s+(parseFloat(r.spent)||0),0);
-  const remaining = grant - spent;
+let budgetState = {template:null, periods:[], salary:[], op:[]};
 
-  document.getElementById('br-total').textContent = '$'+grant.toFixed(2);
-  document.getElementById('br-budgeted').textContent = '$'+budgeted.toFixed(2);
-  document.getElementById('br-spent').textContent = '$'+spent.toFixed(2);
-  document.getElementById('br-remaining').textContent = '$'+remaining.toFixed(2);
-
-  const remEl = document.getElementById('budget-remaining');
-  remEl.classList.toggle('budget-over', remaining<0);
-}
-
-function renderBudget(){
-  const tbody = document.getElementById('budget-body');
-  tbody.innerHTML = budgetRows.map((r,i)=>`
-    <tr>
-      <td><input type="text" value="${r.name||''}" placeholder="Line item description" onchange="budgetRows[${i}].name=this.value;saveBudget();"/></td>
-      <td>
-        <select onchange="budgetRows[${i}].cat=this.value;saveBudget();" style="width:100%;font-size:12px;padding:6px 8px;">
-          ${BUDGET_CATS.map(c=>`<option ${r.cat===c?'selected':''}>${c}</option>`).join('')}
-        </select>
-      </td>
-      <td><input type="number" value="${r.budgeted||''}" placeholder="0.00" onchange="budgetRows[${i}].budgeted=this.value;updateBudgetTotal();saveBudget();" style="text-align:right;"/></td>
-      <td><input type="number" value="${r.spent||''}" placeholder="0.00" onchange="budgetRows[${i}].spent=this.value;updateBudgetTotal();saveBudget();" style="text-align:right;"/></td>
-      <td><input type="text" value="${r.notes||''}" placeholder="Notes" onchange="budgetRows[${i}].notes=this.value;saveBudget();"/></td>
-      <td><button class="icon-btn" onclick="removeBudgetRow(${i})" style="border:none;background:none;cursor:pointer;color:var(--text3);font-size:13px;">✕</button></td>
-    </tr>`).join('');
-  updateBudgetTotal();
-}
-
-function addBudgetRow(){
-  budgetRows.push({name:'',cat:BUDGET_CATS[0],budgeted:'',spent:'',notes:''});
-  renderBudget();
-}
-
-function removeBudgetRow(i){
-  budgetRows.splice(i,1);
-  renderBudget();
+function selectBudgetTemplate(tpl){
+  const def = BUDGET_DEFS[tpl];
+  if(!def) return;
+  const prev = budgetState.template;
+  budgetState.template = tpl;
+  if(prev !== tpl){
+    budgetState.periods = def.defaultPeriods.map(p=>({...p}));
+    budgetState.salary = def.salaryRows.map(()=>({amounts:def.defaultPeriods.map(()=>0), desc:''}));
+    budgetState.op = def.opRows.map(()=>({amount:0, desc:''}));
+  }
+  document.querySelectorAll('.budget-tpl-card').forEach(c=>c.classList.remove('selected'));
+  const card = document.getElementById('btpl-'+tpl);
+  if(card) card.classList.add('selected');
+  document.getElementById('budget-builder').style.display='block';
+  renderBudgetBuilder();
   saveBudget();
 }
 
+function fmt$(n){
+  const v = parseFloat(n)||0;
+  if(v===0) return '—';
+  return '$'+v.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g,',');
+}
+
+function renderBudgetBuilder(){
+  const def = BUDGET_DEFS[budgetState.template];
+  if(!def) return;
+  const periods = budgetState.periods;
+  const nP = periods.length;
+
+  // Period label inputs
+  let pInputs = '';
+  for(let p=0;p<nP;p++){
+    pInputs += `<div class="field" style="flex:1;min-width:130px;">
+      <label>Period ${p+1}</label>
+      <input type="text" value="${periods[p].label||''}" oninput="budgetState.periods[${p}].label=this.value;renderBudgetBuilder();saveBudget();" style="width:100%;font-size:13px;"/>
+    </div>`;
+  }
+  document.getElementById('budget-period-inputs').innerHTML = pInputs;
+
+  // Calculate salary subtotals
+  const salByP = Array(nP).fill(0);
+  const fringeByP = Array(nP).fill(0);
+  let salaryRowsHtml = '';
+
+  def.salaryRows.forEach((row,ri)=>{
+    const s = budgetState.salary[ri]||{amounts:Array(nP).fill(0),desc:''};
+    budgetState.salary[ri]=s;
+    if(s.amounts.length<nP) s.amounts = [...s.amounts,...Array(nP-s.amounts.length).fill(0)];
+    let rowTotal=0;
+    let cells='';
+    for(let p=0;p<nP;p++){
+      const amt=parseFloat(s.amounts[p])||0;
+      rowTotal+=amt; salByP[p]+=amt; fringeByP[p]+=amt*row.fringeRate;
+      cells+=`<td class="bgt-input-cell"><input type="number" min="0" step="100" value="${amt||''}" placeholder="0" onchange="budgetState.salary[${ri}].amounts[${p}]=parseFloat(this.value)||0;renderBudgetBuilder();saveBudget();"/></td>`;
+    }
+    const frLabel = row.fringeRate===0 ? '0%' : (row.fringeRate*100).toFixed(1)+'%';
+    const descHtml = row.hasDesc ? `<div class="bgt-desc-input"><input type="text" placeholder="Describe activity…" value="${s.desc||''}" oninput="budgetState.salary[${ri}].desc=this.value;" onblur="saveBudget();" /></div>` : '';
+    salaryRowsHtml+=`<tr class="bgt-data-row">
+      <td class="bgt-label-cell">${row.name}${descHtml}</td>
+      ${cells}
+      <td class="bgt-calc-cell">${rowTotal?fmt$(rowTotal):'—'}</td>
+      <td class="bgt-fringe-cell"><span class="fringe-badge">${frLabel}</span></td>
+    </tr>`;
+  });
+
+  const salTotal=salByP.reduce((a,b)=>a+b,0);
+  const fringeTotal=fringeByP.reduce((a,b)=>a+b,0);
+  const sfByP=salByP.map((s,i)=>s+fringeByP[i]);
+  const sfTotal=salTotal+fringeTotal;
+
+  const salSubCells=salByP.map(v=>`<td class="bgt-subtotal-cell">${fmt$(v)}</td>`).join('');
+  const fringeSubCells=fringeByP.map(v=>`<td class="bgt-subtotal-cell">${fmt$(v)}</td>`).join('');
+  const sfSubCells=sfByP.map(v=>`<td class="bgt-subtotal-cell">${fmt$(v)}</td>`).join('');
+  const emptyP=Array(nP).fill('<td class="bgt-na-cell">—</td>').join('');
+
+  // Operating rows
+  let opRowsHtml=''; let opTotal=0;
+  def.opRows.forEach((row,ri)=>{
+    const o=budgetState.op[ri]||{amount:0,desc:''};
+    budgetState.op[ri]=o;
+    const amt=parseFloat(o.amount)||0; opTotal+=amt;
+    const descHtml=row.hasDesc?`<div class="bgt-desc-input"><input type="text" placeholder="Describe…" value="${o.desc||''}" oninput="budgetState.op[${ri}].desc=this.value;" onblur="saveBudget();" /></div>`:'';
+    opRowsHtml+=`<tr class="bgt-data-row">
+      <td class="bgt-label-cell">${row.name}${descHtml}</td>
+      ${emptyP}
+      <td class="bgt-input-cell"><input type="number" min="0" step="100" value="${amt||''}" placeholder="0" onchange="budgetState.op[${ri}].amount=parseFloat(this.value)||0;renderBudgetBuilder();saveBudget();"/></td>
+      <td class="bgt-na-cell">—</td>
+    </tr>`;
+  });
+
+  const grandTotal=sfTotal+opTotal;
+  const remaining=def.max-grandTotal;
+  const statusCls=remaining<0?'bgt-status-over':remaining<=def.max*0.1?'bgt-status-warn':'bgt-status-ok';
+  const statusIcon=remaining<0?'⚠':'✓';
+  const statusMsg=remaining<0
+    ?`Over budget by $${Math.abs(remaining).toLocaleString('en-US',{minimumFractionDigits:2})} — exceeds $${def.max.toLocaleString()} maximum`
+    :`Within budget — $${remaining.toLocaleString('en-US',{minimumFractionDigits:2})} remaining of $${def.max.toLocaleString()} maximum`;
+
+  const colHeaders=periods.map(p=>`<th class="bgt-period-header">${p.label||'Period'}</th>`).join('');
+  const gtByP=sfByP.map(v=>v);
+  const gtCells=gtByP.map(v=>`<td class="bgt-total-cell">${fmt$(v)}</td>`).join('');
+
+  document.getElementById('budget-table-container').innerHTML=`
+    <table class="bgt-main-table">
+      <thead><tr>
+        <th class="bgt-label-header">Line Item</th>
+        ${colHeaders}
+        <th class="bgt-total-header">Total</th>
+        <th class="bgt-fringe-header">Fringe</th>
+      </tr></thead>
+      <tbody>
+        <tr class="bgt-section-header"><td colspan="${nP+3}">Salaries &amp; Fringe Benefits</td></tr>
+        <tr class="bgt-section-note"><td colspan="${nP+3}">Faculty — describe activity in the field below each applicable row</td></tr>
+        ${salaryRowsHtml}
+        <tr class="bgt-subtotal-row">
+          <td class="bgt-subtotal-label">Subtotal Salaries</td>${salSubCells}
+          <td class="bgt-subtotal-cell">${fmt$(salTotal)}</td><td></td>
+        </tr>
+        <tr class="bgt-fringe-row">
+          <td class="bgt-subtotal-label">Fringe Benefits <span style="font-weight:400;font-size:11px;">(auto-calculated)</span></td>${fringeSubCells}
+          <td class="bgt-subtotal-cell">${fmt$(fringeTotal)}</td><td></td>
+        </tr>
+        <tr class="bgt-subtotal-row bgt-bold-subtotal">
+          <td class="bgt-subtotal-label">Subtotal Salaries &amp; Fringe Benefits</td>${sfSubCells}
+          <td class="bgt-subtotal-cell">${fmt$(sfTotal)}</td><td></td>
+        </tr>
+        <tr class="bgt-section-header"><td colspan="${nP+3}">Operating Expense</td></tr>
+        ${opRowsHtml}
+        <tr class="bgt-subtotal-row">
+          <td class="bgt-subtotal-label">Subtotal Operating Expense</td>${emptyP}
+          <td class="bgt-subtotal-cell">${fmt$(opTotal)}</td><td></td>
+        </tr>
+        <tr class="bgt-grand-total-row">
+          <td class="bgt-grand-label">TOTAL</td>${gtCells}
+          <td class="bgt-grand-total-cell">${fmt$(grandTotal)}</td><td></td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="budget-status-bar ${statusCls}">${statusIcon} ${statusMsg}</div>`;
+}
+
+function updateBudgetTotal(){
+  // Auto-select template from grant amount if none chosen yet
+  if(!budgetState.template){
+    const g=parseFloat(document.getElementById('s-grant').value)||0;
+    if(g===10000) selectBudgetTemplate('10k');
+    else if(g===25000) selectBudgetTemplate('25k');
+  }
+}
+
 function saveBudget(){
-  const data = loadAll();
-  data.budget = budgetRows;
+  const data=loadAll();
+  data.budget_v2=budgetState;
   saveAll(data);
 }
 
 function loadBudget(){
-  const data = loadAll();
-  if(data.budget) budgetRows = data.budget;
-  renderBudget();
+  const data=loadAll();
+  if(data.budget_v2&&data.budget_v2.template){
+    budgetState=data.budget_v2;
+    selectBudgetTemplate(budgetState.template);
+  } else {
+    const g=parseFloat(document.getElementById('s-grant').value)||0;
+    if(g===10000) selectBudgetTemplate('10k');
+    else if(g===25000) selectBudgetTemplate('25k');
+  }
 }
 
 // ═══════════════════════════════════════════════════════
@@ -1415,11 +1654,11 @@ async function callGuide(userMsg){
   const fw = data.framework || {};
   const ctx = s.title ? `\n\nProject context:\nTitle: ${s.title}\nFaculty lead: ${s.lead||'not specified'}\nDept: ${s.dept||'not specified'}\nChallenge: ${s.challenge||'not specified'}\nVision: ${s.vision||'not specified'}\nAudience: ${s.audience||'not specified'}\nMedia needs: ${s.media||'not specified'}\nData analysis needs: ${s.data_needs||'not specified'}\nTechnology: ${s.tech||'not specified'}\nStudent workers: ${s.workers||'not specified'}\nAvailability constraints: ${s.availability||'not specified'}\n\nImpact Framework:\nProblems: ${fw.problems||'not yet filled'}\nObjectives: ${fw.objectives||'not yet filled'}\nImpacts: ${fw.impacts||'not yet filled'}\nMeasures: ${fw.measures||'not yet filled'}\nData collection: ${fw.collection||'not yet filled'}\nData analysis: ${fw.analysis||'not yet filled'}` : '';
 
-  const res = await fetch('https://api.anthropic.com/v1/messages',{
+  const res = await fetch('https://lnooney--b59323963f5711f1a86342b51c65c3df.web.val.run',{
     method:'POST',
     headers:{'Content-Type':'application/json'},
     body:JSON.stringify({
-      model:'claude-sonnet-4-20250514',
+      model:'claude-sonnet-4-5',
       max_tokens:1000,
       system: SYSTEM,
       messages:[{role:'user',content: userMsg + ctx}]
@@ -1484,7 +1723,7 @@ async function aiTimelineHelp(){
   const data = loadAll();
   const done = Object.values(data.task_states||{}).filter(Boolean).length;
   const notes = data.milestone_notes || {};
-  const prompt = `I have ${done} tasks completed across my project milestones. Here are my milestone notes:\nM1: ${notes.m1||'none'}\nM2: ${notes.m2||'none'}\nM3: ${notes.m3||'none'}\nM4: ${notes.m4||'none'}\n\nCan you help me think through my timeline and any risks I should be aware of?`;
+  const prompt = `I have ${done} tasks completed across my project milestones. Here are my milestone notes:\nM1 (Prepare): ${notes.m1||'none'}\nM2 (Conduct & Gather): ${notes.m2||'none'}\nM3 (Analyze & Share): ${notes.m3||'none'}\nM4 (Iterate & Scale): ${notes.m4||'none'}\nM5 (Report & Close): ${notes.m5||'none'}\n\nCan you help me think through my timeline and any risks I should be aware of?`;
   try{
     const r = await callGuide(prompt);
     out.innerHTML=`<div class="ai-response">${r}</div>`;
@@ -1496,12 +1735,32 @@ async function aiTimelineHelp(){
 async function aibudgethelp(){
   const out = document.getElementById('budget-output');
   showThinking(out);
-  const data = loadAll();
-  const grant = parseFloat(document.getElementById('s-grant').value)||0;
-  const budgeted = budgetRows.reduce((s,r)=>s+(parseFloat(r.budgeted)||0),0);
-  const spent = budgetRows.reduce((s,r)=>s+(parseFloat(r.spent)||0),0);
-  const items = budgetRows.map(r=>`${r.name} (${r.cat}): budgeted $${r.budgeted||0}, spent $${r.spent||0}`).join('; ');
-  const prompt = `My grant total is $${grant}. I have budgeted $${budgeted} and spent $${spent} so far. Line items: ${items||'none entered yet'}. Can you give me feedback on my budget and flag any common pitfalls I should watch for?`;
+  const def = BUDGET_DEFS[budgetState.template];
+  if(!def){
+    out.innerHTML=`<div class="ai-response">Please select a budget template ($10K or $25K) first.</div>`;
+    return;
+  }
+  let summary = `Grant award: $${def.max.toLocaleString()} (${budgetState.template==='10k'?'$10K':'$25K'} template)\n\nSalary line items:\n`;
+  let salTotal=0, fringeTotal=0;
+  def.salaryRows.forEach((row,ri)=>{
+    const s=budgetState.salary[ri]||{amounts:[]};
+    const rowTotal=s.amounts.reduce((a,b)=>a+(parseFloat(b)||0),0);
+    if(rowTotal>0){
+      salTotal+=rowTotal; fringeTotal+=rowTotal*row.fringeRate;
+      summary+=`  ${row.name}: $${rowTotal.toFixed(2)} (fringe ${(row.fringeRate*100).toFixed(1)}%)\n`;
+    }
+  });
+  let opTotal=0;
+  summary+=`\nOperating expense line items:\n`;
+  def.opRows.forEach((row,ri)=>{
+    const o=budgetState.op[ri]||{amount:0};
+    const amt=parseFloat(o.amount)||0;
+    if(amt>0){ opTotal+=amt; summary+=`  ${row.name}: $${amt.toFixed(2)}\n`; }
+  });
+  const grand=salTotal+fringeTotal+opTotal;
+  const rem=def.max-grand;
+  summary+=`\nSalaries subtotal: $${salTotal.toFixed(2)}\nFringe benefits: $${fringeTotal.toFixed(2)}\nOperating subtotal: $${opTotal.toFixed(2)}\nGrand total: $${grand.toFixed(2)}\nRemaining: $${rem.toFixed(2)}`;
+  const prompt=`Please review my Shipley project budget and give me specific, practical feedback. Flag concerns, common pitfalls for this type of grant, or categories I may have overlooked.\n\n${summary}`;
   try{
     const r = await callGuide(prompt);
     out.innerHTML=`<div class="ai-response">${r}</div>`;
@@ -1557,18 +1816,6 @@ window.addEventListener('DOMContentLoaded',()=>{
   renderMilestones();
   updateReportTitlePreview();
 
-  // Add default budget rows if empty
-  const data = loadAll();
-  if(!data.budget || data.budget.length===0){
-    budgetRows = [
-      {name:'Faculty stipend',cat:'Personnel — faculty stipend',budgeted:'',spent:'',notes:''},
-      {name:'Graduate student worker',cat:'Personnel — graduate student',budgeted:'',spent:'',notes:''},
-      {name:'Undergraduate student worker',cat:'Personnel — undergraduate student',budgeted:'',spent:'',notes:''},
-      {name:'Software / technology licenses',cat:'Technology / software licenses',budgeted:'',spent:'',notes:''},
-      {name:'Participant incentives (survey/interview)',cat:'Participant incentives',budgeted:'',spent:'',notes:''},
-    ];
-    renderBudget();
-  }
 });
 </script>
 </body>
