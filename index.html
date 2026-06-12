@@ -179,19 +179,57 @@ input,select,textarea,button{
 input:focus,textarea:focus,select:focus{
   border-color:var(--navy);box-shadow:0 0 0 2px rgba(26,39,68,0.12);background:#fff;
 }
-button{cursor:pointer;background:none;padding:10px 20px;font-weight:500;transition:all 0.12s;}
-button:hover{background:var(--bg2);}
+button{
+  cursor:pointer;background:transparent;color:var(--navy);
+  border:2px solid var(--navy);border-radius:100px;
+  padding:8px 22px;font-weight:700;font-size:13px;
+  letter-spacing:0.05em;line-height:1.2;
+  transition:background 0.15s,color 0.15s,border-color 0.15s;
+}
+button:hover{background:var(--navy);color:#fff;}
 button:active{transform:scale(0.98);}
 
 .btn-primary{background:var(--navy);color:#fff;border-color:var(--navy);}
-.btn-primary:hover{background:var(--navy2);}
-.btn-gold{background:var(--gold);color:#fff;border-color:var(--gold);}
-.btn-gold:hover{background:#b8821e;}
+.btn-primary:hover{background:var(--navy2);border-color:var(--navy2);color:#fff;}
+.btn-gold{background:var(--orange);color:var(--navy);border-color:var(--orange);}
+.btn-gold:hover{background:#d9843a;border-color:#d9843a;color:var(--navy);}
+/* Small ghost utility buttons — used for Clear, Remove, inline toggles */
+.btn-sm{padding:4px 12px;font-size:12px;font-weight:600;border-width:1.5px;}
+/* Bare text-style links that behave as buttons — no pill border */
+a{color:var(--blue-text);}
+a:hover{color:var(--navy);}
+.btn-bare{border:none;background:none;padding:0;font-weight:500;font-size:12px;color:var(--blue-text);text-decoration:underline;border-radius:0;}
+.btn-bare:hover{background:none;color:var(--navy);}
 
 .field{margin-bottom:14px;}
 .field label{display:block;font-size:13px;color:var(--text2);margin-bottom:5px;font-weight:500;}
 .field .hint{font-size:12px;color:var(--text3);margin-top:4px;line-height:1.5;}
 .radio-pill-group{display:flex;gap:10px;flex-wrap:wrap;margin-top:6px;}
+/* Tech consideration rows */
+.tc-row{border:1px solid var(--border);border-radius:8px;padding:10px 12px;margin-bottom:8px;background:var(--bg);}
+.tc-header{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+.tc-label{font-size:13px;font-weight:600;color:var(--navy);flex:1;min-width:160px;line-height:1.4;}
+.tc-label .tc-desc{font-size:12px;font-weight:400;color:var(--text3);margin-top:2px;line-height:1.5;}
+/* Repeating entry rows (availability, priorities) */
+.entry-row{display:flex;gap:8px;align-items:flex-start;margin-bottom:8px;flex-wrap:wrap;}
+.entry-row input[type="text"]{flex:2;min-width:140px;}
+.entry-row input[type="date"]{flex:1;min-width:130px;}
+.entry-row .remove-btn{background:none;border:none;color:var(--text3);font-size:16px;padding:6px 4px;cursor:pointer;line-height:1;border-radius:0;}
+.entry-row .remove-btn:hover{color:var(--red);background:none;}
+.priority-toggle{display:flex;border-radius:20px;overflow:hidden;border:1.5px solid var(--border);flex-shrink:0;}
+.priority-toggle button{border:none;border-radius:0;padding:5px 12px;font-size:12px;font-weight:600;background:#fff;color:var(--text3);cursor:pointer;}
+.priority-toggle button:hover{background:var(--bg2);}
+.priority-toggle button.must{background:var(--navy);color:#fff;}
+.priority-toggle button.nice{background:var(--orange-pale);color:var(--navy);}
+.tc-pills{display:flex;gap:6px;}
+.tc-pill{font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;border:1.5px solid var(--border);background:#fff;cursor:pointer;color:var(--text3);transition:all .12s;}
+.tc-pill.addressed{border-color:var(--green);background:var(--green-bg);color:var(--green-text);}
+.tc-pill.needs_attention{border-color:var(--amber);background:var(--amber-bg);color:var(--amber-text);}
+.tc-pill.na{border-color:var(--border);background:var(--bg2);color:var(--text3);}
+.tc-notes{margin-top:8px;display:none;}
+.tc-notes.visible{display:block;}
+.tc-deadline{margin-top:6px;display:none;}
+.tc-deadline.visible{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text2);}
 .radio-pill{display:flex;align-items:center;gap:6px;padding:7px 16px;border:1.5px solid var(--border);border-radius:20px;font-size:14px;font-weight:500;color:var(--navy);cursor:pointer;background:#fff;transition:border-color .15s,background .15s;}
 .radio-pill:has(input:checked){border-color:var(--orange);background:var(--orange-pale);color:var(--navy);}
 .radio-pill input[type="radio"]{accent-color:var(--orange);width:15px;height:15px;}
@@ -285,6 +323,10 @@ button:active{transform:scale(0.98);}
 .task-name{font-size:14px;color:var(--text);}
 .task-name.done{color:var(--text3);text-decoration:line-through;}
 .task-lead{font-size:12px;color:var(--text3);margin-top:2px;}
+.task-meta-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:6px;}
+.task-meta-field{display:flex;flex-direction:column;gap:2px;flex:1;min-width:130px;}
+.task-meta-label{font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.04em;}
+.task-meta-input{font-size:12px;padding:5px 8px;border:1px solid var(--border);border-radius:6px;background:var(--bg);color:var(--text);width:100%;}
 .task-blocker{
   font-size:12px;color:var(--amber-text);background:var(--amber-bg);
   padding:3px 8px;border-radius:4px;margin-top:4px;display:inline-block;
@@ -380,9 +422,7 @@ button:active{transform:scale(0.98);}
 /* Focus indicators */
 :focus-visible{outline:3px solid var(--navy);outline-offset:3px;border-radius:3px;}
 .tab:focus-visible{outline:3px solid var(--orange);outline-offset:-3px;}
-/* Fix btn-gold contrast: orange bg needs dark text to pass WCAG AA */
-.btn-gold{color:var(--navy)!important;}
-.btn-gold:hover{color:var(--navy)!important;}
+/* btn-gold contrast already handled in base styles above */
 /* Skip-to-content link */
 .skip-link{
   position:absolute;left:-999px;top:auto;width:1px;height:1px;overflow:hidden;
@@ -423,7 +463,7 @@ button:active{transform:scale(0.98);}
 /* ── SAVE INDICATOR ── */
 .save-bar{
   position:fixed;bottom:20px;right:20px;
-  background:var(--navy);color:#fff;font-size:12px;
+  background:var(--green);color:#fff;font-size:12px;
   padding:8px 16px;border-radius:999px;opacity:0;
   transition:opacity .3s;pointer-events:none;
   box-shadow:var(--shadow-md);
@@ -502,9 +542,9 @@ button:active{transform:scale(0.98);}
         <div class="card-title">Import from Proposal</div>
         <div class="card-sub">Upload your proposal. The guide will pre-fill the tool with what it finds.</div>
       </div>
-      <button onclick="toggleImportCard()" style="margin-left:auto;font-size:12px;color:var(--text3);border:none;background:none;cursor:pointer;padding:4px 8px;" aria-expanded="true" aria-controls="import-body" id="import-toggle">Collapse ▲</button>
+      <button onclick="toggleImportCard()" style="margin-left:auto;" aria-expanded="false" aria-controls="import-body" id="import-toggle">Expand ▼</button>
     </div>
-    <div id="import-body">
+    <div id="import-body" style="display:none;">
       <div class="alert alert-blue" style="margin-bottom:14px;">
         The guide will extract project details from your uploaded proposal, filling in fields throughout the tool. Be sure to review every field for accuracy.
       </div>
@@ -525,12 +565,12 @@ button:active{transform:scale(0.98);}
         <span aria-hidden="true">✓</span>
         <span class="ur-name" id="ur-filename"></span>
         <span class="ur-meta" id="ur-wordcount"></span>
-        <button onclick="clearImportFile()" style="background:none;border:none;font-size:12px;color:var(--text3);cursor:pointer;padding:0;">Remove</button>
+        <button onclick="clearImportFile()" class="btn-sm">Remove</button>
       </div>
 
       <div class="hint" style="margin-top:8px;">
         For PDFs: open the file in Preview or your browser, select all text (⌘A), copy, then
-        <button onclick="togglePasteFallback()" style="background:none;border:none;color:var(--blue-text);font-size:12px;cursor:pointer;text-decoration:underline;padding:0;">paste it here instead</button>.
+        <button onclick="togglePasteFallback()" class="btn-bare">paste it here instead</button>.
       </div>
 
       <div id="paste-fallback" style="display:none;margin-top:12px;">
@@ -544,7 +584,7 @@ button:active{transform:scale(0.98);}
       <div style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap;">
         <button class="btn-primary" onclick="runProposalImport()" id="import-btn" disabled
           style="opacity:0.5;cursor:not-allowed;">Import from proposal ↗</button>
-        <button onclick="clearImportFile()">Clear</button>
+        <button onclick="clearImportFile()" class="btn-sm">Clear</button>
       </div>
       <div id="import-output" style="margin-top:14px;" aria-live="polite"></div>
     </div>
@@ -631,30 +671,27 @@ button:active{transform:scale(0.98);}
       </div>
     </div>
 
-    <div class="alert alert-amber">
+    <div class="alert alert-blue">
       <strong>What is IRB?</strong> The Institutional Review Board (IRB) is the university body that reviews research involving human subjects to ensure it is conducted ethically. You may be required to obtain IRB approval before collecting any data from students — even surveys.
     </div>
 
-    <div class="alert alert-blue">
-      Projects that research teaching and learning require IRB approval, even if many are deemed exempt. If you plan to collect, analyze, or publish findings from student data (surveys, grades, work samples, interviews), IRB review is required. You will need to complete <a href="https://www.bu.edu/research/ethics-compliance/human-subjects/human-subjects-training/" target="_blank" style="color:var(--blue);font-weight:600;">CITI Training</a> and receive certification as well. Starting data collection before approval can invalidate your findings entirely and put you and your students at risk.
+    <div class="alert alert-amber">
+      <strong>Projects that research teaching and learning require IRB approval</strong>, even if many are deemed exempt. If you plan to collect, analyze, or publish findings from student data (surveys, grades, work samples, interviews), IRB review is required. You will need to complete <a href="https://www.bu.edu/research/ethics-compliance/human-subjects/human-subjects-training/" target="_blank" style="color:var(--blue-text);font-weight:600;">CITI Training</a> and receive certification as well. Starting data collection before approval can invalidate your findings entirely and put you and your students at risk.
     </div>
 
-    <div class="section-label" style="margin-bottom:10px;">Where does your project likely fall?</div>
+    <div class="section-label" style="margin-bottom:10px;">What data will you collect? How will you use it?</div>
     <div class="irb-options" role="radiogroup" aria-label="IRB status">
       <div class="irb-option" id="irb-opt-yes" role="radio" aria-checked="false" tabindex="0" onclick="selectIRB('yes')" onkeydown="if(event.key==='Enter'||event.key===' ')selectIRB('yes')">
         <div class="opt-icon" aria-hidden="true">📋</div>
-        <div class="opt-label">IRB likely needed</div>
-        <div class="opt-desc">I plan to collect student data and analyze or publish findings</div>
+        <div class="opt-label"><strong>I plan to collect student data and publish findings</strong></div>
       </div>
       <div class="irb-option" id="irb-opt-maybe" role="radio" aria-checked="false" tabindex="0" onclick="selectIRB('maybe')" onkeydown="if(event.key==='Enter'||event.key===' ')selectIRB('maybe')">
         <div class="opt-icon" aria-hidden="true">🤔</div>
-        <div class="opt-label">Not sure</div>
-        <div class="opt-desc">I'm uncertain whether my data collection requires approval</div>
+        <div class="opt-label">I'm not sure what data I will collect or how I will use it</div>
       </div>
       <div class="irb-option" id="irb-opt-no" role="radio" aria-checked="false" tabindex="0" onclick="selectIRB('no')" onkeydown="if(event.key==='Enter'||event.key===' ')selectIRB('no')">
         <div class="opt-icon" aria-hidden="true">✅</div>
-        <div class="opt-label">IRB not needed</div>
-        <div class="opt-desc">This is purely a teaching improvement project with no data collection for research purposes</div>
+        <div class="opt-label"><strong>This is purely a teaching improvement project with no data collection.</strong></div>
       </div>
     </div>
 
@@ -666,7 +703,7 @@ button:active{transform:scale(0.98);}
     </div>
 
     <div style="margin-top:6px;">
-      <a href="https://www.bu.edu/research/ethics-compliance/human-subjects/" target="_blank" style="font-size:13px;color:var(--blue);">BU IRB Office → bu.edu/research/ethics-compliance/human-subjects/</a>
+      <a href="https://www.bu.edu/research/ethics-compliance/human-subjects/" target="_blank" style="font-size:13px;color:var(--blue-text);">BU IRB Office → bu.edu/research/ethics-compliance/human-subjects/</a>
     </div>
   </div>
 
@@ -690,7 +727,14 @@ button:active{transform:scale(0.98);}
         <option value="maybe">Possibly — still determining scope</option>
         <option value="no">No — no media production needed</option>
       </select>
-      <div id="media-note" class="hint" style="display:none;color:var(--amber-text);">Media production involves real costs and lead time. Budget for this early — production support, licensing stock footage or music, accessibility requirements (captions, audio descriptions) can all add up. Factor this into your timeline.</div>
+      <div id="media-note" style="display:none;">
+        <div class="hint" style="color:var(--amber-text);margin-top:4px;">Media production involves real costs and lead time. Budget for this early — production support, licensing stock footage or music, accessibility requirements (captions, audio descriptions) can all add up. Factor this into your timeline.</div>
+        <div class="field" style="margin-top:8px;">
+          <label>Estimated media production cost ($)</label>
+          <input type="number" id="s-media-cost" min="0" step="100" placeholder="0" style="width:180px;" oninput="syncMediaToProjectPlan()"/>
+          <div class="hint">Added to your budget as a media production line item.</div>
+        </div>
+      </div>
     </div>
 
     <div class="section-label" style="margin-top:14px;">Data &amp; Analytics <a href="#" class="service-link" aria-label="Learn more about data and analytics support (link coming soon)" onclick="return false;" title="Link coming soon">Learn more ↗</a></div>
@@ -703,30 +747,33 @@ button:active{transform:scale(0.98);}
         <option value="maybe">Possibly — still determining scope</option>
         <option value="no">No data analysis anticipated</option>
       </select>
-      <div id="data-note" class="hint" style="display:none;color:var(--amber-text);">If you need data analysis support, plan for this well in advance. Options include hiring a graduate student with quantitative skills, collaborating with a colleague who has that expertise, or consulting with BU's Institutional Research office. This should be factored into your budget and timeline from the start.</div>
+      <div id="data-note" style="display:none;">
+        <div class="hint" style="color:var(--amber-text);margin-top:4px;">If you need data analysis support, plan for this well in advance. Options include hiring a graduate student with quantitative skills, collaborating with a colleague who has that expertise, or consulting with BU's Institutional Research office. This should be factored into your budget and timeline from the start.</div>
+        <div class="field" style="margin-top:8px;">
+          <label>Estimated data &amp; analytics cost ($)</label>
+          <input type="number" id="s-data-cost" min="0" step="100" placeholder="0" style="width:180px;" oninput="syncDataToProjectPlan()"/>
+          <div class="hint">Added to your budget as a data &amp; analytics line item.</div>
+        </div>
+      </div>
     </div>
 
     <div class="section-label" style="margin-top:14px;">Technology <a href="#" class="service-link" aria-label="Learn more about technology support (link coming soon)" onclick="return false;" title="Link coming soon">Learn more ↗</a></div>
-    <div class="field">
-      <label>Will your project require technology tools, platforms, or software?</label>
-      <textarea id="s-tech" placeholder="List any tools, platforms, apps, or software you plan to use or are considering. Include tools you already have access to and any you would need to acquire." style="width:100%;min-height:60px;"></textarea>
+
+    <div class="alert alert-navy" style="margin-bottom:8px;">Each tool will appear as its own line item in your budget and its own set of considerations below.</div>
+    <div id="tech-tool-entries"></div>
+    <button class="btn-sm" onclick="addTechToolEntry()" style="margin-bottom:12px;">+ Add tool</button>
+
+    <div class="section-label" style="margin-top:14px;">Technology considerations</div>
+    <div class="alert alert-navy" style="margin-bottom:10px;">For each item to consider, mark your status and add notes. Items marked "Needs attention" will be added as tasks in Milestone 1.</div>
+    <div id="tech-considerations">
+      <!-- rendered by renderTechConsiderations() -->
     </div>
-    <div id="tech-checklist" class="alert alert-amber" style="margin-top:8px;">
-      <strong>Technology checklist:</strong>
-      <ol style="margin:8px 0 4px 18px;padding:0;line-height:1.8;">
-        <li><strong>Accessibility</strong> — does it meet WCAG standards and work with screen readers?</li>
-        <li><strong>Privacy</strong> — does it comply with FERPA for student data?</li>
-        <li><strong>Security</strong> — does it meet BU's data security requirements?</li>
-        <li><strong>Cost</strong> — licenses, per-seat fees, renewal costs.</li>
-        <li><strong>Vendor contracts</strong> — some tools require a formal Statement of Work reviewed by BU's legal team, which takes time.</li>
-      </ol>
-      <strong>Do not assume a tool is approved for use simply because it is popular.</strong>
-    </div>
+    <div class="alert alert-amber" style="margin-top:8px;"><strong>Do not assume a tool is approved for use simply because it is popular.</strong></div>
 
     <div class="section-label" style="margin-top:14px;">Student Workers</div>
     <div class="field">
       <label>Do you plan to hire student workers (undergraduate or graduate)?</label>
-      <select id="s-workers" style="width:100%;" onchange="showWorkerNote()">
+      <select id="s-workers" style="width:100%;" onchange="showWorkerNote();syncWorkersToProjectPlan();">
         <option value="">— Select —</option>
         <option value="yes-grad">Yes — graduate student(s)</option>
         <option value="yes-undergrad">Yes — undergraduate student(s)</option>
@@ -736,18 +783,32 @@ button:active{transform:scale(0.98);}
       <div id="worker-note" class="hint" style="display:none;color:var(--amber-text);">Hiring student workers involves administrative steps that take longer than most faculty expect. You will need to post positions, conduct interviews, complete HR onboarding paperwork, and set up payroll — plan for 4–6 weeks minimum before a student worker can begin paid work. If your project depends on student worker contributions early in the semester, begin this process before the semester starts. Also confirm with your department whether a stipend or hourly employment is more appropriate for your project.</div>
     </div>
 
-    <div class="section-label" style="margin-top:14px;">Time & Availability</div>
-    <div class="field">
-      <label>What are your team's significant availability constraints?</label>
-      <textarea id="s-availability" placeholder="e.g. Faculty lead on sabbatical spring semester; co-investigator on 9-month contract (unavailable July-August without stipend); teaching 3 courses fall semester; service commitments on two major committees" style="width:100%;min-height:70px;"></textarea>
-      <div class="hint">Be specific. A realistic picture of availability is essential for building a workable timeline. If team members are on 9-month contracts and the grant does not include summer stipends, project work may need to pause or slow significantly during summer months.</div>
+    <div id="worker-details" style="display:none;">
+      <div class="grid2">
+        <div class="field">
+          <label>Estimated total compensation ($)</label>
+          <input type="number" id="s-worker-cost" min="0" step="100" placeholder="0" style="width:100%;"
+            oninput="syncWorkersToProjectPlan()"/>
+          <div class="hint">Added to your budget as a salary line item.</div>
+        </div>
+        <div class="field">
+          <label>Target hire date</label>
+          <input type="date" id="s-worker-date" style="width:100%;"
+            onchange="syncWorkersToProjectPlan()"/>
+          <div class="hint">Adds a hiring task to Milestone 1 with this deadline.</div>
+        </div>
+      </div>
     </div>
 
-    <div class="section-label" style="margin-top:14px;">Prioritization</div>
-    <div class="field">
-      <label>What elements of this project are must-have vs. nice-to-have?</label>
-      <textarea id="s-priorities" placeholder="e.g. Must-have: redesigned assignment sequence, pre/post survey. Nice-to-have: student interviews, video documentation of process" style="width:100%;min-height:60px;"></textarea>
-    </div>
+    <div class="section-label" style="margin-top:14px;">Time & Availability</div>
+    <div class="hint" style="margin-bottom:10px;">Be specific. A realistic picture of availability is essential for building a workable timeline. If team members are on 9-month contracts and the grant does not include summer stipends, project work may need to pause or slow significantly during summer months.</div>
+    <div id="availability-entries"></div>
+    <button class="btn-sm" onclick="addAvailabilityEntry()" style="margin-top:4px;">+ Add constraint</button>
+
+    <div class="section-label" style="margin-top:20px;">Prioritization</div>
+    <div class="hint" style="margin-bottom:10px;">What elements of this project are must-have vs. nice-to-have?</div>
+    <div id="priority-entries"></div>
+    <button class="btn-sm" onclick="addPriorityEntry()" style="margin-top:4px;">+ Add item</button>
   </div>
 
   <div style="display:flex;gap:10px;justify-content:flex-end;">
@@ -892,7 +953,7 @@ button:active{transform:scale(0.98);}
     </div>
     <div class="milestone-body" id="m1-body">
       <div class="alert alert-amber" style="margin-bottom:14px;">
-        <strong>Key blocker to watch:</strong> IRB approval and student worker hiring both take longer than expected. If your project depends on either, begin these processes immediately — before the semester starts if possible.
+        <strong>Key blockers to watch:</strong> IRB approval, student worker hiring, confirming technology meets BU standards, and securing vendor contracts all take longer than expected. If your project depends on any of these, begin these processes immediately — before the semester starts if possible.
       </div>
       <div id="m1-tasks"></div>
       <div style="margin-top:12px;">
@@ -929,8 +990,8 @@ button:active{transform:scale(0.98);}
       <div class="milestone-status" id="m3-status">0 of 5 complete</div>
     </div>
     <div class="milestone-body" id="m3-body" style="display:none;">
-      <div class="alert alert-green" style="margin-bottom:14px;">
-        <strong>Dissemination tip:</strong> The IETL Showcase is a key opportunity to share your work with the BU community. Conference submissions and journal articles reach broader audiences — your guide can help you identify appropriate venues for SoTL publication.
+      <div class="alert alert-blue" style="margin-bottom:14px;">
+        <strong>Dissemination tip:</strong> The Institute Showcase is a key opportunity to share your work with the BU community. Conference submissions and journal articles reach broader audiences — the Institute team can help you identify appropriate venues for teaching and learning research publication.
       </div>
       <div id="m3-tasks"></div>
       <div style="margin-top:12px;">
@@ -972,6 +1033,19 @@ button:active{transform:scale(0.98);}
     </div>
   </div>
 
+  <!-- Export / Gantt -->
+  <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px;">
+    <button class="btn-primary" onclick="downloadProjectCSV()">⬇ Download Project Plan (CSV)</button>
+    <button class="btn-primary" onclick="showGanttModal()">📊 View Gantt Chart</button>
+  </div>
+  <div id="gantt-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:9999;overflow:auto;padding:20px;">
+    <div style="background:#fff;border-radius:12px;max-width:98vw;margin:0 auto;padding:24px;position:relative;">
+      <button onclick="closeGanttModal()" style="position:absolute;top:14px;right:18px;background:none;border:none;font-size:20px;cursor:pointer;color:var(--text2);">✕</button>
+      <h2 style="margin:0 0 16px;font-size:17px;color:var(--navy);">Project Gantt Chart</h2>
+      <div id="gantt-container" style="overflow-x:auto;"></div>
+    </div>
+  </div>
+
   <!-- Custom Tasks -->
   <div class="card">
     <div class="card-header">
@@ -1007,10 +1081,20 @@ button:active{transform:scale(0.98);}
     <button class="btn-primary" onclick="addCustomTask()">Add task</button>
   </div>
 
-  <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:4px;">
-    <button onclick="aiTimelineHelp()" class="btn-gold">Ask guide about my timeline ↗</button>
+  <div class="card" style="margin-top:8px;">
+    <div class="card-header">
+      <div class="card-icon">🗓</div>
+      <div><div class="card-title">Timeline Guide</div><div class="card-sub">Ask questions about your project timeline</div></div>
+    </div>
+    <div id="timeline-output" style="margin-bottom:12px;"></div>
+    <div style="display:flex;gap:8px;align-items:flex-end;">
+      <textarea id="timeline-input" placeholder="Ask about your timeline, risks, or sequencing…" rows="2"
+        style="flex:1;font-size:13px;resize:vertical;"
+        onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();aiTimelineChat();}"></textarea>
+      <button class="btn-gold" onclick="aiTimelineChat()" style="white-space:nowrap;">Send ↗</button>
+    </div>
+    <button class="btn-primary" onclick="aiTimelineHelp()" style="margin-top:8px;">Start a new conversation</button>
   </div>
-  <div id="timeline-output" style="margin-top:16px;"></div>
 
 </div><!-- end milestones -->
 
@@ -1025,24 +1109,27 @@ button:active{transform:scale(0.98);}
       <div class="card-icon">💰</div>
       <div><div class="card-title">Budget Builder</div><div class="card-sub">Based on official Shipley Award budget templates</div></div>
     </div>
-    <p style="font-size:14px;color:var(--text2);line-height:1.7;margin-bottom:14px;">
-      Select your grant award amount to load the appropriate template. Yellow cells are your input fields — salary fringe benefits calculate automatically. Period labels are editable if your project dates differ from the defaults.
-    </p>
+    <div class="alert alert-navy" style="margin-bottom:14px;">Select your grant award amount to load the appropriate budget template. Yellow cells are your input fields — fringe benefits calculate automatically. Adjust the timeline labels to match your project start year.</div>
     <div class="alert alert-amber" style="margin-bottom:14px;">
       <strong>Before you spend:</strong> Contact your department grants administrator before making large purchases or hiring decisions. Keep receipts for all expenditures. Unspent funds at project close may need to be returned.
     </div>
 
     <div class="section-label">My Shipley award is:</div>
     <div class="budget-tpl-selector">
+      <div class="budget-tpl-card" id="btpl-5k" onclick="selectBudgetTemplate('5k')">
+        <div class="tpl-amount">$5,000</div>
+        <div class="tpl-label">Pilot award</div>
+        <div class="tpl-periods">2 terms · Fall + Spring</div>
+      </div>
       <div class="budget-tpl-card" id="btpl-10k" onclick="selectBudgetTemplate('10k')">
         <div class="tpl-amount">$10,000</div>
         <div class="tpl-label">Standard award</div>
-        <div class="tpl-periods">2 periods · Fall + Spring</div>
+        <div class="tpl-periods">3 terms · Full calendar year</div>
       </div>
       <div class="budget-tpl-card" id="btpl-25k" onclick="selectBudgetTemplate('25k')">
         <div class="tpl-amount">$25,000</div>
         <div class="tpl-label">Expanded award</div>
-        <div class="tpl-periods">4 periods · Fall → Fall</div>
+        <div class="tpl-periods">4 terms · Fall → Fall</div>
       </div>
     </div>
   </div>
@@ -1051,7 +1138,18 @@ button:active{transform:scale(0.98);}
     <div class="card">
       <div class="card-header">
         <div class="card-icon">📅</div>
-        <div><div class="card-title">Period Labels</div><div class="card-sub">Edit if your project schedule differs from the defaults</div></div>
+        <div><div class="card-title">Timeline Labels</div><div class="card-sub">Select your start year — labels update automatically</div></div>
+        <div style="margin-left:auto;display:flex;align-items:center;gap:8px;">
+          <label style="font-size:13px;font-weight:600;color:var(--navy);">Start year:</label>
+          <select id="budget-start-year" style="font-size:13px;padding:4px 8px;border-radius:6px;border:1px solid var(--border);"
+            onchange="updateBudgetYear(this.value)">
+            <option value="2025">2025</option>
+            <option value="2026" selected>2026</option>
+            <option value="2027">2027</option>
+            <option value="2028">2028</option>
+            <option value="2029">2029</option>
+          </select>
+        </div>
       </div>
       <div class="bgt-period-config" id="budget-period-inputs"></div>
       <div class="budget-fringe-ref">
@@ -1069,10 +1167,16 @@ button:active{transform:scale(0.98);}
         <div><div class="card-title">Budget Summary</div><div class="card-sub">Enter amounts in yellow cells — totals calculate automatically</div></div>
       </div>
       <div id="budget-table-container" style="overflow-x:auto;"></div>
-      <div style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap;">
-        <button onclick="aibudgethelp()" class="btn-gold">Ask guide about my budget ↗</button>
+      <div style="margin-top:16px;">
+        <div id="budget-output" style="margin-bottom:12px;"></div>
+        <div style="display:flex;gap:8px;align-items:flex-end;">
+          <textarea id="budget-input" placeholder="Ask about your budget, spending categories, or fringe rates…" rows="2"
+            style="flex:1;font-size:13px;resize:vertical;"
+            onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();aiBudgetChat();}"></textarea>
+          <button class="btn-gold" onclick="aiBudgetChat()" style="white-space:nowrap;">Send ↗</button>
+        </div>
+        <button class="btn-primary" onclick="aibudgethelp()" style="margin-top:8px;">Ask guide about my budget ↗</button>
       </div>
-      <div id="budget-output" style="margin-top:14px;"></div>
     </div>
   </div>
 
@@ -1096,7 +1200,7 @@ button:active{transform:scale(0.98);}
       Build your report progressively throughout the project — don't wait until the end. Each section below maps directly to the Shipley report template. Your guide can help you draft any section.
     </p>
     <div class="alert alert-blue">
-      <strong>Dissemination goals:</strong> Beyond the project report, consider whether your findings are appropriate for conference presentation or journal publication. SoTL venues like the International Society for the Scholarship of Teaching and Learning (ISSOTL) and discipline-specific teaching journals are good starting points. Ask your guide for suggestions relevant to your field.
+      <strong>Dissemination goals:</strong> Beyond the project report, consider whether your findings are appropriate for conference presentation or journal publication. Teaching and learning research venues like the International Society for the Scholarship of Teaching and Learning (ISSOTL) and discipline-specific teaching journals are good starting points. Ask your guide for suggestions relevant to your field.
     </div>
   </div>
 
@@ -1172,13 +1276,13 @@ button:active{transform:scale(0.98);}
     <div class="guide-chips">
       <button class="chip" onclick="guideChip(this)">How do I write a good survey for my project?</button>
       <button class="chip" onclick="guideChip(this)">We're behind on our timeline — help me think through options</button>
-      <button class="chip" onclick="guideChip(this)">What SoTL journals should I consider for publication?</button>
+      <button class="chip" onclick="guideChip(this)">What teaching and learning research journals should I consider?</button>
       <button class="chip" onclick="guideChip(this)">Help me think through my data analysis plan</button>
       <button class="chip" onclick="guideChip(this)">We need to hire a graduate student — what should I know?</button>
       <button class="chip" onclick="guideChip(this)">How do I approach a vendor contract at BU?</button>
       <button class="chip" onclick="guideChip(this)">What accessibility requirements apply to my technology?</button>
       <button class="chip" onclick="guideChip(this)">Help me think through incentivizing students to complete surveys</button>
-      <button class="chip" onclick="guideChip(this)">What should I present at the IETL Showcase?</button>
+      <button class="chip" onclick="guideChip(this)">What should I present at the Institute Showcase?</button>
     </div>
     <div class="field">
       <textarea id="guide-input" placeholder="Ask your guide anything about your project…" style="width:100%;min-height:80px;"></textarea>
@@ -1214,7 +1318,7 @@ Key knowledge you bring:
 - Survey design for educational research: validated scales, pre/post design, incentive strategies
 - Data analysis options: paired t-tests for pre/post, thematic coding for qualitative data, descriptive statistics
 - SoTL dissemination: ISSOTL, discipline-specific teaching journals, conference venues
-- BU context: IETL Showcase as a dissemination venue, BU IRB office, BU grants administration
+- BU context: Institute Showcase as a dissemination venue, BU IRB office, BU grants administration
 
 Tone: Collegial and direct. You are a knowledgeable colleague, not a help desk. Be specific. Don't hedge unnecessarily. When faculty describe a plan that has a real problem, name it clearly and helpfully.
 
@@ -1440,9 +1544,9 @@ function selectIRB(val){
   const g = document.getElementById('irb-guidance');
   g.style.display='block';
   const msgs = {
-    yes:`<div class="alert alert-amber"><strong>Action required before data collection:</strong> You should submit an IRB application before collecting any data from students. Visit the BU IRB office website to determine whether your study qualifies for exempt, expedited, or full board review. Exempt review (the most common for SoTL) is still a formal process — do not assume exemption without official confirmation. Plan for 4–8 weeks for the review process. Contact the BU IRB office: <a href="https://www.bu.edu/research/ethics-compliance/human-subjects/" target="_blank" style="color:var(--blue);">bu.edu/research/ethics-compliance/human-subjects</a></div>`,
-    maybe:`<div class="alert alert-amber"><strong>Seek clarification before proceeding:</strong> When in doubt, consult the BU IRB office. They can help you determine whether your project requires review. It is always safer to ask than to assume you don't need approval — collecting data without proper approval can invalidate your findings and create serious compliance issues. Contact: <a href="https://www.bu.edu/research/ethics-compliance/human-subjects/" target="_blank" style="color:var(--blue);">bu.edu/research/ethics-compliance/human-subjects</a></div>`,
-    no:`<div class="alert alert-green"><strong>Noted.</strong> If your project later evolves to include data collection for research or publication purposes, revisit this determination. Keep a brief note of why you determined IRB was not needed — this is good practice if questions arise later.</div>`
+    yes:`<div class="alert alert-amber"><strong>Action required before data collection:</strong> You should submit an IRB application before collecting any data from students. Visit the BU IRB office website to determine whether your study qualifies for exempt, expedited, or full board review. Exempt review (the most common for teaching and learning research) is still a formal process — do not assume exemption without official confirmation. Plan for 4–8 weeks for the review process. Contact the BU IRB office: <a href="https://www.bu.edu/research/ethics-compliance/human-subjects/" target="_blank" style="color:var(--blue-text);">bu.edu/research/ethics-compliance/human-subjects</a></div>`,
+    maybe:`<div class="alert alert-amber"><strong>Seek clarification before proceeding:</strong> When in doubt, consult the BU IRB office. They can help you determine whether your project requires review. It is always safer to ask than to assume you don't need approval — collecting data without proper approval can invalidate your findings and create serious compliance issues. Contact: <a href="https://www.bu.edu/research/ethics-compliance/human-subjects/" target="_blank" style="color:var(--blue-text);">bu.edu/research/ethics-compliance/human-subjects</a></div>`,
+    no:`<div class="alert alert-amber"><strong>Be prepared.</strong> If your project later evolves to include data collection for research or publication, you will need to have IRB approval. It is best to seek this in advance of any data collection so you don't jeopardize your project or create compliance issues. Contact: <a href="https://www.bu.edu/research/ethics-compliance/human-subjects/" target="_blank" style="color:var(--blue-text);">bu.edu/research/ethics-compliance/human-subjects</a></div>`
   };
   g.innerHTML = msgs[val]||'';
   const data = loadAll();
@@ -1455,20 +1559,204 @@ function selectIRB(val){
 // ═══════════════════════════════════════════════════════
 function showMediaNote(){
   const v = document.getElementById('s-media').value;
-  document.getElementById('media-note').style.display = v==='yes'||v==='maybe' ? 'block':'none';
+  const show = v==='yes'||v==='maybe';
+  document.getElementById('media-note').style.display = show ? 'block':'none';
+  syncMediaToProjectPlan();
 }
 function showDataNote(){
   const v = document.getElementById('s-data').value;
-  document.getElementById('data-note').style.display = v==='yes-support' ? 'block':'none';
+  const show = v==='yes-support'||v==='yes-self'||v==='maybe';
+  document.getElementById('data-note').style.display = show ? 'block':'none';
+  syncDataToProjectPlan();
+}
+
+function syncMediaToProjectPlan(){
+  const v = document.getElementById('s-media').value;
+  const active = v==='yes'||v==='maybe';
+  const cost = parseFloat(document.getElementById('s-media-cost')?.value)||0;
+  // Budget: find or use Meeting/Workshop row as proxy; use desc to label it
+  if(budgetState.template){
+    const def = BUDGET_DEFS[budgetState.template];
+    const ri = def.opRows.findIndex(r=>r.name.toLowerCase().includes('meeting')||r.name.toLowerCase().includes('workshop'));
+    // Add as a separate dynamic op entry via desc override on "Other" row
+    // Instead, store in data and render dynamically in budget
+  }
+  // Milestones
+  customTasks = customTasks.filter(t=>t.id!=='media_task');
+  if(active){
+    customTasks.push({id:'media_task', name:'Plan and budget for media production', lead:'Faculty lead', milestone:'m1', date:'', blocker:'Budget for production support, stock licensing, and accessibility (captions) early — costs add up.', custom:true});
+  }
+  // Budget dynamic line
+  syncDynamicOpToBudget('media', active ? 'Media & Content Production' : null, cost);
+  const data = loadAll();
+  data.custom_tasks = customTasks;
+  data.media_cost = cost;
+  saveAll(data);
+  renderMilestones();
+}
+
+function syncDataToProjectPlan(){
+  const v = document.getElementById('s-data').value;
+  const active = v==='yes-support'||v==='yes-self'||v==='maybe';
+  const cost = parseFloat(document.getElementById('s-data-cost')?.value)||0;
+  customTasks = customTasks.filter(t=>t.id!=='data_task');
+  if(active){
+    customTasks.push({id:'data_task', name:'Establish data collection and analysis plan', lead:'Project team & data support', milestone:'m1', date:'', group:'Learning Analytics', blocker:'Identify data support resources and build this into your budget and timeline from the start.', custom:true});
+  }
+  syncDynamicOpToBudget('data', active ? 'Data & Analytics Support' : null, cost);
+  const data = loadAll();
+  data.custom_tasks = customTasks;
+  data.data_cost = cost;
+  saveAll(data);
+  renderMilestones();
+}
+
+// Dynamic op rows: keyed entries injected into budget outside template rows
+let dynamicOpRows = {}; // {key: {label, amount}}
+function syncDynamicOpToBudget(key, label, amount){
+  if(label && amount>0) dynamicOpRows[key] = {label, amount};
+  else delete dynamicOpRows[key];
+  renderBudgetBuilder();
+  saveBudget();
 }
 function showWorkerNote(){
   const v = document.getElementById('s-workers').value;
-  document.getElementById('worker-note').style.display = v&&v!=='no' ? 'block':'none';
+  const hiring = v && v !== 'no';
+  document.getElementById('worker-note').style.display = hiring ? 'block' : 'none';
+  document.getElementById('worker-details').style.display = hiring ? 'block' : 'none';
+}
+
+function syncWorkersToProjectPlan(){
+  const v = document.getElementById('s-workers').value;
+  const hiring = v && v !== 'no';
+  const cost = parseFloat(document.getElementById('s-worker-cost')?.value) || 0;
+  const date = document.getElementById('s-worker-date')?.value || '';
+
+  // ── Budget: populate the appropriate salary row(s) ──
+  if(budgetState.template){
+    const def = BUDGET_DEFS[budgetState.template];
+    // Map worker type to salary row name(s)
+    const rowNames = [];
+    if(v==='yes-grad'||v==='yes-both'){
+      // $25k has PhD Student; $5k/$10k use Research Assistant
+      const gradRow = def.salaryRows.find(r=>r.name.toLowerCase().includes('phd')||r.name.toLowerCase().includes('research assistant'));
+      if(gradRow) rowNames.push(gradRow.name);
+    }
+    if(v==='yes-undergrad'||v==='yes-both'){
+      const undergradRow = def.salaryRows.find(r=>r.name.toLowerCase().includes('hourly')||r.name.toLowerCase().includes('undergrad'));
+      if(undergradRow && !rowNames.includes(undergradRow.name)) rowNames.push(undergradRow.name);
+    }
+    // Distribute cost evenly across matched rows × period 0
+    def.salaryRows.forEach((row, ri)=>{
+      if(!budgetState.salary[ri]) budgetState.salary[ri]={amounts:def.defaultPeriods.map(()=>0),desc:''};
+      if(hiring && rowNames.includes(row.name)){
+        const share = rowNames.length > 1 ? Math.round(cost/2) : cost;
+        budgetState.salary[ri].amounts[0] = share;
+      }
+    });
+    renderBudgetBuilder();
+    saveBudget();
+  }
+
+  // ── Milestones: inject/remove hiring task in M1 ──
+  customTasks = customTasks.filter(t=>t.id!=='worker_hire');
+  if(hiring){
+    customTasks.push({
+      id: 'worker_hire',
+      name: 'Post and hire student worker position(s)',
+      lead: 'Faculty lead',
+      milestone: 'm1',
+      date: date,
+      blocker: 'HR onboarding takes 4–6 weeks minimum. Begin before the semester starts.',
+      custom: true
+    });
+  }
+  const data = loadAll();
+  data.custom_tasks = customTasks;
+  data.worker_details = { cost, date };
+  saveAll(data);
+  renderMilestones();
 }
 
 // ═══════════════════════════════════════════════════════
 // SAVE / LOAD SETUP
 // ═══════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════
+// AVAILABILITY ENTRIES
+// ═══════════════════════════════════════════════════════
+let availabilityEntries = [];
+
+function renderAvailabilityEntries(){
+  const container = document.getElementById('availability-entries');
+  if(!container) return;
+  if(availabilityEntries.length===0) availabilityEntries.push({name:'',start:'',end:''});
+  container.innerHTML = availabilityEntries.map((e,i)=>`
+    <div class="entry-row">
+      <input type="text" placeholder="Name / constraint description" value="${(e.name||'').replace(/"/g,'&quot;')}"
+        oninput="availabilityEntries[${i}].name=this.value;saveSetup();" style="flex:2;"/>
+      <input type="date" value="${e.start||''}" title="Unavailable from"
+        onchange="availabilityEntries[${i}].start=this.value;saveSetup();" style="flex:1;"/>
+      <input type="date" value="${e.end||''}" title="Unavailable until"
+        onchange="availabilityEntries[${i}].end=this.value;saveSetup();" style="flex:1;"/>
+      <button class="remove-btn" onclick="removeAvailabilityEntry(${i})" aria-label="Remove">✕</button>
+    </div>`).join('');
+}
+
+function addAvailabilityEntry(){
+  availabilityEntries.push({name:'',start:'',end:''});
+  renderAvailabilityEntries();
+}
+
+function removeAvailabilityEntry(i){
+  availabilityEntries.splice(i,1);
+  if(availabilityEntries.length===0) availabilityEntries.push({name:'',start:'',end:''});
+  renderAvailabilityEntries();
+  saveSetup();
+}
+
+function getAvailabilityEntries(){ return availabilityEntries; }
+
+// ═══════════════════════════════════════════════════════
+// PRIORITY ENTRIES
+// ═══════════════════════════════════════════════════════
+let priorityEntries = [];
+
+function renderPriorityEntries(){
+  const container = document.getElementById('priority-entries');
+  if(!container) return;
+  if(priorityEntries.length===0) priorityEntries.push({text:'',type:''});
+  container.innerHTML = priorityEntries.map((e,i)=>`
+    <div class="entry-row">
+      <input type="text" placeholder="Describe this project element" value="${(e.text||'').replace(/"/g,'&quot;')}"
+        oninput="priorityEntries[${i}].text=this.value;saveSetup();" style="flex:2;"/>
+      <div class="priority-toggle">
+        <button class="${e.type==='must'?'must':''}" onclick="setPriorityType(${i},'must')">Must-have</button>
+        <button class="${e.type==='nice'?'nice':''}" onclick="setPriorityType(${i},'nice')">Nice-to-have</button>
+      </div>
+      <button class="remove-btn" onclick="removePriorityEntry(${i})" aria-label="Remove">✕</button>
+    </div>`).join('');
+}
+
+function setPriorityType(i, type){
+  priorityEntries[i].type = priorityEntries[i].type===type ? '' : type;
+  renderPriorityEntries();
+  saveSetup();
+}
+
+function addPriorityEntry(){
+  priorityEntries.push({text:'',type:''});
+  renderPriorityEntries();
+}
+
+function removePriorityEntry(i){
+  priorityEntries.splice(i,1);
+  if(priorityEntries.length===0) priorityEntries.push({text:'',type:''});
+  renderPriorityEntries();
+  saveSetup();
+}
+
+function getPriorityEntries(){ return priorityEntries; }
+
 function saveSetup(){
   const data = loadAll();
   data.setup = {
@@ -1485,10 +1773,10 @@ function saveSetup(){
     prior: document.getElementById('s-prior').value,
     media: document.getElementById('s-media').value,
     data_needs: document.getElementById('s-data').value,
-    tech: document.getElementById('s-tech').value,
+    tech: document.getElementById('s-tech')?.value || '',
     workers: document.getElementById('s-workers').value,
-    availability: document.getElementById('s-availability').value,
-    priorities: document.getElementById('s-priorities').value,
+    availability: getAvailabilityEntries(),
+    priorities: getPriorityEntries(),
     irb_notes: document.getElementById('s-irb-notes').value,
   };
   saveAll(data);
@@ -1500,7 +1788,7 @@ function loadSetup(){
   const data = loadAll();
   const s = data.setup;
   if(!s) return;
-  const fields = ['title','lead','dept','team','start','end','challenge','vision','audience','prior','tech','availability','priorities'];
+  const fields = ['title','lead','dept','team','start','end','challenge','vision','audience','prior'];
   fields.forEach(f=>{
     const el = document.getElementById('s-'+f);
     if(el && s[f] !== undefined) el.value = s[f];
@@ -1515,6 +1803,18 @@ function loadSetup(){
   });
   if(s.irb_notes) document.getElementById('s-irb-notes').value = s.irb_notes;
   if(s.irb_status) selectIRB(s.irb_status);
+  // Restore worker details
+  const wd = data.worker_details || {};
+  if(wd.cost) document.getElementById('s-worker-cost').value = wd.cost;
+  if(wd.date) document.getElementById('s-worker-date').value = wd.date;
+  showWorkerNote();
+  // Restore repeating entries
+  if(Array.isArray(s.availability) && s.availability.length) availabilityEntries = s.availability;
+  else availabilityEntries = [{name:'',start:'',end:''}];
+  renderAvailabilityEntries();
+  if(Array.isArray(s.priorities) && s.priorities.length) priorityEntries = s.priorities;
+  else priorityEntries = [{text:'',type:''}];
+  renderPriorityEntries();
   updateProjectName();
 }
 
@@ -1555,21 +1855,34 @@ function loadFramework(){
 // ═══════════════════════════════════════════════════════
 const MILESTONE_TASKS = {
   m1: [
-    {name:'Identify project team and confirm roles', lead:'Faculty lead', blocker:null},
-    {name:'Hold project kickoff meeting with Shipley Center / IETL', lead:'Faculty lead & IETL', blocker:null},
-    {name:'Determine IRB status — submit application if required', lead:'Faculty lead', blocker:'IRB review takes 4–8 weeks. Do not collect data before formal approval.'},
-    {name:'Contact vendor / investigate technology platforms (accessibility, privacy, security)', lead:'Faculty lead & EdTech', blocker:'Vendor contracts may require BU legal review — start well in advance.'},
-    {name:'Post and hire student worker positions (if applicable)', lead:'Faculty lead', blocker:'Hiring and HR onboarding takes 4–6 weeks minimum. Begin before the semester starts.'},
-    {name:'Prepare and onboard student workers', lead:'Faculty lead', blocker:null},
-    {name:'Finalize vendor agreements and licenses', lead:'Faculty lead', blocker:null},
-    {name:'Plan learning analytics and data flow with data support team', lead:'Project team & data support', blocker:null},
-    {name:'Complete Impact Evaluation Framework (Problems → Data Analysis)', lead:'Full team', blocker:null},
-    {name:'Develop data collection instruments (surveys, rubrics, observation protocols)', lead:'Full team', blocker:null},
-    {name:'Launch project page on IETL site (project team shares assets)', lead:'Project team & IETL', blocker:null},
+    // General
+    {name:'Identify project team and confirm roles', lead:'Faculty lead', blocker:null, group:'General'},
+    {name:'Hold project kickoff', lead:'Faculty lead', blocker:null, group:'General'},
+    {name:'Share project team bios and photos with the Institute team', lead:'Project team', blocker:null, group:'General'},
+    // IRB
+    {name:'Confirm IRB review requirement', lead:'Faculty lead', blocker:'IRB review takes 4–8 weeks. Do not collect data before formal approval.', group:'IRB'},
+    {name:'Complete CITI training', lead:'Faculty lead', blocker:null, group:'IRB'},
+    {name:'Submit IRB application for review', lead:'Faculty lead', blocker:null, group:'IRB'},
+    // Content Development
+    {name:'Develop / revise learning materials', lead:'Faculty lead', blocker:null, group:'Content Development'},
+    {name:'Develop / revise assignments', lead:'Faculty lead', blocker:null, group:'Content Development'},
+    {name:'Develop / revise assessments', lead:'Faculty lead', blocker:null, group:'Content Development'},
+    {name:'Develop / revise rubrics', lead:'Faculty lead', blocker:null, group:'Content Development'},
+    {name:'Develop / revise instructor guides', lead:'Faculty lead', blocker:null, group:'Content Development'},
+    // Hiring
+    {name:'Post and hire student worker positions (if applicable)', lead:'Faculty lead', blocker:'Hiring and HR onboarding takes 4–6 weeks minimum. Begin before the semester starts.', group:'Hiring'},
+    {name:'Find and secure data analysis support', lead:'Faculty lead', blocker:null, group:'Hiring'},
+    {name:'Prepare and onboard student workers', lead:'Faculty lead', blocker:null, group:'Hiring'},
+    // Technology
+    {name:'Activate vendor licenses', lead:'Project team', blocker:null, group:'Technology'},
+    {name:'Finalize vendor agreements and licenses', lead:'Faculty lead', blocker:'Vendor contracts may require BU legal review — start well in advance.', group:'Technology'},
+    // Learning Analytics
+    {name:'Plan learning analytics and data flow with data support team', lead:'Project team', blocker:null, group:'Learning Analytics'},
+    {name:'Complete Impact Evaluation Framework (Problems → Data Analysis)', lead:'Full team', blocker:null, group:'Learning Analytics'},
+    {name:'Develop data collection instruments (surveys, rubrics, observation protocols)', lead:'Full team', blocker:null, group:'Learning Analytics'},
   ],
   m2: [
-    {name:'Acquire / activate vendor licenses', lead:'Project team', blocker:null},
-    {name:'Devise and finalize data plan with data support team', lead:'Project team & data support', blocker:null},
+    {name:'Finalize data plan with data support team', lead:'Project team', blocker:null},
     {name:'Implement pedagogical intervention in course(s)', lead:'Piloting instructors', blocker:null},
     {name:'Administer pre-intervention surveys and baseline measures', lead:'Project team', blocker:'Do not collect data until IRB approval is confirmed.'},
     {name:'Collect ongoing data per your data collection plan', lead:'Project team', blocker:null},
@@ -1577,27 +1890,27 @@ const MILESTONE_TASKS = {
     {name:'Collect teaching materials and artifacts for analysis', lead:'Project team', blocker:null},
   ],
   m3: [
-    {name:'Present at IETL Showcase or other campus venue', lead:'Faculty lead', blocker:null},
-    {name:'Analyze quantitative data (surveys, grades, LMS data)', lead:'Project team & data support', blocker:null},
+    {name:'Analyze quantitative data (surveys, grades, LMS data)', lead:'Project team', blocker:null},
     {name:'Analyze qualitative data (artifacts, interviews, open-ended responses)', lead:'Project team', blocker:null},
     {name:'Synthesize findings and draft impact narrative', lead:'Faculty lead', blocker:null},
-    {name:'Post selected resources to IETL site', lead:'IETL team', blocker:null},
-    {name:'Share findings via lightning talks or other information sessions', lead:'Project team & IETL', blocker:null},
+    {name:'Share requested resources with Institute team', lead:'Project team', blocker:null},
+    {name:'Share findings via lightning talks or other information sessions', lead:'Project team', blocker:null},
     {name:'Identify and pursue publication or conference dissemination', lead:'Faculty lead', blocker:null},
+    {name:'Present at Institute event', lead:'Faculty lead', blocker:null},
   ],
   m4: [
     {name:'Review data and assess plan for second iteration or scale', lead:'Full team', blocker:null},
     {name:'Refine intervention based on findings and faculty feedback', lead:'Faculty lead', blocker:null},
     {name:'Plan and implement second pilot (if applicable)', lead:'Piloting instructors', blocker:null},
-    {name:'Analyze second iteration data', lead:'Project team & data support', blocker:null},
+    {name:'Analyze second iteration data', lead:'Project team', blocker:null},
     {name:'Present findings to programs and broader BU community', lead:'Project team', blocker:null},
     {name:'Reflect on lessons learned — what would you do differently?', lead:'Full team', blocker:null},
     {name:'Develop plan to sustain or scale the intervention', lead:'Faculty lead', blocker:null},
   ],
   m5: [
     {name:'Complete project report', lead:'Faculty lead', blocker:null},
-    {name:'Submit final report to IETL / Shipley Center', lead:'Faculty lead', blocker:null},
-    {name:'Share resources and final findings with IETL for broader dissemination', lead:'Faculty lead & IETL', blocker:null},
+    {name:'Submit final report to Institute team', lead:'Faculty lead', blocker:null},
+    {name:'Share resources and final findings with Institute team for broader dissemination', lead:'Faculty lead', blocker:null},
     {name:'Document sustainability plan or handoff', lead:'Faculty lead', blocker:null},
   ]
 };
@@ -1610,22 +1923,124 @@ function renderMilestones(){
   taskStates = data.task_states || {};
   customTasks = data.custom_tasks || [];
 
+  const M1_GROUPS = ['General','IRB','Content Development','Hiring','Technology','Learning Analytics'];
+
   ['m1','m2','m3','m4','m5'].forEach(m=>{
     const container = document.getElementById(m+'-tasks');
     const tasks = MILESTONE_TASKS[m];
     const custom = customTasks.filter(t=>t.milestone===m);
-    const allTasks = [...tasks.map((t,i)=>({...t,id:m+'_'+i,custom:false})), ...custom.map(t=>({...t,custom:true}))];
+    let allTasks = [...tasks.map((t,i)=>({...t,id:m+'_'+i,custom:false})), ...custom.map(t=>({
+      ...t,
+      // Ensure auto-generated tasks land in the correct group regardless of stored value
+      group: (t.id && t.id.startsWith('tech_')) ? 'Technology'
+           : t.id === 'data_task' ? 'Learning Analytics'
+           : t.group,
+      custom:true
+    }))];
+    if(m==='m1'){
+      allTasks.sort((a,b)=>{
+        const ga = M1_GROUPS.indexOf(a.group||'');
+        const gb = M1_GROUPS.indexOf(b.group||'');
+        if(ga!==gb) return (ga===-1?999:ga)-(gb===-1?999:gb);
+        return 0;
+      });
+    }
 
-    container.innerHTML = allTasks.map(t=>`
-      <div class="task-row">
+    const taskMeta = data.task_meta || {};
+    const tools = (typeof techTools !== 'undefined') ? techTools.filter(t=>t.name.trim()) : [];
+
+    // ── helper: build a single task row HTML ──────────────────────
+    function buildTaskRow(t){
+      const meta = taskMeta[t.id] || {};
+      const lead = meta.lead !== undefined ? meta.lead : (t.lead||'');
+      const dueDate = meta.due || '';
+      const startDate = meta.start || '';
+      const isTechTask = t.id && t.id.startsWith('tech_');
+      const toolChecks = isTechTask && tools.length ? `<div style="margin-top:6px;display:flex;flex-wrap:wrap;gap:6px;">
+        ${tools.map(tool=>{
+          const checked = taskStates[t.id+'__'+tool.name] ? 'checked' : '';
+          return `<label style="display:inline-flex;align-items:center;gap:4px;font-size:12px;cursor:pointer;padding:2px 6px;background:rgba(26,39,68,0.05);border-radius:4px;">
+            <input type="checkbox" ${checked} style="width:13px;height:13px;accent-color:var(--navy);"
+              onchange="toggleTechToolCheck('${t.id}','${tool.name.replace(/'/g,"\\'")}',this.checked)"/>
+            ${tool.name}</label>`;
+        }).join('')}
+      </div>` : '';
+      const isAutoGenerated = t.custom && (t.id==='media_task'||t.id==='data_task'||t.id==='worker_hire'||isTechTask);
+      const removeBtn = t.custom && !isAutoGenerated ? `<button class="remove-btn" onclick="removeCustomTask('${t.id}')">✕</button>` : '';
+      return `<div class="task-row">
         <button class="task-check ${taskStates[t.id]?'done':''}" onclick="toggleMilestoneTask('${t.id}')"></button>
         <div class="task-body">
           <div class="task-name ${taskStates[t.id]?'done':''}">${t.name}</div>
-          <div class="task-lead">${t.lead||''}${t.date?' · Target: '+fmtDate(t.date):''}</div>
+          <div class="task-meta-row">
+            <div class="task-meta-field">
+              <label class="task-meta-label">Responsible</label>
+              <input type="text" class="task-meta-input" value="${lead.replace(/"/g,'&quot;')}" placeholder="Person responsible"
+                onchange="saveTaskMeta('${t.id}','lead',this.value)"/>
+            </div>
+            <div class="task-meta-field">
+              <label class="task-meta-label">Due date</label>
+              <input type="date" class="task-meta-input" value="${dueDate}"
+                onchange="saveTaskMeta('${t.id}','due',this.value)"/>
+            </div>
+            <div class="task-meta-field">
+              <label class="task-meta-label">Start date <span style="font-weight:400;opacity:0.7;">(optional)</span></label>
+              <input type="date" class="task-meta-input" value="${startDate}"
+                onchange="saveTaskMeta('${t.id}','start',this.value)"/>
+            </div>
+          </div>
+          ${toolChecks}
           ${t.blocker?`<div class="task-blocker">⚠ ${t.blocker}</div>`:''}
         </div>
-        ${t.custom?`<button class="task-check" style="border:none;font-size:13px;color:var(--text3);" onclick="removeCustomTask('${t.id}')">✕</button>`:''}
-      </div>`).join('');
+        ${removeBtn}
+      </div>`;
+    }
+
+    // ── helper: build an inline "add task" row ────────────────────
+    function buildAddRow(milestone, group){
+      const gid = (group||'none').replace(/\s+/g,'_');
+      const groupArg = group ? group.replace(/'/g,"\\'") : '';
+      return `<div class="task-row" style="background:rgba(26,39,68,0.025);border:1px dashed rgba(26,39,68,0.18);border-radius:6px;margin-top:4px;">
+        <div style="width:24px;min-width:24px;"></div>
+        <div class="task-body" style="flex:1;">
+          <input type="text" id="nt-name-${milestone}-${gid}" placeholder="+ Add a task…"
+            style="width:100%;font-size:13px;border:none;background:transparent;color:var(--text2);padding:2px 0;"
+            onkeydown="if(event.key==='Enter'){saveInlineTask('${milestone}','${groupArg}','${gid}');}"/>
+          <div class="task-meta-row" style="margin-top:6px;">
+            <div class="task-meta-field">
+              <label class="task-meta-label">Responsible</label>
+              <input type="text" class="task-meta-input" id="nt-lead-${milestone}-${gid}" placeholder="Person responsible"/>
+            </div>
+            <div class="task-meta-field">
+              <label class="task-meta-label">Due date</label>
+              <input type="date" class="task-meta-input" id="nt-due-${milestone}-${gid}"/>
+            </div>
+            <div class="task-meta-field">
+              <label class="task-meta-label">Start date <span style="font-weight:400;opacity:0.7;">(optional)</span></label>
+              <input type="date" class="task-meta-input" id="nt-start-${milestone}-${gid}"/>
+            </div>
+          </div>
+        </div>
+        <button class="btn-sm" onclick="saveInlineTask('${milestone}','${groupArg}','${gid}')"
+          style="align-self:flex-start;margin-top:2px;">Add</button>
+      </div>`;
+    }
+
+    // ── render ─────────────────────────────────────────────────────
+    let html = '';
+    if(m==='m1'){
+      const byGroup = {};
+      M1_GROUPS.forEach(g=>{ byGroup[g]=[]; });
+      allTasks.forEach(t=>{ const g=t.group||'General'; if(!byGroup[g]) byGroup[g]=[]; byGroup[g].push(t); });
+      M1_GROUPS.forEach(group=>{
+        html += `<div style="margin:14px 0 4px;font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--navy);opacity:0.65;padding-bottom:3px;border-bottom:1px solid rgba(26,39,68,0.12);">${group}</div>`;
+        byGroup[group].forEach(t=>{ html += buildTaskRow(t); });
+        html += buildAddRow(m, group);
+      });
+    } else {
+      allTasks.forEach(t=>{ html += buildTaskRow(t); });
+      html += buildAddRow(m, null);
+    }
+    container.innerHTML = html;
 
     const total = allTasks.length;
     const done = allTasks.filter(t=>taskStates[t.id]).length;
@@ -1640,6 +2055,14 @@ function renderMilestones(){
   }
 }
 
+function saveTaskMeta(id, field, value){
+  const data = loadAll();
+  if(!data.task_meta) data.task_meta = {};
+  if(!data.task_meta[id]) data.task_meta[id] = {};
+  data.task_meta[id][field] = value;
+  saveAll(data);
+}
+
 function toggleMilestoneTask(id){
   taskStates[id] = !taskStates[id];
   const data = loadAll();
@@ -1648,10 +2071,38 @@ function toggleMilestoneTask(id){
   renderMilestones();
 }
 
+function toggleTechToolCheck(taskId, toolName, checked){
+  taskStates[taskId+'__'+toolName] = checked;
+  const data = loadAll();
+  data.task_states = taskStates;
+  saveAll(data);
+}
+
 function removeCustomTask(id){
   customTasks = customTasks.filter(t=>t.id!==id);
   const data = loadAll();
   data.custom_tasks = customTasks;
+  saveAll(data);
+  renderMilestones();
+}
+
+function saveInlineTask(milestone, group, gid){
+  const nameEl = document.getElementById(`nt-name-${milestone}-${gid}`);
+  if(!nameEl) return;
+  const name = nameEl.value.trim();
+  if(!name) return;
+  const lead  = document.getElementById(`nt-lead-${milestone}-${gid}`)?.value || '';
+  const due   = document.getElementById(`nt-due-${milestone}-${gid}`)?.value  || '';
+  const start = document.getElementById(`nt-start-${milestone}-${gid}`)?.value || '';
+  const id = 'custom_'+Date.now();
+  const task = { id, name, lead, milestone, date: due, group: group||null, custom: true };
+  customTasks.push(task);
+  const data = loadAll();
+  data.custom_tasks = customTasks;
+  if(lead||due||start){
+    if(!data.task_meta) data.task_meta = {};
+    data.task_meta[id] = { lead, due, start };
+  }
   saveAll(data);
   renderMilestones();
 }
@@ -1698,15 +2149,35 @@ function toggleMilestone(id){
 // BUDGET BUILDER
 // ═══════════════════════════════════════════════════════
 const BUDGET_DEFS = {
-  '10k': {
-    max: 10000,
+  '5k': {
+    max: 5000,
     defaultPeriods: [
       {label:'Fall 2026 (Sept–Dec)'},
       {label:'Spring 2027 (Jan–May)'},
     ],
     salaryRows: [
+      {name:'Summer Stipend', fringeRate:0.31},
+      {name:'Course Release', fringeRate:0.31},
+      {name:'Other Faculty (describe)', fringeRate:0.31, hasDesc:true},
+      {name:'Research Assistant (Hourly)', fringeRate:0},
+    ],
+    opRows: [
+      {name:'AI Tools & Software Licenses (e.g., ChatGPT Pro, Jutly)'},
+      {name:'Supplies, Equipment, & Materials'},
+      {name:'Meeting / Workshop Expense'},
+      {name:'Other, please describe', hasDesc:true},
+    ]
+  },
+  '10k': {
+    max: 10000,
+    defaultPeriods: [
+      {label:'Fall 2026 (Sept–Dec)'},
+      {label:'Spring 2027 (Jan–May)'},
+      {label:'Summer 2027 (Jun–Aug)'},
+    ],
+    salaryRows: [
       {name:'Summer Stipend (shared between PIs)', fringeRate:0.31},
-      {name:'Course Release / Adjunct', fringeRate:0.31},
+      {name:'Course Release', fringeRate:0.31},
       {name:'Other Faculty (describe)', fringeRate:0.31, hasDesc:true},
       {name:'Research Assistant (Hourly)', fringeRate:0},
     ],
@@ -1726,7 +2197,7 @@ const BUDGET_DEFS = {
       {label:'Fall 2027 (Sept–Dec)'},
     ],
     salaryRows: [
-      {name:'Course Release / Adjunct', fringeRate:0.31},
+      {name:'Course Release', fringeRate:0.31},
       {name:'Summer Salary', fringeRate:0.31},
       {name:'Overbase', fringeRate:0.31},
       {name:'Other Faculty (describe)', fringeRate:0.31, hasDesc:true},
@@ -1750,13 +2221,43 @@ const BUDGET_DEFS = {
 
 let budgetState = {template:null, periods:[], salary:[], op:[]};
 
+// Term label patterns per template
+const TERM_PATTERNS = {
+  '5k': (yr) => [
+    `Fall ${yr} (Sept–Dec)`,
+    `Spring ${yr+1} (Jan–May)`,
+  ],
+  '10k': (yr) => [
+    `Fall ${yr} (Sept–Dec)`,
+    `Spring ${yr+1} (Jan–May)`,
+    `Summer ${yr+1} (Jun–Aug)`,
+  ],
+  '25k': (yr) => [
+    `Fall ${yr} (Sept–Dec)`,
+    `Spring ${yr+1} (Jan–May)`,
+    `Summer ${yr+1} (Jun–Aug)`,
+    `Fall ${yr+1} (Sept–Dec)`,
+  ],
+};
+
+function updateBudgetYear(yr){
+  yr = parseInt(yr);
+  if(!budgetState.template || !TERM_PATTERNS[budgetState.template]) return;
+  const labels = TERM_PATTERNS[budgetState.template](yr);
+  labels.forEach((lbl,i)=>{ if(budgetState.periods[i]) budgetState.periods[i].label = lbl; });
+  renderBudgetBuilder();
+  saveBudget();
+}
+
 function selectBudgetTemplate(tpl){
   const def = BUDGET_DEFS[tpl];
   if(!def) return;
   const prev = budgetState.template;
   budgetState.template = tpl;
   if(prev !== tpl){
-    budgetState.periods = def.defaultPeriods.map(p=>({...p}));
+    const startYr = parseInt(document.getElementById('budget-start-year')?.value || 2026);
+    const labels = TERM_PATTERNS[tpl] ? TERM_PATTERNS[tpl](startYr) : def.defaultPeriods.map(p=>p.label);
+    budgetState.periods = def.defaultPeriods.map((p,i)=>({...p, label: labels[i]||p.label}));
     budgetState.salary = def.salaryRows.map(()=>({amounts:def.defaultPeriods.map(()=>0), desc:''}));
     budgetState.op = def.opRows.map(()=>({amount:0, desc:''}));
   }
@@ -1784,7 +2285,7 @@ function renderBudgetBuilder(){
   let pInputs = '';
   for(let p=0;p<nP;p++){
     pInputs += `<div class="field" style="flex:1;min-width:130px;">
-      <label>Period ${p+1}</label>
+      <label>Term ${p+1}</label>
       <input type="text" value="${periods[p].label||''}" oninput="budgetState.periods[${p}].label=this.value;renderBudgetBuilder();saveBudget();" style="width:100%;font-size:13px;"/>
     </div>`;
   }
@@ -1840,6 +2341,17 @@ function renderBudgetBuilder(){
       <td class="bgt-na-cell">—</td>
     </tr>`;
   });
+  // Dynamic rows from tech tools, media, data
+  Object.entries(dynamicOpRows).forEach(([key,row])=>{
+    if(!row.label||!row.amount) return;
+    opTotal+=row.amount;
+    opRowsHtml+=`<tr class="bgt-data-row" style="background:var(--orange-pale);">
+      <td class="bgt-label-cell" style="font-style:italic;">${row.label}</td>
+      ${emptyP}
+      <td class="bgt-input-cell">${fmt$(row.amount)}</td>
+      <td class="bgt-na-cell" style="font-size:11px;color:var(--text3);">auto</td>
+    </tr>`;
+  });
 
   const grandTotal=sfTotal+opTotal;
   const remaining=def.max-grandTotal;
@@ -1849,7 +2361,7 @@ function renderBudgetBuilder(){
     ?`Over budget by $${Math.abs(remaining).toLocaleString('en-US',{minimumFractionDigits:2})} — exceeds $${def.max.toLocaleString()} maximum`
     :`Within budget — $${remaining.toLocaleString('en-US',{minimumFractionDigits:2})} remaining of $${def.max.toLocaleString()} maximum`;
 
-  const colHeaders=periods.map(p=>`<th class="bgt-period-header">${p.label||'Period'}</th>`).join('');
+  const colHeaders=periods.map(p=>`<th class="bgt-period-header">${p.label||'Term'}</th>`).join('');
   const gtByP=sfByP.map(v=>v);
   const gtCells=gtByP.map(v=>`<td class="bgt-total-cell">${fmt$(v)}</td>`).join('');
 
@@ -1899,13 +2411,166 @@ function getGrantAmount(){
 
 function onGrantAmountChange(radio){
   const g = parseFloat(radio.value);
-  if(g===5000||g===10000) selectBudgetTemplate('10k');
+  if(g===5000) selectBudgetTemplate('5k');
+  else if(g===10000) selectBudgetTemplate('10k');
   else if(g===25000) selectBudgetTemplate('25k');
   saveData();
 }
 
 function updateBudgetTotal(){
   // legacy no-op — grant amount now driven by radio buttons
+}
+
+// ═══════════════════════════════════════════════════════
+// TECH CONSIDERATIONS
+// ═══════════════════════════════════════════════════════
+const TECH_ITEMS = [
+  {key:'accessibility', label:'Accessibility', desc:'Does it meet WCAG standards and work with screen readers?'},
+  {key:'privacy',       label:'Privacy',       desc:'Does it comply with FERPA for student data?'},
+  {key:'security',      label:'Security',      desc:'Does it meet BU\'s data security requirements?'},
+  {key:'cost',          label:'Cost',          desc:'Licenses, per-seat fees, renewal costs — have you confirmed total expense?'},
+  {key:'vendor',        label:'Vendor contracts', desc:'Some tools require a Statement of Work reviewed by BU\'s legal team, which takes time.'},
+];
+
+// techTools: [{name, cost}]  techState: {itemKey: {toolKey: status, notes}}
+let techTools = [];
+let techState = {};
+
+function renderTechToolEntries(){
+  const container = document.getElementById('tech-tool-entries');
+  if(!container) return;
+  if(techTools.length===0) techTools.push({name:'',cost:0});
+  container.innerHTML = techTools.map((t,i)=>`
+    <div class="entry-row">
+      <input type="text" placeholder="Tool name (e.g. ChatGPT Pro)" value="${(t.name||'').replace(/"/g,'&quot;')}"
+        style="flex:2;" oninput="techTools[${i}].name=this.value;saveTechConsiderations();syncTechToBudget();renderTechConsiderations();"/>
+      <input type="number" min="0" step="100" placeholder="Cost $" value="${t.cost||''}"
+        style="flex:1;min-width:100px;" oninput="techTools[${i}].cost=parseFloat(this.value)||0;saveTechConsiderations();syncTechToBudget();"/>
+      <button class="remove-btn" onclick="removeTechTool(${i})" aria-label="Remove">✕</button>
+    </div>`).join('');
+}
+
+function addTechToolEntry(){
+  techTools.push({name:'',cost:0});
+  renderTechToolEntries();
+}
+
+function removeTechTool(i){
+  techTools.splice(i,1);
+  if(techTools.length===0) techTools.push({name:'',cost:0});
+  renderTechToolEntries();
+  saveTechConsiderations();
+  syncTechToBudget();
+  syncTechToMilestones();
+  renderTechConsiderations();
+}
+
+function renderTechConsiderations(){
+  const container = document.getElementById('tech-considerations');
+  if(!container) return;
+  const tools = techTools.filter(t=>t.name.trim());
+  container.innerHTML = TECH_ITEMS.map(item=>{
+    const itemState = techState[item.key] || {};
+    const notes = itemState.notes || '';
+    const hasStatus = itemState.overall ? true : false;
+    const notesVis = notes || hasStatus ? 'visible' : '';
+    const toolList = tools.length
+      ? `<div style="margin-top:6px;font-size:12px;color:var(--text3);">${tools.map(t=>t.name).join(' · ')}</div>`
+      : '';
+    return `<div class="tc-row" id="tc-row-${item.key}">
+      <div class="tc-header">
+        <div class="tc-label">${item.label}<div class="tc-desc">${item.desc}</div></div>
+        <div class="tc-pills">
+          <button class="tc-pill ${itemState.overall==='addressed'?'addressed':''}" onclick="setTechItemOverall('${item.key}','addressed')">✓ All addressed</button>
+          <button class="tc-pill ${itemState.overall==='needs_attention'?'needs_attention':''}" onclick="setTechItemOverall('${item.key}','needs_attention')">⚠ Needs attention</button>
+          <button class="tc-pill ${itemState.overall==='na'?'na':''}" onclick="setTechItemOverall('${item.key}','na')">N/A</button>
+        </div>
+      </div>
+      ${toolList}
+      <div class="tc-notes ${notesVis}">
+        <input type="text" placeholder="Notes…" value="${notes.replace(/"/g,'&quot;')}"
+          style="width:100%;font-size:13px;"
+          oninput="if(!techState['${item.key}'])techState['${item.key}']={};techState['${item.key}'].notes=this.value;saveTechConsiderations();" />
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function setTechToolStatus(itemKey, toolName, checked){
+  if(!techState[itemKey]) techState[itemKey]={};
+  techState[itemKey][toolName] = checked ? 'done' : '';
+  // Auto-mark overall addressed if all tools checked
+  const tools = techTools.filter(t=>t.name.trim());
+  const allDone = tools.length>0 && tools.every(t=>techState[itemKey][t.name]==='done');
+  if(allDone) techState[itemKey].overall = 'addressed';
+  saveTechConsiderations();
+  syncTechToMilestones();
+  renderTechConsiderations();
+}
+
+function setTechItemOverall(key, status){
+  if(!techState[key]) techState[key]={};
+  techState[key].overall = techState[key].overall===status ? '' : status;
+  saveTechConsiderations();
+  syncTechToMilestones();
+  renderTechConsiderations();
+}
+
+function saveTechConsiderations(){
+  const data = loadAll();
+  data.tech_considerations = { tools: techTools, items: techState };
+  saveAll(data);
+}
+
+function loadTechConsiderations(){
+  const data = loadAll();
+  const tc = data.tech_considerations || {};
+  techTools = Array.isArray(tc.tools) ? tc.tools : (tc.tools ? [{name:tc.tools,cost:tc.cost||0}] : []);
+  techState = tc.items || {};
+  renderTechToolEntries();
+  renderTechConsiderations();
+}
+
+function syncTechToBudget(){
+  if(!budgetState.template) return;
+  // Each named tool gets its own dynamic op row
+  const existingKeys = Object.keys(dynamicOpRows).filter(k=>k.startsWith('tool_'));
+  existingKeys.forEach(k=>delete dynamicOpRows[k]);
+  techTools.filter(t=>t.name.trim()).forEach((t,i)=>{
+    dynamicOpRows['tool_'+i] = {label: t.name.trim(), amount: t.cost||0};
+  });
+  renderBudgetBuilder();
+  saveBudget();
+}
+
+function syncTechToMilestones(){
+  customTasks = customTasks.filter(t=>!t.id.startsWith('tech_'));
+  const tools = techTools.filter(t=>t.name.trim());
+  if(!tools.length) { const data=loadAll(); data.custom_tasks=customTasks; saveAll(data); renderMilestones(); return; }
+  // One task per consideration, listing tool names
+  TECH_ITEMS.forEach(item=>{
+    const itemState = techState[item.key]||{};
+    if(itemState.overall==='na') return;
+    const needsWork = itemState.overall==='needs_attention' ||
+      tools.some(t=>!itemState[t.name]||itemState[t.name]!=='done');
+    if(needsWork){
+      const toolList = tools.map(t=>t.name).join(', ');
+      customTasks.push({
+        id: 'tech_'+item.key,
+        name: item.key==='cost' ? `Confirm cost: ${toolList}` : `Confirm ${item.label.toLowerCase()} compliance: ${toolList}`,
+        lead: 'Faculty lead & EdTech',
+        milestone: 'm1',
+        date: '',
+        group: 'Technology',
+        blocker: item.key==='vendor'?'Vendor contracts may require BU legal review — start well in advance.':null,
+        custom: true
+      });
+    }
+  });
+  const data = loadAll();
+  data.custom_tasks = customTasks;
+  saveAll(data);
+  renderMilestones();
 }
 
 function saveBudget(){
@@ -1921,7 +2586,8 @@ function loadBudget(){
     selectBudgetTemplate(budgetState.template);
   } else {
     const g=getGrantAmount();
-    if(g===5000||g===10000) selectBudgetTemplate('10k');
+    if(g===5000) selectBudgetTemplate('5k');
+    else if(g===10000) selectBudgetTemplate('10k');
     else if(g===25000) selectBudgetTemplate('25k');
   }
 }
@@ -2037,7 +2703,7 @@ async function aiScopeReview(){
   if(s.priorities)   filled.push(`Priorities: ${s.priorities}`);
 
   if(filled.length === 0){
-    out.innerHTML = `<div class="alert alert-amber">Nothing to review yet — fill in some fields on this page first, then ask for feedback.</div>`;
+    out.innerHTML = `<div class="ai-response"><strong>Nothing to review yet</strong> — fill in some fields on this page first, then ask for feedback.</div>`;
     return;
   }
 
@@ -2080,27 +2746,244 @@ async function reviewFramework(){
   }
 }
 
+// ═══════════════════════════════════════════════════════
+// CSV DOWNLOAD + GANTT CHART
+// ═══════════════════════════════════════════════════════
+
+function getAllProjectTasks(){
+  const data = loadAll();
+  const taskMeta = data.task_meta || {};
+  const taskStatesLocal = data.task_states || {};
+  const customTasksLocal = data.custom_tasks || [];
+  const milestoneLabels = {m1:'Milestone 1: Prepare',m2:'Milestone 2: Conduct & Gather',m3:'Milestone 3: Analyze & Share',m4:'Milestone 4: Iterate & Scale',m5:'Milestone 5: Report & Close'};
+  const rows = [];
+  // Goals & Roles sheet rows first (header)
+  const setup = data.setup || {};
+  const teamRows = [];
+  if(setup.lead) teamRows.push({role:'Faculty Lead',name:setup.lead,dept:setup.dept||''});
+  (setup.team_members||[]).forEach(m=>{ if(m.name) teamRows.push({role:m.role||'Team Member',name:m.name,dept:''}); });
+  // Build task rows
+  ['m1','m2','m3','m4','m5'].forEach(m=>{
+    const tasks = MILESTONE_TASKS[m];
+    const custom = customTasksLocal.filter(t=>t.milestone===m);
+    const all = [...tasks.map((t,i)=>({...t,id:m+'_'+i})), ...custom];
+    all.forEach(t=>{
+      const meta = taskMeta[t.id] || {};
+      const lead = meta.lead !== undefined ? meta.lead : (t.lead||'');
+      const status = taskStatesLocal[t.id] ? 'Complete' : (meta.start ? 'In Progress' : 'Not Started');
+      rows.push({
+        milestone: milestoneLabels[m] || m,
+        group: t.group || '',
+        task: t.name,
+        responsible: lead,
+        start: meta.start || '',
+        end: meta.due || '',
+        status,
+        notes: (t.blocker || '')
+      });
+    });
+  });
+  return {rows, teamRows};
+}
+
+function downloadProjectCSV(){
+  const {rows, teamRows} = getAllProjectTasks();
+  const data = loadAll();
+  const setup = data.setup || {};
+  let csv = '';
+  // Sheet 1: Goals & Roles (flattened as header rows)
+  csv += 'PROJECT TEAM\r\n';
+  csv += 'Role,Name,Department\r\n';
+  teamRows.forEach(r=>{ csv += `"${r.role}","${r.name}","${r.dept}"\r\n`; });
+  csv += '\r\n';
+  // Sheet 2: Tasks
+  csv += 'TASKS, RESPONSIBILITIES & TIMELINE\r\n';
+  csv += 'Milestone,Group,Task,Responsible Party,Start,End,Status,Notes\r\n';
+  rows.forEach(r=>{
+    csv += [r.milestone,r.group,r.task,r.responsible,r.start,r.end,r.status,r.notes]
+      .map(v=>`"${(v||'').replace(/"/g,'""')}"`)
+      .join(',') + '\r\n';
+  });
+  const blob = new Blob([csv], {type:'text/csv'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `${(setup.title||'Shipley-Project').replace(/\s+/g,'_')}_Project_Plan.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function showGanttModal(){
+  const {rows} = getAllProjectTasks();
+  renderGantt(rows);
+  document.getElementById('gantt-modal').style.display = 'block';
+}
+
+function closeGanttModal(){
+  document.getElementById('gantt-modal').style.display = 'none';
+}
+
+function renderGantt(rows){
+  // Find date range across all tasks
+  const today = new Date();
+  let minDate = new Date(today.getFullYear(), today.getMonth(), 1);
+  let maxDate = new Date(today.getFullYear(), today.getMonth()+6, 1);
+  rows.forEach(r=>{
+    if(r.start){ const d = new Date(r.start+'T00:00:00'); if(!isNaN(d) && d<minDate) minDate=new Date(d.getFullYear(),d.getMonth(),1); }
+    if(r.end){ const d = new Date(r.end+'T00:00:00'); if(!isNaN(d) && d>maxDate) maxDate=new Date(d.getFullYear(),d.getMonth()+1,1); }
+  });
+  // Build monthly columns
+  const months = [];
+  let cur = new Date(minDate);
+  while(cur <= maxDate){
+    months.push(new Date(cur));
+    cur.setMonth(cur.getMonth()+1);
+  }
+  const totalMonths = months.length;
+  const msPerMonth = (maxDate-minDate)/totalMonths;
+  function colPos(dateStr){
+    if(!dateStr) return null;
+    const d = new Date(dateStr+'T00:00:00');
+    if(isNaN(d)) return null;
+    return Math.max(0,Math.min(totalMonths, (d-minDate)/msPerMonth));
+  }
+  const COL_W = 80;
+  const ROW_H = 34;
+  const LABEL_W = 240;
+  const milestoneColors = {
+    'm1':'#4A86E8','m2':'#4A86E8','m3':'#4A86E8','m4':'#4A86E8','m5':'#4A86E8'
+  };
+  const statusFill = {'Complete':'#93C47D','In Progress':'#FFE599','Not Started':'#EA9999'};
+  const milestoneOrder = ['Milestone 1: Prepare','Milestone 2: Conduct & Gather','Milestone 3: Analyze & Share','Milestone 4: Iterate & Scale','Milestone 5: Report & Close'];
+  // Group rows by milestone
+  const grouped = {};
+  milestoneOrder.forEach(m=>{ grouped[m]=[]; });
+  rows.forEach(r=>{ if(grouped[r.milestone]) grouped[r.milestone].push(r); });
+  let html = `<div style="min-width:${LABEL_W+COL_W*totalMonths}px;">`;
+  // Header row
+  html += `<div style="display:flex;background:var(--navy);color:#fff;font-size:11px;font-weight:700;border-radius:6px 6px 0 0;">`;
+  html += `<div style="width:${LABEL_W}px;min-width:${LABEL_W}px;padding:8px 10px;">Task</div>`;
+  months.forEach(m=>{
+    html += `<div style="width:${COL_W}px;min-width:${COL_W}px;text-align:center;padding:8px 2px;">${m.toLocaleDateString('en-US',{month:'short',year:'2-digit'})}</div>`;
+  });
+  html += '</div>';
+  // Rows
+  milestoneOrder.forEach(milestone=>{
+    const mRows = grouped[milestone]||[];
+    if(!mRows.length) return;
+    // Milestone header
+    html += `<div style="display:flex;align-items:center;background:#4A86E8;color:#fff;font-size:12px;font-weight:700;padding:6px 10px;">`;
+    html += `<div style="width:${LABEL_W}px;min-width:${LABEL_W}px;">${milestone}</div>`;
+    html += `<div style="flex:1;"></div></div>`;
+    // Task rows
+    mRows.forEach((r,ri)=>{
+      const bg = ri%2===0?'#fff':'#f6f8fb';
+      const fill = statusFill[r.status]||'#ccc';
+      const s = colPos(r.start);
+      const e = colPos(r.end);
+      html += `<div style="display:flex;align-items:center;background:${bg};border-bottom:1px solid #eee;min-height:${ROW_H}px;">`;
+      html += `<div style="width:${LABEL_W}px;min-width:${LABEL_W}px;padding:4px 8px;font-size:11px;line-height:1.3;color:var(--text1);">${r.task}</div>`;
+      // Draw bar in monthly grid
+      html += `<div style="flex:1;position:relative;height:${ROW_H}px;display:flex;">`;
+      months.forEach((mo,mi)=>{
+        html += `<div style="width:${COL_W}px;min-width:${COL_W}px;border-left:1px solid #eee;height:100%;box-sizing:border-box;"></div>`;
+      });
+      if(s!==null && e!==null && e>s){
+        const left = s*COL_W;
+        const width = Math.max(4,(e-s)*COL_W);
+        html += `<div style="position:absolute;top:8px;height:18px;left:${left}px;width:${width}px;background:${fill};border-radius:4px;border:1px solid rgba(0,0,0,0.1);box-sizing:border-box;" title="${r.task}: ${r.start} → ${r.end} (${r.status})"></div>`;
+      }
+      html += `</div></div>`;
+    });
+  });
+  // Legend
+  html += `<div style="display:flex;gap:16px;padding:10px 12px;font-size:11px;border-top:1px solid #eee;flex-wrap:wrap;">`;
+  Object.entries(statusFill).forEach(([label,color])=>{
+    html += `<span><span style="display:inline-block;width:14px;height:14px;background:${color};border-radius:3px;border:1px solid rgba(0,0,0,0.15);vertical-align:middle;margin-right:4px;"></span>${label}</span>`;
+  });
+  html += '</div>';
+  html += '</div>';
+  document.getElementById('gantt-container').innerHTML = html;
+}
+
+let timelineHistory = [];
+
 async function aiTimelineHelp(){
+  // Start a fresh conversation with context
+  timelineHistory = [];
   const out = document.getElementById('timeline-output');
   showThinking(out);
   const data = loadAll();
-  const done = Object.values(data.task_states||{}).filter(Boolean).length;
+  const done = Object.values(data.task_states||{}).filter(v=>v===true).length;
   const notes = data.milestone_notes || {};
-  const prompt = `I have ${done} tasks completed across my project milestones. Here are my milestone notes:\nM1 (Prepare): ${notes.m1||'none'}\nM2 (Conduct & Gather): ${notes.m2||'none'}\nM3 (Analyze & Share): ${notes.m3||'none'}\nM4 (Iterate & Scale): ${notes.m4||'none'}\nM5 (Report & Close): ${notes.m5||'none'}\n\nCan you help me think through my timeline and any risks I should be aware of?`;
+  const systemContext = `I have ${done} tasks completed across my project milestones. Here are my milestone notes:\nM1 (Prepare): ${notes.m1||'none'}\nM2 (Conduct & Gather): ${notes.m2||'none'}\nM3 (Analyze & Share): ${notes.m3||'none'}\nM4 (Iterate & Scale): ${notes.m4||'none'}\nM5 (Report & Close): ${notes.m5||'none'}\n\nCan you help me think through my timeline and any risks I should be aware of?`;
   try{
-    const r = await callGuide(prompt);
+    const r = await callGuide(systemContext);
+    timelineHistory.push({role:'user',content:systemContext});
+    timelineHistory.push({role:'assistant',content:r});
     out.innerHTML=`<div class="ai-response">${r}</div>`;
   }catch(e){
     out.innerHTML=`<div class="ai-response" style="border-left-color:var(--red);">Something went wrong.</div>`;
   }
 }
 
+async function aiTimelineChat(){
+  const inputEl = document.getElementById('timeline-input');
+  const input = inputEl.value.trim();
+  if(!input) return;
+  const out = document.getElementById('timeline-output');
+  // Append user message
+  const existingHTML = out.innerHTML;
+  out.innerHTML = existingHTML + `<div style="background:rgba(26,39,68,0.05);border-radius:8px;padding:10px 14px;margin-bottom:8px;font-size:13px;"><strong>You:</strong> ${input}</div>`;
+  inputEl.value = '';
+  const thinkingDiv = document.createElement('div');
+  out.appendChild(thinkingDiv);
+  showThinking(thinkingDiv);
+  timelineHistory.push({role:'user',content:input});
+  // Build prompt with conversation history
+  const historyText = timelineHistory.slice(0,-1).map(m=>`${m.role==='user'?'Faculty':'Guide'}: ${m.content}`).join('\n\n');
+  const fullPrompt = (historyText ? historyText + '\n\nFaculty: ' : '') + input;
+  try{
+    const r = await callGuide(fullPrompt);
+    timelineHistory.push({role:'assistant',content:r});
+    thinkingDiv.outerHTML = `<div class="ai-response" style="margin-bottom:8px;">${r}</div>`;
+  }catch(e){
+    thinkingDiv.outerHTML = `<div class="ai-response" style="border-left-color:var(--red);margin-bottom:8px;">Something went wrong.</div>`;
+  }
+}
+
+let budgetHistory = [];
+
+async function aiBudgetChat(){
+  const inputEl = document.getElementById('budget-input');
+  const input = inputEl.value.trim();
+  if(!input) return;
+  const out = document.getElementById('budget-output');
+  const existingHTML = out.innerHTML;
+  out.innerHTML = existingHTML + `<div style="background:rgba(26,39,68,0.05);border-radius:8px;padding:10px 14px;margin-bottom:8px;font-size:13px;"><strong>You:</strong> ${input}</div>`;
+  inputEl.value = '';
+  const thinkingDiv = document.createElement('div');
+  out.appendChild(thinkingDiv);
+  showThinking(thinkingDiv);
+  budgetHistory.push({role:'user',content:input});
+  const historyText = budgetHistory.slice(0,-1).map(m=>`${m.role==='user'?'Faculty':'Guide'}: ${m.content}`).join('\n\n');
+  const fullPrompt = (historyText ? historyText + '\n\nFaculty: ' : '') + input;
+  try{
+    const r = await callGuide(fullPrompt);
+    budgetHistory.push({role:'assistant',content:r});
+    thinkingDiv.outerHTML = `<div class="ai-response" style="margin-bottom:8px;">${r}</div>`;
+  }catch(e){
+    thinkingDiv.outerHTML = `<div class="ai-response" style="border-left-color:var(--red);margin-bottom:8px;">Something went wrong.</div>`;
+  }
+}
+
 async function aibudgethelp(){
+  budgetHistory = [];
   const out = document.getElementById('budget-output');
   showThinking(out);
   const def = BUDGET_DEFS[budgetState.template];
   if(!def){
-    out.innerHTML=`<div class="ai-response">Please select a budget template ($10K or $25K) first.</div>`;
+    out.innerHTML=`<div class="ai-response">Please select a budget template first.</div>`;
     return;
   }
   let summary = `Grant award: $${def.max.toLocaleString()} (${budgetState.template==='10k'?'$10K':'$25K'} template)\n\nSalary line items:\n`;
@@ -2126,6 +3009,8 @@ async function aibudgethelp(){
   const prompt=`Please review my Shipley project budget and give me specific, practical feedback. Flag concerns, common pitfalls for this type of grant, or categories I may have overlooked.\n\n${summary}`;
   try{
     const r = await callGuide(prompt);
+    budgetHistory.push({role:'user',content:prompt});
+    budgetHistory.push({role:'assistant',content:r});
     out.innerHTML=`<div class="ai-response">${r}</div>`;
   }catch(e){
     out.innerHTML=`<div class="ai-response" style="border-left-color:var(--red);">Something went wrong.</div>`;
@@ -2172,13 +3057,16 @@ function fmtDate(s){
 // INIT
 // ═══════════════════════════════════════════════════════
 window.addEventListener('DOMContentLoaded',()=>{
+  renderAvailabilityEntries();
+  renderPriorityEntries();
+  renderTechToolEntries();
   loadSetup();
+  loadTechConsiderations();
   loadFramework();
   loadBudget();
   loadReport();
   renderMilestones();
   updateReportTitlePreview();
-
 });
 </script>
 </body>
