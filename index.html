@@ -6,6 +6,7 @@
 <title>Shipley Academic Innovation Project Guide</title>
 <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
 <script src="https://cdn.jsdelivr.net/npm/mammoth@1.8.0/mammoth.browser.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/exceljs@4.3.0/dist/exceljs.min.js"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 
@@ -204,6 +205,8 @@ a:hover{color:var(--navy);}
 .field{margin-bottom:14px;}
 .field label{display:block;font-size:13px;color:var(--text2);margin-bottom:5px;font-weight:500;}
 .field .hint{font-size:12px;color:var(--text3);margin-top:4px;line-height:1.5;}
+.conditional-note{margin-top:12px;padding-top:4px;}
+.conditional-note .hint{margin-top:0;}
 .radio-pill-group{display:flex;gap:10px;flex-wrap:wrap;margin-top:6px;}
 /* Tech consideration rows */
 .tc-row{border:1px solid var(--border);border-radius:8px;padding:10px 12px;margin-bottom:8px;background:var(--bg);}
@@ -245,8 +248,10 @@ a:hover{color:var(--navy);}
   border-left:3px solid var(--gold);color:var(--text);
 }
 .thinking{
-  display:flex;align-items:center;gap:8px;
-  font-size:13px;color:var(--text3);padding:12px 0;
+  display:flex;align-items:center;gap:12px;
+  font-size:14px;font-weight:500;color:var(--navy);padding:14px 18px;
+  background:var(--gold-pale);border-left:3px solid var(--orange);
+  border-radius:var(--radius);margin-top:4px;
 }
 .dots span{
   display:inline-block;width:5px;height:5px;border-radius:50%;
@@ -309,10 +314,12 @@ a:hover{color:var(--navy);}
 }
 .task-row:last-child{border-bottom:none;}
 .task-check{
-  width:20px;height:20px;border-radius:4px;border:1.5px solid var(--border2);
-  flex-shrink:0;cursor:pointer;background:none;padding:0;
+  width:22px;height:22px;border-radius:4px;border:1.5px solid var(--border2);
+  flex-shrink:0;cursor:pointer;background:#fff;padding:0;
   display:flex;align-items:center;justify-content:center;transition:all .15s;margin-top:1px;
+  font-size:14px;line-height:1;
 }
+.task-check.in-progress{background:var(--amber-bg);border-color:var(--amber);color:var(--amber);}
 .task-check.done{background:var(--green-bg);border-color:var(--green);}
 .task-check.done::after{
   content:'';width:10px;height:6px;
@@ -322,7 +329,16 @@ a:hover{color:var(--navy);}
 .task-body{flex:1;}
 .task-name{font-size:14px;color:var(--text);}
 .task-name.done{color:var(--text3);text-decoration:line-through;}
+.task-name.in-progress{color:var(--text2);}
 .task-lead{font-size:12px;color:var(--text3);margin-top:2px;}
+/* FIX 6: AI response action buttons */
+.ai-actions{display:flex;gap:8px;margin-top:6px;margin-bottom:14px;}
+.ai-actions button{font-size:12px;padding:4px 12px;border-width:1px;}
+/* FIX 15: Gantt scrollbar always visible */
+#gantt-scroll-area{overflow-x:scroll;overflow-y:visible;scrollbar-width:auto;}
+#gantt-scroll-area::-webkit-scrollbar{height:12px;display:block;}
+#gantt-scroll-area::-webkit-scrollbar-track{background:#f0f0f0;border-radius:5px;}
+#gantt-scroll-area::-webkit-scrollbar-thumb{background:var(--navy2);border-radius:5px;}
 .task-meta-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:6px;}
 .task-meta-field{display:flex;flex-direction:column;gap:2px;flex:1;min-width:130px;}
 .task-meta-label{font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.04em;}
@@ -581,10 +597,12 @@ a:hover{color:var(--navy);}
         </div>
       </div>
 
-      <div style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap;">
-        <button class="btn-primary" onclick="runProposalImport()" id="import-btn" disabled
-          style="opacity:0.5;cursor:not-allowed;">Import from proposal ↗</button>
-        <button onclick="clearImportFile()" class="btn-sm">Clear</button>
+      <div id="import-actions" style="display:none;margin-top:14px;">
+        <div style="display:flex;gap:10px;flex-wrap:wrap;">
+          <button class="btn-primary" onclick="runProposalImport()" id="import-btn" disabled
+            style="opacity:0.5;cursor:not-allowed;">Import from proposal ↗</button>
+          <button onclick="clearImportFile()" class="btn-sm">Clear</button>
+        </div>
       </div>
       <div id="import-output" style="margin-top:14px;" aria-live="polite"></div>
     </div>
@@ -727,7 +745,7 @@ a:hover{color:var(--navy);}
         <option value="maybe">Possibly — still determining scope</option>
         <option value="no">No — no media production needed</option>
       </select>
-      <div id="media-note" style="display:none;">
+      <div id="media-note" class="conditional-note" style="display:none;">
         <div class="hint" style="color:var(--amber-text);margin-top:4px;">Media production involves real costs and lead time. Budget for this early — production support, licensing stock footage or music, accessibility requirements (captions, audio descriptions) can all add up. Factor this into your timeline.</div>
         <div class="field" style="margin-top:8px;">
           <label>Estimated media production cost ($)</label>
@@ -747,7 +765,7 @@ a:hover{color:var(--navy);}
         <option value="maybe">Possibly — still determining scope</option>
         <option value="no">No data analysis anticipated</option>
       </select>
-      <div id="data-note" style="display:none;">
+      <div id="data-note" class="conditional-note" style="display:none;">
         <div class="hint" style="color:var(--amber-text);margin-top:4px;">If you need data analysis support, plan for this well in advance. Options include hiring a graduate student with quantitative skills, collaborating with a colleague who has that expertise, or consulting with BU's Institutional Research office. This should be factored into your budget and timeline from the start.</div>
         <div class="field" style="margin-top:8px;">
           <label>Estimated data &amp; analytics cost ($)</label>
@@ -780,7 +798,7 @@ a:hover{color:var(--navy);}
         <option value="yes-both">Yes — both graduate and undergraduate</option>
         <option value="no">No student workers planned</option>
       </select>
-      <div id="worker-note" class="hint" style="display:none;color:var(--amber-text);">Hiring student workers involves administrative steps that take longer than most faculty expect. You will need to post positions, conduct interviews, complete HR onboarding paperwork, and set up payroll — plan for 4–6 weeks minimum before a student worker can begin paid work. If your project depends on student worker contributions early in the semester, begin this process before the semester starts. Also confirm with your department whether a stipend or hourly employment is more appropriate for your project.</div>
+      <div id="worker-note" class="conditional-note hint" style="display:none;color:var(--amber-text);">Hiring student workers involves administrative steps that take longer than most faculty expect. You will need to post positions, conduct interviews, complete HR onboarding paperwork, and set up payroll — plan for 4–6 weeks minimum before a student worker can begin paid work. If your project depends on student worker contributions early in the semester, begin this process before the semester starts. Also confirm with your department whether a stipend or hourly employment is more appropriate for your project.</div>
     </div>
 
     <div id="worker-details" style="display:none;">
@@ -813,7 +831,7 @@ a:hover{color:var(--navy);}
 
   <div style="display:flex;gap:10px;justify-content:flex-end;">
     <button onclick="saveSetup()" class="btn-primary">Save project setup</button>
-    <button onclick="aiScopeReview()" class="btn-gold">Get scoping feedback ↗</button>
+    <button onclick="aiScopeReview()" class="btn-gold" id="btn-scope-feedback">Get scoping feedback ↗</button>
   </div>
   <div id="scope-output" style="margin-top:16px;"></div>
 
@@ -1033,20 +1051,7 @@ a:hover{color:var(--navy);}
     </div>
   </div>
 
-  <!-- Export / Gantt -->
-  <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px;">
-    <button class="btn-primary" onclick="downloadProjectCSV()">⬇ Download Project Plan (CSV)</button>
-    <button class="btn-primary" onclick="showGanttModal()">📊 View Gantt Chart</button>
-  </div>
-  <div id="gantt-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:9999;overflow:auto;padding:20px;">
-    <div style="background:#fff;border-radius:12px;max-width:98vw;margin:0 auto;padding:24px;position:relative;">
-      <button onclick="closeGanttModal()" style="position:absolute;top:14px;right:18px;background:none;border:none;font-size:20px;cursor:pointer;color:var(--text2);">✕</button>
-      <h2 style="margin:0 0 16px;font-size:17px;color:var(--navy);">Project Gantt Chart</h2>
-      <div id="gantt-container" style="overflow-x:auto;"></div>
-    </div>
-  </div>
-
-  <!-- Custom Tasks -->
+  <!-- Custom Tasks — FIX 13: moved BEFORE download/gantt buttons -->
   <div class="card">
     <div class="card-header">
       <div class="card-icon">➕</div>
@@ -1081,20 +1086,31 @@ a:hover{color:var(--navy);}
     <button class="btn-primary" onclick="addCustomTask()">Add task</button>
   </div>
 
-  <div class="card" style="margin-top:8px;">
-    <div class="card-header">
-      <div class="card-icon">🗓</div>
-      <div><div class="card-title">Timeline Guide</div><div class="card-sub">Ask questions about your project timeline</div></div>
-    </div>
-    <div id="timeline-output" style="margin-bottom:12px;"></div>
-    <div style="display:flex;gap:8px;align-items:flex-end;">
-      <textarea id="timeline-input" placeholder="Ask about your timeline, risks, or sequencing…" rows="2"
-        style="flex:1;font-size:13px;resize:vertical;"
-        onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();aiTimelineChat();}"></textarea>
-      <button class="btn-gold" onclick="aiTimelineChat()" style="white-space:nowrap;">Send ↗</button>
-    </div>
-    <button class="btn-primary" onclick="aiTimelineHelp()" style="margin-top:8px;">Start a new conversation</button>
+  <!-- FIX 13: Download + Gantt buttons AFTER custom task card -->
+  <!-- FIX 17: Excel download replaces CSV -->
+  <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px;">
+    <button class="btn-primary" onclick="downloadProjectExcel()">⬇ Download Project Plan (.xlsx)</button>
+    <button class="btn-primary" onclick="showGanttModal()">📊 View Gantt Chart</button>
   </div>
+  <!-- FIX 15: Gantt modal with sticky legend and always-visible scrollbar -->
+  <div id="gantt-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:9999;overflow:auto;padding:20px;">
+    <div style="background:#fff;border-radius:12px;max-width:98vw;margin:0 auto;padding:24px;position:relative;display:flex;flex-direction:column;max-height:90vh;">
+      <button onclick="closeGanttModal()" style="position:absolute;top:14px;right:18px;background:none;border:none;font-size:20px;cursor:pointer;color:var(--text2);">✕</button>
+      <h2 style="margin:0 0 8px;font-size:17px;color:var(--navy);">Project Gantt Chart</h2>
+      <div style="display:flex;gap:16px;padding:8px 12px;font-size:11px;font-weight:500;border-bottom:1px solid #eee;margin-bottom:8px;flex-wrap:wrap;" id="gantt-legend">
+        <span><span style="display:inline-block;width:14px;height:14px;background:#93C47D;border-radius:3px;border:1px solid rgba(0,0,0,0.15);vertical-align:middle;margin-right:4px;"></span>Complete</span>
+        <span><span style="display:inline-block;width:14px;height:14px;background:#FFE599;border-radius:3px;border:1px solid rgba(0,0,0,0.15);vertical-align:middle;margin-right:4px;"></span>In Progress</span>
+        <span><span style="display:inline-block;width:14px;height:14px;background:#EA9999;border-radius:3px;border:1px solid rgba(0,0,0,0.15);vertical-align:middle;margin-right:4px;"></span>Not Started</span>
+      </div>
+      <div id="gantt-scroll-area" style="flex:1;overflow-x:scroll;"></div>
+    </div>
+  </div>
+
+  <!-- FIX 14: Replace timeline guide with Get Timeline Feedback button -->
+  <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:8px;">
+    <button class="btn-gold" onclick="aiTimelineHelp(this)">Get Timeline Feedback ↗</button>
+  </div>
+  <div id="timeline-output" style="margin-top:16px;"></div>
 
 </div><!-- end milestones -->
 
@@ -1305,22 +1321,24 @@ a:hover{color:var(--navy);}
 // ═══════════════════════════════════════════════════════
 // SYSTEM PROMPT
 // ═══════════════════════════════════════════════════════
-const SYSTEM = `You are the Shipley Academic Innovation Project Guide, a knowledgeable and collegial advisor for faculty teams at Boston University conducting pedagogical innovation projects funded by the Shipley Academic Innovation fund through the Institute for Excellence in Teaching & Learning (IETL).
+const SYSTEM = `You are the Shipley Academic Innovation Project Guide — a seasoned advisor for faculty teams at Boston University running Shipley Academic Innovation projects. You have over 15 years of experience managing faculty projects in higher education settings.
 
-Your role: help faculty teams plan, execute, measure, and report on innovative teaching and learning projects. You are a peer — warm, direct, and expert — not a bureaucrat. You treat faculty as capable professionals who need specific guidance in areas outside their typical expertise: project management, impact measurement, data collection, and educational research methodology.
+Your role: help faculty teams plan, execute, measure, and report on innovative teaching and learning projects. You are a trusted colleague — warm, direct, and experienced. You treat faculty as capable professionals who need specific guidance in areas outside their typical expertise: project management, impact measurement, data collection, and educational research methodology.
+
+When you give feedback, make it specific and grounded. Move toward something useful — name problems clearly when you see them, the way an experienced colleague would, without fanfare or excessive hedging. Avoid rhetorical parallel constructions ("you're not just doing X, you're doing Y") — they read as performative rather than genuine. Say what you see, flag what matters, and point toward the next useful step.
 
 Key knowledge you bring:
-- The Shipley project framework: four milestones (Prepare → Conduct & Gather Data → Analyze & Share Findings → Reflect/Iterate/Scale)
+- The Shipley project framework: five milestones (Prepare → Conduct & Gather Data → Analyze & Share Findings → Reflect/Iterate/Scale → Report & Close)
 - The Impact Evaluation Framework: Problems → Objectives → Impacts → Measures & Targets → Data Collection → Data Analysis
-- IRB requirements for Scholarship of Teaching and Learning (SoTL) and Educational Research — many faculty don't realize these projects may require IRB review
-- Common project blockers: student worker hiring takes 4-6 weeks; vendor contracts require BU legal review; technology tools need accessibility/privacy/security vetting; 9-month faculty contracts affect summer availability
+- IRB requirements for Scholarship of Teaching and Learning (SoTL) and educational research
+- Common project blockers: student worker hiring takes 4–6 weeks; vendor contracts require BU legal review; technology tools need accessibility/privacy/security vetting; 9-month faculty contracts affect summer availability
 - Technology considerations: FERPA compliance for student data, WCAG accessibility standards, BU data security requirements
 - Survey design for educational research: validated scales, pre/post design, incentive strategies
 - Data analysis options: paired t-tests for pre/post, thematic coding for qualitative data, descriptive statistics
-- SoTL dissemination: ISSOTL, discipline-specific teaching journals, conference venues
-- BU context: Institute Showcase as a dissemination venue, BU IRB office, BU grants administration
+- Dissemination: ISSOTL, discipline-specific teaching journals, conference venues
+- BU context: the Institute Showcase as a dissemination venue, BU IRB office, BU grants administration
 
-Tone: Collegial and direct. You are a knowledgeable colleague, not a help desk. Be specific. Don't hedge unnecessarily. When faculty describe a plan that has a real problem, name it clearly and helpfully.
+Never refer to the Institute for Excellence in Teaching & Learning as "IETL" — always use "the Institute" or "the Institute team."
 
 Always draw on the faculty's specific project context when available. Reference their project title, goals, team, and framework entries to give relevant, personalized advice.`;
 
@@ -1377,6 +1395,7 @@ function toggleImportCard(){
 function togglePasteFallback(){
   const el = document.getElementById('paste-fallback');
   el.style.display = el.style.display==='none' ? 'block' : 'none';
+  if(el.style.display==='block') document.getElementById('import-actions').style.display='block';
 }
 
 function handleFileDrop(e){
@@ -1416,6 +1435,7 @@ function setImportReady(text, filename){
   document.getElementById('ur-filename').textContent = filename;
   document.getElementById('ur-wordcount').textContent = wordCount.toLocaleString()+' words';
   document.getElementById('upload-ready').style.display = 'flex';
+  document.getElementById('import-actions').style.display = 'block';
   const btn = document.getElementById('import-btn');
   btn.disabled = false; btn.style.opacity='1'; btn.style.cursor='pointer';
 }
@@ -1426,6 +1446,7 @@ function clearImportFile(){
   document.getElementById('import-text').value = '';
   document.getElementById('upload-ready').style.display = 'none';
   document.getElementById('import-output').innerHTML = '';
+  document.getElementById('import-actions').style.display = 'none';
   const btn = document.getElementById('import-btn');
   btn.disabled = true; btn.style.opacity='0.5'; btn.style.cursor='not-allowed';
 }
@@ -1869,20 +1890,22 @@ const MILESTONE_TASKS = {
     {name:'Develop / revise assessments', lead:'Faculty lead', blocker:null, group:'Content Development'},
     {name:'Develop / revise rubrics', lead:'Faculty lead', blocker:null, group:'Content Development'},
     {name:'Develop / revise instructor guides', lead:'Faculty lead', blocker:null, group:'Content Development'},
-    // Hiring
-    {name:'Post and hire student worker positions (if applicable)', lead:'Faculty lead', blocker:'Hiring and HR onboarding takes 4–6 weeks minimum. Begin before the semester starts.', group:'Hiring'},
+    // Hiring — FIX 7: reordered: Post → Find/secure → Hire → Prepare/onboard
+    {name:'Post student worker positions', lead:'Faculty lead', blocker:'Hiring and HR onboarding takes 4–6 weeks minimum. Begin before the semester starts.', group:'Hiring'},
     {name:'Find and secure data analysis support', lead:'Faculty lead', blocker:null, group:'Hiring'},
+    {name:'Hire student workers', lead:'Faculty lead', blocker:null, group:'Hiring'},
     {name:'Prepare and onboard student workers', lead:'Faculty lead', blocker:null, group:'Hiring'},
-    // Technology
+    // Technology — FIX 8: Finalize agreements second-to-last, Activate licenses last
+    {name:'Identify and vet technology tools (accessibility, privacy, security)', lead:'Faculty lead', blocker:null, group:'Technology'},
+    {name:'Finalize vendor agreements', lead:'Faculty lead', blocker:'Vendor contracts may require BU legal review — start well in advance.', group:'Technology'},
     {name:'Activate vendor licenses', lead:'Project team', blocker:null, group:'Technology'},
-    {name:'Finalize vendor agreements and licenses', lead:'Faculty lead', blocker:'Vendor contracts may require BU legal review — start well in advance.', group:'Technology'},
     // Learning Analytics
-    {name:'Plan learning analytics and data flow with data support team', lead:'Project team', blocker:null, group:'Learning Analytics'},
+    {name:'Plan learning analytics and data flow', lead:'Project team', blocker:null, group:'Learning Analytics'},
     {name:'Complete Impact Evaluation Framework (Problems → Data Analysis)', lead:'Full team', blocker:null, group:'Learning Analytics'},
     {name:'Develop data collection instruments (surveys, rubrics, observation protocols)', lead:'Full team', blocker:null, group:'Learning Analytics'},
   ],
   m2: [
-    {name:'Finalize data plan with data support team', lead:'Project team', blocker:null},
+    {name:'Finalize data plan', lead:'Project team', blocker:null},
     {name:'Implement pedagogical intervention in course(s)', lead:'Piloting instructors', blocker:null},
     {name:'Administer pre-intervention surveys and baseline measures', lead:'Project team', blocker:'Do not collect data until IRB approval is confirmed.'},
     {name:'Collect ongoing data per your data collection plan', lead:'Project team', blocker:null},
@@ -1893,8 +1916,8 @@ const MILESTONE_TASKS = {
     {name:'Analyze quantitative data (surveys, grades, LMS data)', lead:'Project team', blocker:null},
     {name:'Analyze qualitative data (artifacts, interviews, open-ended responses)', lead:'Project team', blocker:null},
     {name:'Synthesize findings and draft impact narrative', lead:'Faculty lead', blocker:null},
-    {name:'Share requested resources with Institute team', lead:'Project team', blocker:null},
-    {name:'Share findings via lightning talks or other information sessions', lead:'Project team', blocker:null},
+    {name:'Share findings with the broader BU community', lead:'Project team', blocker:null},
+    {name:'Present findings to program and department colleagues', lead:'Faculty lead', blocker:null},
     {name:'Identify and pursue publication or conference dissemination', lead:'Faculty lead', blocker:null},
     {name:'Present at Institute event', lead:'Faculty lead', blocker:null},
   ],
@@ -1903,14 +1926,14 @@ const MILESTONE_TASKS = {
     {name:'Refine intervention based on findings and faculty feedback', lead:'Faculty lead', blocker:null},
     {name:'Plan and implement second pilot (if applicable)', lead:'Piloting instructors', blocker:null},
     {name:'Analyze second iteration data', lead:'Project team', blocker:null},
-    {name:'Present findings to programs and broader BU community', lead:'Project team', blocker:null},
     {name:'Reflect on lessons learned — what would you do differently?', lead:'Full team', blocker:null},
     {name:'Develop plan to sustain or scale the intervention', lead:'Faculty lead', blocker:null},
   ],
   m5: [
     {name:'Complete project report', lead:'Faculty lead', blocker:null},
-    {name:'Submit final report to Institute team', lead:'Faculty lead', blocker:null},
-    {name:'Share resources and final findings with Institute team for broader dissemination', lead:'Faculty lead', blocker:null},
+    {name:'Submit final report to the Institute team', lead:'Faculty lead', blocker:null},
+    {name:'Share requested resources with the Institute team', lead:'Faculty lead', blocker:null},
+    {name:'Share resources and final findings with the Institute team for broader dissemination', lead:'Faculty lead', blocker:null},
     {name:'Document sustainability plan or handoff', lead:'Faculty lead', blocker:null},
   ]
 };
@@ -1968,9 +1991,9 @@ function renderMilestones(){
       const isAutoGenerated = t.custom && (t.id==='media_task'||t.id==='data_task'||t.id==='worker_hire'||isTechTask);
       const removeBtn = t.custom && !isAutoGenerated ? `<button class="remove-btn" onclick="removeCustomTask('${t.id}')">✕</button>` : '';
       return `<div class="task-row">
-        <button class="task-check ${taskStates[t.id]?'done':''}" onclick="toggleMilestoneTask('${t.id}')"></button>
+        <button class="task-check ${taskStates[t.id]==='done'||taskStates[t.id]===true?'done':taskStates[t.id]==='in_progress'?'in-progress':''}" onclick="toggleMilestoneTask('${t.id}')">${taskStates[t.id]==='in_progress'?'•':''}</button>
         <div class="task-body">
-          <div class="task-name ${taskStates[t.id]?'done':''}">${t.name}</div>
+          <div class="task-name ${taskStates[t.id]==='done'||taskStates[t.id]===true?'done':taskStates[t.id]==='in_progress'?'in-progress':''}">${t.name}</div>
           <div class="task-meta-row">
             <div class="task-meta-field">
               <label class="task-meta-label">Responsible</label>
@@ -2043,8 +2066,11 @@ function renderMilestones(){
     container.innerHTML = html;
 
     const total = allTasks.length;
-    const done = allTasks.filter(t=>taskStates[t.id]).length;
-    document.getElementById(m+'-status').textContent = `${done} of ${total} complete`;
+    const done = allTasks.filter(t=>taskStates[t.id]==='done'||taskStates[t.id]===true).length;
+    const inProg = allTasks.filter(t=>taskStates[t.id]==='in_progress').length;
+    let statusText = `${done} of ${total} complete`;
+    if(inProg > 0) statusText += ` · ${inProg} in progress`;
+    document.getElementById(m+'-status').textContent = statusText;
   });
 
   if(data.milestone_notes){
@@ -2064,7 +2090,10 @@ function saveTaskMeta(id, field, value){
 }
 
 function toggleMilestoneTask(id){
-  taskStates[id] = !taskStates[id];
+  const current = taskStates[id];
+  if(!current || current === null) taskStates[id] = 'in_progress';
+  else if(current === 'in_progress') taskStates[id] = 'done';
+  else taskStates[id] = null;
   const data = loadAll();
   data.task_states = taskStates;
   saveAll(data);
@@ -2677,11 +2706,37 @@ async function callGuide(userMsg){
 }
 
 function showThinking(el){
-  el.innerHTML=`<div class="thinking"><span>Your guide is thinking</span><div class="dots"><span></span><span></span><span></span></div></div>`;
+  el.innerHTML=`<div class="thinking"><div class="dots"><span></span><span></span><span></span></div><span>Your guide is working on this…</span></div>`;
+}
+
+function setButtonLoading(btn, loading){
+  if(!btn||typeof btn==='string') return;
+  if(loading){btn.disabled=true;btn.dataset.origText=btn.textContent;btn.textContent='Working…';btn.style.opacity='0.7';}
+  else{btn.disabled=false;btn.textContent=btn.dataset.origText||btn.textContent;btn.style.opacity='1';}
+}
+
+function renderAIResponse(container, text){
+  const id='ai-r-'+Date.now();
+  container.innerHTML=`<div class="ai-response" id="${id}">${text}</div><div class="ai-actions"><button class="btn-sm" onclick="copyAIResponse('${id}')">📋 Copy</button><button class="btn-sm" onclick="saveAIResponseAsPDF('${id}')">⬇ Save as PDF</button></div>`;
+}
+function copyAIResponse(id){
+  const el=document.getElementById(id);if(!el)return;
+  navigator.clipboard.writeText(el.innerText).then(()=>flashSave()).catch(()=>{});
+}
+function saveAIResponseAsPDF(id){
+  const el=document.getElementById(id);if(!el)return;
+  const data=loadAll();const title=(data.setup&&data.setup.title)||'Shipley Project';
+  const date=new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});
+  const win=window.open('','_blank');
+  win.document.write(`<!DOCTYPE html><html><head><title>${title} — Guide Feedback</title><style>body{font-family:Georgia,serif;max-width:680px;margin:40px auto;color:#222;line-height:1.7;font-size:14px;}h1{font-size:18px;color:#1a2744;margin-bottom:4px;}.meta{font-size:12px;color:#888;margin-bottom:24px;border-bottom:1px solid #eee;padding-bottom:12px;}.content{white-space:pre-wrap;}</style></head><body><h1>${title}</h1><div class="meta">Shipley Project Guide feedback — ${date}</div><div class="content">${el.innerText}</div></body></html>`);
+  win.document.close();setTimeout(()=>win.print(),500);
 }
 
 async function aiScopeReview(){
+  const btn = document.getElementById('btn-scope-feedback');
+  if(!btn) return;
   const out = document.getElementById('scope-output');
+  setButtonLoading(btn, true);
   showThinking(out);
   saveSetup();
   const data = loadAll();
@@ -2704,16 +2759,17 @@ async function aiScopeReview(){
 
   if(filled.length === 0){
     out.innerHTML = `<div class="ai-response"><strong>Nothing to review yet</strong> — fill in some fields on this page first, then ask for feedback.</div>`;
+    setButtonLoading(btn, false);
     return;
   }
 
   const prompt = `You are reviewing a faculty member's project scoping information. Only give feedback on what has actually been provided — do not reference or flag omissions for fields that weren't shared with you. Be collegial, specific, and direct. Flag any risks or things worth thinking through more carefully based only on what is here.\n\n${filled.join('\n')}`;
   try{
     const r = await callGuide(prompt);
-    out.innerHTML=`<div class="ai-response">${r}</div>`;
+    renderAIResponse(out, r);
   }catch(e){
     out.innerHTML=`<div class="ai-response" style="border-left-color:var(--red);">Something went wrong — please try again.</div>`;
-  }
+  }finally{ setButtonLoading(btn, false); }
 }
 
 async function askImpact(){
@@ -2723,7 +2779,7 @@ async function askImpact(){
   showThinking(out);
   try{
     const r = await callGuide(input + '\n\nContext: I am working on my Impact Evaluation Framework for my Shipley project.');
-    out.innerHTML=`<div class="ai-response">${r}</div>`;
+    renderAIResponse(out, r);
   }catch(e){
     out.innerHTML=`<div class="ai-response" style="border-left-color:var(--red);">Something went wrong.</div>`;
   }
@@ -2740,14 +2796,14 @@ async function reviewFramework(){
   const prompt = `Please review my Impact Evaluation Framework entries and give me specific, direct feedback. Are the objectives measurable? Do the measures align with the impacts? Is the data collection plan realistic? What's missing or underdeveloped?\n\nProblems: ${fw.problems||'empty'}\nObjectives: ${fw.objectives||'empty'}\nImpacts: ${fw.impacts||'empty'}\nMeasures & Targets: ${fw.measures||'empty'}\nData Collection: ${fw.collection||'empty'}\nData Analysis: ${fw.analysis||'empty'}`;
   try{
     const r = await callGuide(prompt);
-    out.innerHTML=`<div class="ai-response">${r}</div>`;
+    renderAIResponse(out, r);
   }catch(e){
     out.innerHTML=`<div class="ai-response" style="border-left-color:var(--red);">Something went wrong.</div>`;
   }
 }
 
 // ═══════════════════════════════════════════════════════
-// CSV DOWNLOAD + GANTT CHART
+// EXCEL DOWNLOAD + GANTT CHART
 // ═══════════════════════════════════════════════════════
 
 function getAllProjectTasks(){
@@ -2770,7 +2826,7 @@ function getAllProjectTasks(){
     all.forEach(t=>{
       const meta = taskMeta[t.id] || {};
       const lead = meta.lead !== undefined ? meta.lead : (t.lead||'');
-      const status = taskStatesLocal[t.id] ? 'Complete' : (meta.start ? 'In Progress' : 'Not Started');
+      const status = (taskStatesLocal[t.id]==='done'||taskStatesLocal[t.id]===true) ? 'Complete' : taskStatesLocal[t.id]==='in_progress' ? 'In Progress' : 'Not Started';
       rows.push({
         milestone: milestoneLabels[m] || m,
         group: t.group || '',
@@ -2786,29 +2842,93 @@ function getAllProjectTasks(){
   return {rows, teamRows};
 }
 
-function downloadProjectCSV(){
+async function downloadProjectExcel(){
   const {rows, teamRows} = getAllProjectTasks();
   const data = loadAll();
   const setup = data.setup || {};
-  let csv = '';
-  // Sheet 1: Goals & Roles (flattened as header rows)
-  csv += 'PROJECT TEAM\r\n';
-  csv += 'Role,Name,Department\r\n';
-  teamRows.forEach(r=>{ csv += `"${r.role}","${r.name}","${r.dept}"\r\n`; });
-  csv += '\r\n';
-  // Sheet 2: Tasks
-  csv += 'TASKS, RESPONSIBILITIES & TIMELINE\r\n';
-  csv += 'Milestone,Group,Task,Responsible Party,Start,End,Status,Notes\r\n';
+  const wb = new ExcelJS.Workbook();
+
+  // Colors by milestone
+  const mColors = {
+    'Milestone 1: Prepare':'4472C4',
+    'Milestone 2: Conduct & Gather':'5B9BD5',
+    'Milestone 3: Analyze & Share':'70AD47',
+    'Milestone 4: Iterate & Scale':'FFC000',
+    'Milestone 5: Report & Close':'ED7D31'
+  };
+  const statusColors = {'Complete':'C6EFCE','In Progress':'FFEB9C','Not Started':'FFC7CE'};
+  const statusFonts = {'Complete':'006100','In Progress':'9C6500','Not Started':'9C0006'};
+
+  // ── Sheet 1: Team ──
+  const ws1 = wb.addWorksheet('Project Team');
+  ws1.columns = [{header:'Role',key:'role',width:25},{header:'Name',key:'name',width:30},{header:'Department',key:'dept',width:30}];
+  ws1.getRow(1).font = {bold:true,color:{argb:'FFFFFF'}};
+  ws1.getRow(1).fill = {type:'pattern',pattern:'solid',fgColor:{argb:'1A2744'}};
+  teamRows.forEach(r=>ws1.addRow(r));
+
+  // ── Sheet 2: Tasks ──
+  const ws2 = wb.addWorksheet('Tasks & Timeline');
+  ws2.columns = [
+    {header:'Milestone',key:'milestone',width:28},
+    {header:'Group',key:'group',width:20},
+    {header:'Task',key:'task',width:45},
+    {header:'Responsible',key:'responsible',width:22},
+    {header:'Start',key:'start',width:14},
+    {header:'End',key:'end',width:14},
+    {header:'Status',key:'status',width:14},
+    {header:'Notes',key:'notes',width:30}
+  ];
+  ws2.getRow(1).font = {bold:true,color:{argb:'FFFFFF'}};
+  ws2.getRow(1).fill = {type:'pattern',pattern:'solid',fgColor:{argb:'1A2744'}};
+
+  let lastMilestone = '';
   rows.forEach(r=>{
-    csv += [r.milestone,r.group,r.task,r.responsible,r.start,r.end,r.status,r.notes]
-      .map(v=>`"${(v||'').replace(/"/g,'""')}"`)
-      .join(',') + '\r\n';
+    const row = ws2.addRow(r);
+    // Milestone section color
+    const mc = mColors[r.milestone];
+    if(mc && r.milestone !== lastMilestone){
+      // Section header row
+      lastMilestone = r.milestone;
+    }
+    if(mc){
+      row.getCell('milestone').fill = {type:'pattern',pattern:'solid',fgColor:{argb:mc}};
+      row.getCell('milestone').font = {color:{argb:'FFFFFF'},bold:true};
+    }
+    // Status cell color
+    const sc = statusColors[r.status];
+    const sf = statusFonts[r.status];
+    if(sc){
+      row.getCell('status').fill = {type:'pattern',pattern:'solid',fgColor:{argb:sc}};
+      row.getCell('status').font = {color:{argb:sf},bold:true};
+    }
+    // Borders
+    row.eachCell(cell=>{
+      cell.border = {top:{style:'thin',color:{argb:'D9D9D9'}},bottom:{style:'thin',color:{argb:'D9D9D9'}}};
+    });
   });
-  const blob = new Blob([csv], {type:'text/csv'});
+
+  // Merge consecutive identical milestone cells
+  let mergeStart = 2; let prevM = '';
+  for(let i = 2; i <= ws2.rowCount + 1; i++){
+    const val = i <= ws2.rowCount ? ws2.getRow(i).getCell('milestone').value : null;
+    if(val !== prevM && prevM){
+      if(i - 1 > mergeStart) try{ws2.mergeCells(mergeStart,1,i-1,1);}catch(e){}
+      mergeStart = i;
+    }
+    if(val !== prevM) mergeStart = i;
+    prevM = val;
+  }
+
+  // Auto-filter
+  ws2.autoFilter = {from:'A1',to:'H1'};
+
+  // Download
+  const buffer = await wb.xlsx.writeBuffer();
+  const blob = new Blob([buffer],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = `${(setup.title||'Shipley-Project').replace(/\s+/g,'_')}_Project_Plan.csv`;
+  a.download = `${(setup.title||'Shipley-Project').replace(/\s+/g,'_')}_Project_Plan.xlsx`;
   a.click();
   URL.revokeObjectURL(url);
 }
@@ -2903,53 +3023,26 @@ function renderGantt(rows){
   });
   html += '</div>';
   html += '</div>';
-  document.getElementById('gantt-container').innerHTML = html;
+  document.getElementById('gantt-scroll-area').innerHTML = html;
 }
 
-let timelineHistory = [];
-
-async function aiTimelineHelp(){
-  // Start a fresh conversation with context
-  timelineHistory = [];
+async function aiTimelineHelp(btn){
   const out = document.getElementById('timeline-output');
+  if(btn) setButtonLoading(btn, true);
   showThinking(out);
   const data = loadAll();
-  const done = Object.values(data.task_states||{}).filter(v=>v===true).length;
+  const done = Object.values(data.task_states||{}).filter(v=>v==='done'||v===true).length;
+  const inProg = Object.values(data.task_states||{}).filter(v=>v==='in_progress').length;
   const notes = data.milestone_notes || {};
-  const systemContext = `I have ${done} tasks completed across my project milestones. Here are my milestone notes:\nM1 (Prepare): ${notes.m1||'none'}\nM2 (Conduct & Gather): ${notes.m2||'none'}\nM3 (Analyze & Share): ${notes.m3||'none'}\nM4 (Iterate & Scale): ${notes.m4||'none'}\nM5 (Report & Close): ${notes.m5||'none'}\n\nCan you help me think through my timeline and any risks I should be aware of?`;
+  const s = data.setup || {};
+  const dateRange = s.start&&s.end ? `Project runs ${fmtDate(s.start)} through ${fmtDate(s.end)}.` : '';
+  const prompt = `A faculty member wants feedback on their Shipley project timeline. ${dateRange}\n\nStatus: ${done} tasks complete, ${inProg} in progress.\nMilestone notes:\nM1 (Prepare): ${notes.m1||'none'}\nM2 (Conduct & Gather): ${notes.m2||'none'}\nM3 (Analyze & Share): ${notes.m3||'none'}\nM4 (Iterate & Scale): ${notes.m4||'none'}\nM5 (Report & Close): ${notes.m5||'none'}\n\nGive specific, practical feedback on their timeline progress. Note any sequencing risks, things that tend to take longer than faculty expect, and concrete next steps they should be thinking about now.`;
   try{
-    const r = await callGuide(systemContext);
-    timelineHistory.push({role:'user',content:systemContext});
-    timelineHistory.push({role:'assistant',content:r});
-    out.innerHTML=`<div class="ai-response">${r}</div>`;
+    const r = await callGuide(prompt);
+    renderAIResponse(out, r);
   }catch(e){
-    out.innerHTML=`<div class="ai-response" style="border-left-color:var(--red);">Something went wrong.</div>`;
-  }
-}
-
-async function aiTimelineChat(){
-  const inputEl = document.getElementById('timeline-input');
-  const input = inputEl.value.trim();
-  if(!input) return;
-  const out = document.getElementById('timeline-output');
-  // Append user message
-  const existingHTML = out.innerHTML;
-  out.innerHTML = existingHTML + `<div style="background:rgba(26,39,68,0.05);border-radius:8px;padding:10px 14px;margin-bottom:8px;font-size:13px;"><strong>You:</strong> ${input}</div>`;
-  inputEl.value = '';
-  const thinkingDiv = document.createElement('div');
-  out.appendChild(thinkingDiv);
-  showThinking(thinkingDiv);
-  timelineHistory.push({role:'user',content:input});
-  // Build prompt with conversation history
-  const historyText = timelineHistory.slice(0,-1).map(m=>`${m.role==='user'?'Faculty':'Guide'}: ${m.content}`).join('\n\n');
-  const fullPrompt = (historyText ? historyText + '\n\nFaculty: ' : '') + input;
-  try{
-    const r = await callGuide(fullPrompt);
-    timelineHistory.push({role:'assistant',content:r});
-    thinkingDiv.outerHTML = `<div class="ai-response" style="margin-bottom:8px;">${r}</div>`;
-  }catch(e){
-    thinkingDiv.outerHTML = `<div class="ai-response" style="border-left-color:var(--red);margin-bottom:8px;">Something went wrong.</div>`;
-  }
+    out.innerHTML=`<div class="ai-response" style="border-left-color:var(--red);">Something went wrong — please try again.</div>`;
+  }finally{ if(btn) setButtonLoading(btn, false); }
 }
 
 let budgetHistory = [];
@@ -3011,7 +3104,7 @@ async function aibudgethelp(){
     const r = await callGuide(prompt);
     budgetHistory.push({role:'user',content:prompt});
     budgetHistory.push({role:'assistant',content:r});
-    out.innerHTML=`<div class="ai-response">${r}</div>`;
+    renderAIResponse(out, r);
   }catch(e){
     out.innerHTML=`<div class="ai-response" style="border-left-color:var(--red);">Something went wrong.</div>`;
   }
@@ -3023,7 +3116,7 @@ async function aiReportHelp(){
   const prompt = `Help me draft or improve my project report. I'll share what I have:\n\nTeam: ${document.getElementById('r-team').value||'not yet written'}\nGoals: ${document.getElementById('r-goals').value||'not yet written'}\nMilestones: ${document.getElementById('r-milestones').value||'not yet written'}\nImpact: ${document.getElementById('r-impact').value||'not yet written'}\nChallenges: ${document.getElementById('r-challenges').value||'not yet written'}\nLessons: ${document.getElementById('r-lessons').value||'not yet written'}\nNext steps: ${document.getElementById('r-next').value||'not yet written'}\n\nWhich sections need the most work? Help me strengthen the weakest parts.`;
   try{
     const r = await callGuide(prompt);
-    out.innerHTML=`<div class="ai-response">${r}</div>`;
+    renderAIResponse(out, r);
   }catch(e){
     out.innerHTML=`<div class="ai-response" style="border-left-color:var(--red);">Something went wrong.</div>`;
   }
@@ -3036,7 +3129,7 @@ async function askGuide(){
   showThinking(out);
   try{
     const r = await callGuide(input);
-    out.innerHTML=`<div class="ai-response">${r}</div>`;
+    renderAIResponse(out, r);
   }catch(e){
     out.innerHTML=`<div class="ai-response" style="border-left-color:var(--red);">Something went wrong — please try again.</div>`;
   }
