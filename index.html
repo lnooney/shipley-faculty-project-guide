@@ -319,7 +319,7 @@ a:hover{color:var(--navy);}
   display:flex;align-items:center;justify-content:center;transition:all .15s;margin-top:1px;
   font-size:14px;line-height:1;
 }
-.task-check.in-progress{background:var(--amber-bg);border-color:var(--amber);color:var(--amber);}
+.task-check.in-progress{background:var(--amber-bg);border-color:var(--amber);color:var(--amber);font-size:16px;font-weight:700;line-height:1;}
 .task-check.done{background:var(--green-bg);border-color:var(--green);}
 .task-check.done::after{
   content:'';width:10px;height:6px;
@@ -476,6 +476,83 @@ a:hover{color:var(--navy);}
 /* IRB options keyboard/screen-reader */
 .irb-option:focus-visible{outline:3px solid var(--navy);outline-offset:2px;}
 
+/* ── PROJECT MANAGER ── */
+.proj-mgr-btns{display:flex;align-items:center;gap:8px;flex-shrink:0;}
+.proj-switcher-wrap{position:relative;}
+.proj-switcher-btn{
+  display:flex;align-items:center;gap:6px;
+  background:#fff;border:1.5px solid var(--border2);
+  border-radius:100px;padding:5px 12px;font-size:12px;font-weight:600;
+  color:var(--navy);cursor:pointer;max-width:200px;
+}
+.proj-switcher-btn:hover{border-color:var(--navy);background:var(--navy);color:#fff;}
+.proj-switcher-btn:hover .ps-caret{color:#fff;}
+.proj-switcher-btn .ps-label{
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:130px;
+}
+.proj-switcher-btn .ps-caret{flex-shrink:0;font-size:10px;color:var(--text3);}
+.proj-dropdown{
+  position:absolute;top:calc(100% + 6px);right:0;min-width:240px;
+  background:#fff;border:1px solid var(--border2);border-radius:var(--radius-lg);
+  box-shadow:var(--shadow-md);z-index:9000;display:none;overflow:hidden;
+}
+.proj-dropdown.open{display:block;}
+.proj-dd-header{
+  padding:10px 14px;font-size:11px;font-weight:600;
+  color:var(--text3);text-transform:uppercase;letter-spacing:0.07em;
+  border-bottom:1px solid var(--border);background:var(--bg);
+}
+.proj-dd-item{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 14px;cursor:pointer;transition:background .12s;
+  border-bottom:0.5px solid var(--border);
+}
+.proj-dd-item:last-child{border-bottom:none;}
+.proj-dd-item:hover{background:var(--gold-pale);}
+.proj-dd-item.active-proj{background:rgba(26,39,68,0.04);}
+.proj-dd-name{flex:1;font-size:13px;font-weight:500;color:var(--navy);}
+.proj-dd-date{font-size:11px;color:var(--text3);}
+.proj-dd-active-dot{
+  width:8px;height:8px;border-radius:50%;background:var(--green);flex-shrink:0;
+}
+.proj-dd-empty{padding:14px;font-size:13px;color:var(--text3);text-align:center;font-style:italic;}
+.proj-dd-actions{
+  padding:10px 14px;display:flex;gap:8px;flex-wrap:wrap;
+  border-top:1px solid var(--border);background:var(--bg);
+}
+
+/* ── MODAL OVERLAY ── */
+.modal-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:9500;
+  display:flex;align-items:center;justify-content:center;
+  animation:fadeIn .15s ease;
+}
+.modal-overlay.hidden{display:none;}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.modal-box{
+  background:#fff;border-radius:var(--radius-lg);
+  padding:2rem;max-width:440px;width:90%;
+  box-shadow:0 8px 40px rgba(0,0,0,0.18);
+  animation:slideUp .18s ease;
+}
+@keyframes slideUp{from{transform:translateY(12px);opacity:0}to{transform:translateY(0);opacity:1}}
+.modal-title{
+  font-family:var(--serif);font-size:20px;font-weight:400;
+  color:var(--navy);margin-bottom:8px;
+}
+.modal-body{font-size:14px;color:var(--text2);line-height:1.65;margin-bottom:1.25rem;}
+.modal-body strong{color:var(--text);font-weight:600;}
+.modal-field{margin-bottom:1rem;}
+.modal-field label{display:block;font-size:13px;font-weight:500;color:var(--text2);margin-bottom:5px;}
+.modal-field input{width:100%;background:#fff;border:1.5px solid var(--border2);}
+.modal-field input:focus{border-color:var(--navy);}
+.modal-actions{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end;margin-top:1.25rem;}
+.modal-warn{
+  background:var(--amber-bg);border-left:3px solid var(--amber);
+  color:var(--amber-text);border-radius:var(--radius);
+  padding:10px 14px;font-size:13px;line-height:1.6;margin-bottom:1rem;
+}
+
 /* ── SAVE INDICATOR ── */
 .save-bar{
   position:fixed;bottom:20px;right:20px;
@@ -523,9 +600,85 @@ a:hover{color:var(--navy);}
   </div>
   <div class="header-row2">
     <span class="header-app-title">Shipley Academic Innovation Project Guide</span>
-    <div class="project-name-badge" id="header-project-name">No project loaded</div>
+    <div class="proj-mgr-btns">
+      <!-- Project switcher dropdown -->
+      <div class="proj-switcher-wrap" id="proj-switcher-wrap">
+        <button class="proj-switcher-btn" onclick="toggleProjDropdown(event)" aria-haspopup="listbox" aria-expanded="false" id="proj-switcher-btn" title="Switch or manage projects">
+          <span class="ps-label" id="proj-switcher-label">No project loaded</span>
+          <span class="ps-caret">▾</span>
+        </button>
+        <div class="proj-dropdown" id="proj-dropdown" role="listbox">
+          <div class="proj-dd-header">Saved projects</div>
+          <div id="proj-dd-list"></div>
+          <div class="proj-dd-actions">
+            <button class="btn-sm btn-primary" onclick="openSaveModal();closeProjDropdown();">Save current</button>
+            <button class="btn-sm" onclick="openNewProjectModal();closeProjDropdown();">New project</button>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </header>
+
+<!-- ══════════════════════════════════════════════
+     MODALS
+══════════════════════════════════════════════ -->
+
+<!-- Save Project Modal -->
+<div class="modal-overlay hidden" id="modal-save" role="dialog" aria-modal="true" aria-labelledby="modal-save-title">
+  <div class="modal-box">
+    <div class="modal-title" id="modal-save-title">Save project</div>
+    <div class="modal-body">Give this project a name so you can return to it later.</div>
+    <div class="modal-field">
+      <label for="modal-save-name">Project name</label>
+      <input type="text" id="modal-save-name" placeholder="e.g. AI in Intro Biology, Fall 2026" maxlength="80"/>
+    </div>
+    <div class="modal-actions">
+      <button onclick="closeSaveModal()">Cancel</button>
+      <button class="btn-primary" onclick="confirmSaveProject()">Save project</button>
+    </div>
+  </div>
+</div>
+
+<!-- New Project Modal -->
+<div class="modal-overlay hidden" id="modal-new" role="dialog" aria-modal="true" aria-labelledby="modal-new-title">
+  <div class="modal-box">
+    <div class="modal-title" id="modal-new-title">Start a new project</div>
+    <div class="modal-warn">⚠ This will clear your current workspace. Any unsaved work will be lost.</div>
+    <div class="modal-body">Save your current project first if you want to be able to return to it.</div>
+    <div class="modal-actions">
+      <button onclick="closeNewProjectModal()">Cancel</button>
+      <button onclick="saveAndStartNew()">Save first, then start new</button>
+      <button class="btn-primary" onclick="confirmStartNew()">Start new without saving</button>
+    </div>
+  </div>
+</div>
+
+<!-- Load Project Confirm Modal -->
+<div class="modal-overlay hidden" id="modal-load" role="dialog" aria-modal="true" aria-labelledby="modal-load-title">
+  <div class="modal-box">
+    <div class="modal-title" id="modal-load-title">Switch project</div>
+    <div class="modal-warn">⚠ Any unsaved changes to your current workspace will be lost.</div>
+    <div class="modal-body">Load <strong id="modal-load-name"></strong>?</div>
+    <div class="modal-actions">
+      <button onclick="closeLoadModal()">Cancel</button>
+      <button onclick="saveAndLoad()">Save current first</button>
+      <button class="btn-primary" onclick="confirmLoad()">Load project</button>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Project Confirm Modal -->
+<div class="modal-overlay hidden" id="modal-delete" role="dialog" aria-modal="true" aria-labelledby="modal-delete-title">
+  <div class="modal-box">
+    <div class="modal-title" id="modal-delete-title">Delete project</div>
+    <div class="modal-warn">⚠ This will permanently delete <strong id="modal-delete-name"></strong>. This cannot be undone.</div>
+    <div class="modal-actions">
+      <button onclick="closeDeleteModal()">Cancel</button>
+      <button class="btn-primary" style="background:var(--red);border-color:var(--red);" onclick="confirmDelete()">Delete permanently</button>
+    </div>
+  </div>
+</div>
 
 <!-- TABS -->
 <nav class="tabs" role="tablist" aria-label="Project sections">
@@ -1549,7 +1702,11 @@ function applyProposalImport(data, out){
 // ═══════════════════════════════════════════════════════
 function updateProjectName(){
   const title = document.getElementById('s-title').value.trim();
-  document.getElementById('header-project-name').textContent = title || 'No project loaded';
+  const id = getActiveId();
+  const projects = loadProjects();
+  const savedName = id && projects[id] ? projects[id].name : '';
+  const el = document.getElementById('proj-switcher-label');
+  if(el) el.textContent = title || savedName || 'No project loaded';
   updateReportTitlePreview();
 }
 
@@ -1887,8 +2044,8 @@ const MILESTONE_TASKS = {
     // Content Development
     {name:'Develop / revise learning materials', lead:'Faculty lead', blocker:null, group:'Content Development'},
     {name:'Develop / revise assignments', lead:'Faculty lead', blocker:null, group:'Content Development'},
-    {name:'Develop / revise assessments', lead:'Faculty lead', blocker:null, group:'Content Development'},
     {name:'Develop / revise rubrics', lead:'Faculty lead', blocker:null, group:'Content Development'},
+    {name:'Develop / revise assessments', lead:'Faculty lead', blocker:null, group:'Content Development'},
     {name:'Develop / revise instructor guides', lead:'Faculty lead', blocker:null, group:'Content Development'},
     // Hiring — FIX 7: reordered: Post → Find/secure → Hire → Prepare/onboard
     {name:'Post student worker positions', lead:'Faculty lead', blocker:'Hiring and HR onboarding takes 4–6 weeks minimum. Begin before the semester starts.', group:'Hiring'},
@@ -1991,7 +2148,7 @@ function renderMilestones(){
       const isAutoGenerated = t.custom && (t.id==='media_task'||t.id==='data_task'||t.id==='worker_hire'||isTechTask);
       const removeBtn = t.custom && !isAutoGenerated ? `<button class="remove-btn" onclick="removeCustomTask('${t.id}')">✕</button>` : '';
       return `<div class="task-row">
-        <button class="task-check ${taskStates[t.id]==='done'||taskStates[t.id]===true?'done':taskStates[t.id]==='in_progress'?'in-progress':''}" onclick="toggleMilestoneTask('${t.id}')">${taskStates[t.id]==='in_progress'?'•':''}</button>
+        <button class="task-check ${taskStates[t.id]==='done'||taskStates[t.id]===true?'done':taskStates[t.id]==='in_progress'?'in-progress':''}" onclick="toggleMilestoneTask('${t.id}')">${taskStates[t.id]==='in_progress'?'—':''}</button>
         <div class="task-body">
           <div class="task-name ${taskStates[t.id]==='done'||taskStates[t.id]===true?'done':taskStates[t.id]==='in_progress'?'in-progress':''}">${t.name}</div>
           <div class="task-meta-row">
@@ -2511,7 +2668,7 @@ function renderTechConsiderations(){
         <div class="tc-label">${item.label}<div class="tc-desc">${item.desc}</div></div>
         <div class="tc-pills">
           <button class="tc-pill ${itemState.overall==='addressed'?'addressed':''}" onclick="setTechItemOverall('${item.key}','addressed')">✓ All addressed</button>
-          <button class="tc-pill ${itemState.overall==='needs_attention'?'needs_attention':''}" onclick="setTechItemOverall('${item.key}','needs_attention')">⚠ Needs attention</button>
+          <button class="tc-pill ${itemState.overall==='needs_attention'?'needs_attention':''}" onclick="setTechItemOverall('${item.key}','needs_attention')">⚠ Needs confirmation</button>
           <button class="tc-pill ${itemState.overall==='na'?'na':''}" onclick="setTechItemOverall('${item.key}','na')">N/A</button>
         </div>
       </div>
@@ -2587,7 +2744,7 @@ function syncTechToMilestones(){
       customTasks.push({
         id: 'tech_'+item.key,
         name: item.key==='cost' ? `Confirm cost: ${toolList}` : `Confirm ${item.label.toLowerCase()} compliance: ${toolList}`,
-        lead: 'Faculty lead & EdTech',
+        lead: 'Faculty lead',
         milestone: 'm1',
         date: '',
         group: 'Technology',
@@ -3031,12 +3188,26 @@ async function aiTimelineHelp(btn){
   if(btn) setButtonLoading(btn, true);
   showThinking(out);
   const data = loadAll();
-  const done = Object.values(data.task_states||{}).filter(v=>v==='done'||v===true).length;
-  const inProg = Object.values(data.task_states||{}).filter(v=>v==='in_progress').length;
+  const taskStatesData = data.task_states || {};
   const notes = data.milestone_notes || {};
   const s = data.setup || {};
   const dateRange = s.start&&s.end ? `Project runs ${fmtDate(s.start)} through ${fmtDate(s.end)}.` : '';
-  const prompt = `A faculty member wants feedback on their Shipley project timeline. ${dateRange}\n\nStatus: ${done} tasks complete, ${inProg} in progress.\nMilestone notes:\nM1 (Prepare): ${notes.m1||'none'}\nM2 (Conduct & Gather): ${notes.m2||'none'}\nM3 (Analyze & Share): ${notes.m3||'none'}\nM4 (Iterate & Scale): ${notes.m4||'none'}\nM5 (Report & Close): ${notes.m5||'none'}\n\nGive specific, practical feedback on their timeline progress. Note any sequencing risks, things that tend to take longer than faculty expect, and concrete next steps they should be thinking about now.`;
+  const customTasksData = data.custom_tasks || [];
+  const milestoneLabels = {m1:'Prepare',m2:'Conduct & Gather Data',m3:'Analyze & Share Findings',m4:'Reflect, Iterate & Scale',m5:'Report & Close'};
+  let milestoneBreakdown = '';
+  ['m1','m2','m3','m4','m5'].forEach(m=>{
+    const baseTasks = (MILESTONE_TASKS[m]||[]).map((t,i)=>({...t,id:m+'_'+i}));
+    const custom = customTasksData.filter(t=>t.milestone===m);
+    const all = [...baseTasks, ...custom];
+    const doneList = all.filter(t=>taskStatesData[t.id]==='done'||taskStatesData[t.id]===true).map(t=>t.name);
+    const inProgList = all.filter(t=>taskStatesData[t.id]==='in_progress').map(t=>t.name);
+    const notStarted = all.length - doneList.length - inProgList.length;
+    milestoneBreakdown += `\n${milestoneLabels[m]} (${doneList.length} complete, ${inProgList.length} in progress, ${notStarted} not started)`;
+    if(doneList.length) milestoneBreakdown += `\n  Completed: ${doneList.join('; ')}`;
+    if(inProgList.length) milestoneBreakdown += `\n  In progress: ${inProgList.join('; ')}`;
+    if(notes[m]) milestoneBreakdown += `\n  Notes: ${notes[m]}`;
+  });
+  const prompt = `A faculty member wants feedback on their Shipley project timeline. ${dateRange}\n\nTask status by milestone:${milestoneBreakdown}\n\nGive specific, practical feedback on their timeline progress. Reference specific completed and in-progress tasks by name where relevant. Note any sequencing risks, things that tend to take longer than faculty expect, and concrete next steps they should be thinking about now.`;
   try{
     const r = await callGuide(prompt);
     renderAIResponse(out, r);
@@ -3147,9 +3318,231 @@ function fmtDate(s){
 }
 
 // ═══════════════════════════════════════════════════════
+// PROJECT MANAGER
+// ═══════════════════════════════════════════════════════
+const PROJECTS_KEY = 'shipley_projects';
+const ACTIVE_KEY   = 'shipley_active_project';
+
+function loadProjects(){
+  try{ return JSON.parse(localStorage.getItem(PROJECTS_KEY)||'{}'); }
+  catch(e){ return {}; }
+}
+
+function saveProjects(projects){
+  localStorage.setItem(PROJECTS_KEY, JSON.stringify(projects));
+}
+
+function getActiveId(){
+  return localStorage.getItem(ACTIVE_KEY)||null;
+}
+
+function setActiveId(id){
+  if(id) localStorage.setItem(ACTIVE_KEY, id);
+  else localStorage.removeItem(ACTIVE_KEY);
+}
+
+// On first load: migrate legacy shipley_guide_v1 data into the new project store
+function migrateLegacyData(){
+  const legacy = localStorage.getItem('shipley_guide_v1');
+  if(!legacy) return;
+  // Only migrate if no projects exist yet
+  const existing = loadProjects();
+  if(Object.keys(existing).length > 0) return;
+  try{
+    const data = JSON.parse(legacy);
+    const title = data.setup?.projectTitle || '';
+    const name = title ? title : 'Imported project';
+    const id = 'proj_' + Date.now();
+    existing[id] = { id, name, savedAt: Date.now(), data };
+    saveProjects(existing);
+    setActiveId(id);
+    localStorage.setItem(KEY, JSON.stringify(data)); // keep KEY in sync
+  }catch(e){}
+}
+
+function updateHeaderLabel(){
+  const id = getActiveId();
+  const projects = loadProjects();
+  const label = id && projects[id] ? projects[id].name : 'No project loaded';
+  document.getElementById('proj-switcher-label').textContent = label;
+}
+
+function renderProjDropdown(){
+  const projects = loadProjects();
+  const activeId = getActiveId();
+  const list = document.getElementById('proj-dd-list');
+  const ids = Object.keys(projects).sort((a,b)=> projects[b].savedAt - projects[a].savedAt);
+  if(ids.length === 0){
+    list.innerHTML = '<div class="proj-dd-empty">No saved projects yet.</div>';
+    return;
+  }
+  list.innerHTML = ids.map(id=>{
+    const p = projects[id];
+    const isActive = id === activeId;
+    const date = new Date(p.savedAt).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+    return `<div class="proj-dd-item${isActive?' active-proj':''}" role="option" aria-selected="${isActive}">
+      ${isActive?'<div class="proj-dd-active-dot" title="Currently loaded"></div>':'<div style="width:8px;flex-shrink:0;"></div>'}
+      <div class="proj-dd-name">${escHtml(p.name)}</div>
+      <div class="proj-dd-date">${date}</div>
+      ${isActive?'':'<button class="btn-bare" onclick="event.stopPropagation();promptDeleteProject(\''+id+'\')" title="Delete" style="color:var(--text3);font-size:16px;line-height:1;text-decoration:none;">×</button>'}
+      ${isActive?'<span style="font-size:11px;color:var(--green-text);font-weight:600;">active</span>':'<button class="btn-bare" onclick="event.stopPropagation();promptLoadProject(\''+id+'\')" style="font-size:12px;">Load</button>'}
+    </div>`;
+  }).join('');
+}
+
+function escHtml(s){
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function toggleProjDropdown(e){
+  e.stopPropagation();
+  const dd = document.getElementById('proj-dropdown');
+  const btn = document.getElementById('proj-switcher-btn');
+  const isOpen = dd.classList.contains('open');
+  if(!isOpen){ renderProjDropdown(); }
+  dd.classList.toggle('open');
+  btn.setAttribute('aria-expanded', String(!isOpen));
+}
+
+function closeProjDropdown(){
+  document.getElementById('proj-dropdown').classList.remove('open');
+  document.getElementById('proj-switcher-btn').setAttribute('aria-expanded','false');
+}
+
+document.addEventListener('click', e=>{
+  if(!document.getElementById('proj-switcher-wrap').contains(e.target)) closeProjDropdown();
+});
+
+// ── Save modal ──
+let _afterSaveCallback = null;
+
+function openSaveModal(callback){
+  _afterSaveCallback = callback || null;
+  // Pre-fill with project title or current saved name
+  const id = getActiveId();
+  const projects = loadProjects();
+  const existingName = id && projects[id] ? projects[id].name : '';
+  const setupTitle = document.getElementById('proj-title')?.value?.trim() || '';
+  document.getElementById('modal-save-name').value = existingName || setupTitle || '';
+  document.getElementById('modal-save').classList.remove('hidden');
+  setTimeout(()=>document.getElementById('modal-save-name').focus(), 50);
+}
+
+function closeSaveModal(){ document.getElementById('modal-save').classList.add('hidden'); _afterSaveCallback=null; }
+
+function confirmSaveProject(){
+  const name = document.getElementById('modal-save-name').value.trim();
+  if(!name){ document.getElementById('modal-save-name').focus(); return; }
+  const projects = loadProjects();
+  let id = getActiveId();
+  if(!id || !projects[id]){
+    id = 'proj_' + Date.now();
+  }
+  const currentData = loadAll();
+  projects[id] = { id, name, savedAt: Date.now(), data: currentData };
+  saveProjects(projects);
+  setActiveId(id);
+  updateHeaderLabel();
+  closeSaveModal();
+  flashSave();
+  if(_afterSaveCallback){ _afterSaveCallback(); _afterSaveCallback=null; }
+}
+
+// ── New project modal ──
+function openNewProjectModal(){
+  document.getElementById('modal-new').classList.remove('hidden');
+}
+function closeNewProjectModal(){ document.getElementById('modal-new').classList.add('hidden'); }
+
+function saveAndStartNew(){
+  closeNewProjectModal();
+  openSaveModal(()=>{ doStartNew(); });
+}
+
+function confirmStartNew(){
+  closeNewProjectModal();
+  doStartNew();
+}
+
+function doStartNew(){
+  localStorage.removeItem(KEY);
+  setActiveId(null);
+  location.reload();
+}
+
+// ── Load project modal ──
+let _pendingLoadId = null;
+
+function promptLoadProject(id){
+  closeProjDropdown();
+  const projects = loadProjects();
+  if(!projects[id]) return;
+  _pendingLoadId = id;
+  document.getElementById('modal-load-name').textContent = projects[id].name;
+  document.getElementById('modal-load').classList.remove('hidden');
+}
+
+function closeLoadModal(){ document.getElementById('modal-load').classList.add('hidden'); _pendingLoadId=null; }
+
+function saveAndLoad(){
+  const idToLoad = _pendingLoadId;
+  closeLoadModal();
+  openSaveModal(()=>{ doLoadProject(idToLoad); });
+}
+
+function confirmLoad(){
+  const id = _pendingLoadId;
+  closeLoadModal();
+  doLoadProject(id);
+}
+
+function doLoadProject(id){
+  const projects = loadProjects();
+  if(!projects[id]) return;
+  localStorage.setItem(KEY, JSON.stringify(projects[id].data));
+  setActiveId(id);
+  location.reload();
+}
+
+// ── Delete project modal ──
+let _pendingDeleteId = null;
+
+function promptDeleteProject(id){
+  closeProjDropdown();
+  const projects = loadProjects();
+  if(!projects[id]) return;
+  _pendingDeleteId = id;
+  document.getElementById('modal-delete-name').textContent = projects[id].name;
+  document.getElementById('modal-delete').classList.remove('hidden');
+}
+
+function closeDeleteModal(){ document.getElementById('modal-delete').classList.add('hidden'); _pendingDeleteId=null; }
+
+function confirmDelete(){
+  const id = _pendingDeleteId;
+  closeDeleteModal();
+  const projects = loadProjects();
+  delete projects[id];
+  saveProjects(projects);
+  if(getActiveId()===id) setActiveId(null);
+  updateHeaderLabel();
+  renderProjDropdown();
+  closeProjDropdown();
+}
+
+// Escape key closes any open modal
+document.addEventListener('keydown', e=>{
+  if(e.key==='Escape'){
+    closeSaveModal(); closeNewProjectModal(); closeLoadModal(); closeDeleteModal(); closeProjDropdown();
+  }
+});
+
+// ═══════════════════════════════════════════════════════
 // INIT
 // ═══════════════════════════════════════════════════════
 window.addEventListener('DOMContentLoaded',()=>{
+  migrateLegacyData();
+  updateHeaderLabel();
   renderAvailabilityEntries();
   renderPriorityEntries();
   renderTechToolEntries();
