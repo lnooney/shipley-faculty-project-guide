@@ -412,6 +412,39 @@ a:hover{color:var(--navy);}
   font-size:13px;color:var(--text3);font-style:italic;margin-bottom:8px;line-height:1.5;
 }
 .report-section textarea{width:100%;min-height:90px;resize:vertical;}
+.report-mode-toggle{
+  display:flex;border:1.5px solid var(--border2);border-radius:100px;
+  overflow:hidden;margin-bottom:1.25rem;width:fit-content;
+}
+.report-mode-toggle button{
+  border:none;border-radius:0;padding:8px 22px;font-size:13px;font-weight:600;
+  background:#fff;color:var(--text3);cursor:pointer;transition:all .15s;
+}
+.report-mode-toggle button.active{background:var(--navy);color:#fff;}
+.report-mode-toggle button:hover:not(.active){background:var(--bg2);color:var(--navy);}
+.field-guide-btn{
+  display:none;margin-top:6px;
+}
+.field-guide-btn.visible{display:inline-flex;}
+.prefill-note{
+  font-size:12px;color:var(--amber-text);background:var(--amber-bg);
+  border-left:3px solid var(--amber);border-radius:var(--radius);
+  padding:7px 10px;margin-top:6px;line-height:1.5;
+}
+.prefill-note.hidden{display:none;}
+.milestone-reflection{
+  margin-top:10px;padding:12px;
+  background:var(--gold-pale);border-left:3px solid var(--gold);
+  border-radius:var(--radius);
+}
+.milestone-reflection label{
+  display:block;font-size:12px;font-weight:600;color:var(--navy);margin-bottom:6px;
+}
+.milestone-reflection textarea{
+  width:100%;min-height:70px;resize:vertical;font-size:13px;
+  background:#fff;border:1px solid var(--border2);border-radius:6px;
+}
+.field-output{margin-top:8px;}
 
 /* ── GUIDE CHAT ── */
 .guide-chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px;}
@@ -1362,66 +1395,179 @@ a:hover{color:var(--navy);}
       <div class="card-icon">📄</div>
       <div>
         <div class="card-title">Project Report</div>
-        <div class="card-sub">Based on the Shipley Pilot Project Report Template</div>
+        <div class="card-sub">Milestone Snapshot for check-ins · Final Report at project close</div>
       </div>
     </div>
     <p style="font-size:14px;color:var(--text2);line-height:1.7;margin-bottom:12px;">
-      Build your report progressively throughout the project — don't wait until the end. Each section below maps directly to the Shipley report template. Your guide can help you draft any section.
+      Use the <strong>Milestone Snapshot</strong> throughout the project for progress check-ins. Switch to the <strong>Final Report</strong> at any time to build your end-of-project impact report. Both can be downloaded as a PDF.
     </p>
     <div class="alert alert-blue">
-      <strong>Dissemination goals:</strong> Beyond the project report, consider whether your findings are appropriate for conference presentation or journal publication. Teaching and learning research venues like the International Society for the Scholarship of Teaching and Learning (ISSOTL) and discipline-specific teaching journals are good starting points. Ask your guide for suggestions relevant to your field.
+      <strong>Dissemination goals:</strong> Beyond the project report, consider whether your findings are appropriate for conference presentation or journal publication. Teaching and learning research venues like the International Society for the Scholarship of Teaching and Learning (ISSOTL) and discipline-specific teaching journals are good starting points. Ask the Institute team for suggestions relevant to your field at excellence@bu.edu.
+    </div>
+    <div class="report-mode-toggle" role="group" aria-label="Report mode">
+      <button id="rmode-snapshot" class="active" onclick="switchReportMode('snapshot')">Milestone Snapshot</button>
+      <button id="rmode-final" onclick="switchReportMode('final')">Final Report</button>
     </div>
   </div>
 
-  <div class="card">
-    <!-- Auto-populated title page info -->
+  <!-- ── MILESTONE SNAPSHOT ── -->
+  <div id="report-snapshot" class="card">
+    <div id="snapshot-title-preview" class="alert alert-navy" style="margin-bottom:16px;font-size:13px;line-height:1.8;"></div>
+
+    <div class="report-section">
+      <h3>Overview</h3>
+      <div class="prompt">Provide a brief overview of what you have accomplished to date, including any preliminary evidence of impact.</div>
+      <textarea id="rs-overview" placeholder="Summarize your progress so far. This will pre-populate from milestone reflections you've entered." style="width:100%;min-height:90px;" oninput="saveSnapshot()"></textarea>
+      <div class="field-guide-btn" id="fgb-rs-overview">
+        <button class="btn-sm btn-gold" onclick="askFieldGuide('rs-overview','Overview of project progress to date')">Ask guide ↗</button>
+        <div class="field-output" id="fout-rs-overview"></div>
+      </div>
+    </div>
+
+    <div class="report-section">
+      <h3>Goals & Changes from Original Plan</h3>
+      <div class="prompt">Describe progress on your original goals. Note any goals that have changed and why.</div>
+      <textarea id="rs-goals" placeholder="This will pre-populate from your project setup. Describe progress and any changes from your original goals." style="width:100%;min-height:90px;" oninput="saveSnapshot()"></textarea>
+      <div class="prefill-note" id="pfn-rs-goals">This was pre-filled from your project setup. Please describe your progress and note any changes from your original goals.</div>
+      <div class="field-guide-btn" id="fgb-rs-goals">
+        <button class="btn-sm btn-gold" onclick="askFieldGuide('rs-goals','Goals and changes from original project plan')">Ask guide ↗</button>
+        <div class="field-output" id="fout-rs-goals"></div>
+      </div>
+    </div>
+
+    <div class="report-section">
+      <h3>Assessment & Sustainability</h3>
+      <div class="prompt">What progress have you made toward assessing the impact of your project on student learning? What is your current plan to sustain the innovations you are developing?</div>
+      <textarea id="rs-assessment" placeholder="This will pre-populate from your Impact Evaluation Framework. Describe your assessment progress and sustainability plan." style="width:100%;min-height:90px;" oninput="saveSnapshot()"></textarea>
+      <div class="prefill-note" id="pfn-rs-assessment">This was pre-filled from your Impact Evaluation Framework. Please describe your assessment progress and sustainability plan.</div>
+      <div class="field-guide-btn" id="fgb-rs-assessment">
+        <button class="btn-sm btn-gold" onclick="askFieldGuide('rs-assessment','Assessment progress and sustainability plan')">Ask guide ↗</button>
+        <div class="field-output" id="fout-rs-assessment"></div>
+      </div>
+    </div>
+
+    <div class="report-section">
+      <h3>Dissemination</h3>
+      <div class="prompt">Have you presented your project or shared your findings inside or outside of BU? Describe any current or future dissemination efforts.</div>
+      <textarea id="rs-dissemination" placeholder="e.g. Presented work-in-progress at the Institute Showcase. Planning to submit to ISSOTL 2027…" style="width:100%;min-height:80px;" oninput="saveSnapshot()"></textarea>
+      <div class="field-guide-btn" id="fgb-rs-dissemination">
+        <button class="btn-sm btn-gold" onclick="askFieldGuide('rs-dissemination','Dissemination of project findings')">Ask guide ↗</button>
+        <div class="field-output" id="fout-rs-dissemination"></div>
+      </div>
+    </div>
+
+    <div class="report-section">
+      <h3>Support Needed</h3>
+      <div class="prompt">What support can the Institute provide to help you accomplish your project goals? (e.g., course design resources, educational technology consultation, teaching strategies)</div>
+      <textarea id="rs-support" placeholder="e.g. Would benefit from a consultation on survey instrument design and guidance on statistical analysis options…" style="width:100%;min-height:80px;" oninput="saveSnapshot()"></textarea>
+      <div class="field-guide-btn" id="fgb-rs-support">
+        <button class="btn-sm btn-gold" onclick="askFieldGuide('rs-support','Support needed from the Institute')">Ask guide ↗</button>
+        <div class="field-output" id="fout-rs-support"></div>
+      </div>
+    </div>
+
+    <div class="report-section">
+      <h3>Timeline & Next Steps</h3>
+      <div class="prompt">What is the remaining timeline for this project? What are your major next steps? Note any changes from your original timeline.</div>
+      <textarea id="rs-timeline" placeholder="This will pre-populate from your project dates and upcoming milestone tasks." style="width:100%;min-height:90px;" oninput="saveSnapshot()"></textarea>
+      <div class="prefill-note" id="pfn-rs-timeline">This was pre-filled from your project setup. Please describe your remaining timeline and next steps.</div>
+      <div class="field-guide-btn" id="fgb-rs-timeline">
+        <button class="btn-sm btn-gold" onclick="askFieldGuide('rs-timeline','Remaining timeline and next steps')">Ask guide ↗</button>
+        <div class="field-output" id="fout-rs-timeline"></div>
+      </div>
+    </div>
+
+    <div style="display:flex;gap:10px;margin-top:8px;flex-wrap:wrap;">
+      <button onclick="saveSnapshot()" class="btn-primary">Save snapshot</button>
+      <button onclick="downloadReportPDF('snapshot')" class="btn-sm">⬇ Download as PDF</button>
+      <button onclick="prefillSnapshot()">Pre-fill from my project data</button>
+    </div>
+    <div id="snapshot-output" style="margin-top:14px;"></div>
+  </div>
+
+  <!-- ── FINAL REPORT ── -->
+  <div id="report-final" class="card" style="display:none;">
     <div id="report-title-preview" class="alert alert-navy" style="margin-bottom:16px;font-size:13px;line-height:1.8;"></div>
 
     <div class="report-section">
       <h3>Project Team and Roles</h3>
-      <div class="prompt">List all team members, their titles, and their roles within the project. Note any special contributions.</div>
-      <textarea id="r-team" placeholder="This will pre-populate from your Project Setup if you've filled it in." style="width:100%;min-height:80px;" oninput="saveReport()"></textarea>
+      <div class="prompt">List all team members, their titles, and their roles within the project.</div>
+      <textarea id="r-team" placeholder="This will pre-populate from your Project Setup." style="width:100%;min-height:80px;" oninput="saveReport();checkPrefillNote('r-team','pfn-r-team');checkFieldGuideBtn('r-team','fgb-r-team')"></textarea>
+      <div class="prefill-note" id="pfn-r-team">This was pre-filled from your project setup. Review and edit as needed.</div>
+      <div class="field-guide-btn" id="fgb-r-team">
+        <button class="btn-sm btn-gold" onclick="askFieldGuide('r-team','Project team and roles')">Ask guide ↗</button>
+        <div class="field-output" id="fout-r-team"></div>
+      </div>
     </div>
 
     <div class="report-section">
-      <h3>Project Goal and Objectives</h3>
-      <div class="prompt">Describe the need addressed, the target audience, and your theory of change — how does this intervention lead to improved learning?</div>
-      <textarea id="r-goals" placeholder="Draw from your project setup and impact evaluation framework." style="width:100%;min-height:90px;" oninput="saveReport()"></textarea>
+      <h3>Project Goals and Objectives</h3>
+      <div class="prompt">Describe the need you addressed and how your intervention led to improved learning for students.</div>
+      <textarea id="r-goals" placeholder="This will pre-populate from your Project Setup." style="width:100%;min-height:90px;" oninput="saveReport();checkPrefillNote('r-goals','pfn-r-goals');checkFieldGuideBtn('r-goals','fgb-r-goals')"></textarea>
+      <div class="prefill-note" id="pfn-r-goals">This was pre-filled from your project setup. Please describe the need you actually addressed and how your intervention led to improved learning for students.</div>
+      <div class="field-guide-btn" id="fgb-r-goals">
+        <button class="btn-sm btn-gold" onclick="askFieldGuide('r-goals','Project goals and objectives — actual outcomes')">Ask guide ↗</button>
+        <div class="field-output" id="fout-r-goals"></div>
+      </div>
     </div>
 
     <div class="report-section">
       <h3>Milestones & Outcomes Achieved</h3>
-      <div class="prompt">List each milestone and outcome achieved. For anything not yet achieved or changed from the original plan, briefly explain why.</div>
-      <textarea id="r-milestones" placeholder="e.g. Milestone 1 (Prepare): Completed August 2024. IRB exempt determination received September 15. Student worker hired and onboarded October 1…" style="width:100%;min-height:100px;" oninput="saveReport()"></textarea>
+      <div class="prompt">What was achieved across the major areas of your project? Note anything that changed from your original plan.</div>
+      <textarea id="r-milestones" placeholder="This will pre-populate from reflections you've entered in the Milestones tab." style="width:100%;min-height:100px;" oninput="saveReport();checkPrefillNote('r-milestones','pfn-r-milestones');checkFieldGuideBtn('r-milestones','fgb-r-milestones')"></textarea>
+      <div class="prefill-note" id="pfn-r-milestones">This was pre-filled from your milestone reflections. Please expand with a narrative on what was achieved and what changed from your original plan.</div>
+      <div class="field-guide-btn" id="fgb-r-milestones">
+        <button class="btn-sm btn-gold" onclick="askFieldGuide('r-milestones','Milestones and outcomes achieved')">Ask guide ↗</button>
+        <div class="field-output" id="fout-r-milestones"></div>
+      </div>
     </div>
 
     <div class="report-section">
       <h3>Impact</h3>
       <div class="prompt">What changed as a result of this project? Describe changes observed by the course team or reported by students. Reference your Impact Evaluation Framework data.</div>
-      <textarea id="r-impact" placeholder="e.g. Pre/post survey results showed a statistically significant increase in student self-efficacy scores (mean increase 0.8 on a 5-point scale, p < .05). Students reported…" style="width:100%;min-height:100px;" oninput="saveReport()"></textarea>
+      <textarea id="r-impact" placeholder="This will pre-populate from your Impact Evaluation Framework." style="width:100%;min-height:100px;" oninput="saveReport();checkPrefillNote('r-impact','pfn-r-impact');checkFieldGuideBtn('r-impact','fgb-r-impact')"></textarea>
+      <div class="prefill-note" id="pfn-r-impact">This was pre-filled from your Impact Evaluation Framework. Please describe the actual impact observed — what changed for students and instructors as a result of this project.</div>
+      <div class="field-guide-btn" id="fgb-r-impact">
+        <button class="btn-sm btn-gold" onclick="askFieldGuide('r-impact','Project impact on student learning')">Ask guide ↗</button>
+        <div class="field-output" id="fout-r-impact"></div>
+      </div>
     </div>
 
     <div class="report-section">
       <h3>Challenges</h3>
-      <div class="prompt">What risks and challenges arose? How did you address them? What support would have been valuable?</div>
-      <textarea id="r-challenges" placeholder="e.g. Vendor contract negotiations took longer than anticipated, delaying technology implementation by 6 weeks. We addressed this by…" style="width:100%;min-height:90px;" oninput="saveReport()"></textarea>
+      <div class="prompt">What operational or logistical challenges arose? How did you address them?</div>
+      <textarea id="r-challenges" placeholder="e.g. Vendor contract negotiations took longer than anticipated, delaying technology implementation by 6 weeks. We addressed this by…" style="width:100%;min-height:90px;" oninput="saveReport();checkFieldGuideBtn('r-challenges','fgb-r-challenges')"></textarea>
+      <div class="field-guide-btn" id="fgb-r-challenges">
+        <button class="btn-sm btn-gold" onclick="askFieldGuide('r-challenges','Challenges and how they were addressed')">Ask guide ↗</button>
+        <div class="field-output" id="fout-r-challenges"></div>
+      </div>
     </div>
 
     <div class="report-section">
       <h3>Lessons Learned</h3>
-      <div class="prompt">What did you learn from challenges, stakeholders, and the process itself? What emerged as best practices?</div>
-      <textarea id="r-lessons" placeholder="e.g. Starting IRB paperwork in the summer before the project semester is essential. Faculty collaborators need protected time built into the timeline…" style="width:100%;min-height:90px;" oninput="saveReport()"></textarea>
+      <div class="prompt">What pedagogical insights emerged from this project? What worked or didn't work in the classroom? What would you do differently in course design? What are your best practices for teaching with this innovation?</div>
+      <textarea id="r-lessons" placeholder="e.g. Students engaged more deeply with the AI simulation tool when given structured reflection prompts before and after. Pairing the technology with explicit metacognitive activities significantly improved…" style="width:100%;min-height:90px;" oninput="saveReport();checkFieldGuideBtn('r-lessons','fgb-r-lessons')"></textarea>
+      <div class="field-guide-btn" id="fgb-r-lessons">
+        <button class="btn-sm btn-gold" onclick="askFieldGuide('r-lessons','Pedagogical lessons learned')">Ask guide ↗</button>
+        <div class="field-output" id="fout-r-lessons"></div>
+      </div>
     </div>
 
     <div class="report-section">
       <h3>Next Steps & Future Plans</h3>
-      <div class="prompt">If ongoing: what are the next milestones? If complete: how will the project's impact continue? Will it be scaled, adapted, or published?</div>
-      <textarea id="r-next" placeholder="e.g. We plan to submit findings to the Journal of Excellence in College Teaching. The revised assignment sequence will be adopted across all sections of BIO 101 beginning Spring 2026…" style="width:100%;min-height:90px;" oninput="saveReport()"></textarea>
+      <div class="prompt">How will the impact of this project continue beyond its funding period? Will it be sustained, scaled to other courses or departments, adapted for other contexts, or published?</div>
+      <textarea id="r-next" placeholder="This will pre-populate from your dissemination notes if available. Describe how this project's impact will continue beyond its funding period." style="width:100%;min-height:90px;" oninput="saveReport();checkPrefillNote('r-next','pfn-r-next');checkFieldGuideBtn('r-next','fgb-r-next')"></textarea>
+      <div class="prefill-note" id="pfn-r-next">This was pre-filled from your dissemination notes. Please expand on how the impact of this project will continue — through scaling, adaptation, publication, or integration into ongoing practice.</div>
+      <div class="field-guide-btn" id="fgb-r-next">
+        <button class="btn-sm btn-gold" onclick="askFieldGuide('r-next','Next steps and future plans beyond the project')">Ask guide ↗</button>
+        <div class="field-output" id="fout-r-next"></div>
+      </div>
     </div>
 
     <div style="display:flex;gap:10px;margin-top:8px;flex-wrap:wrap;">
       <button onclick="saveReport()" class="btn-primary">Save report</button>
-      <button onclick="aiReportHelp()" class="btn-gold">Ask guide to help draft ↗</button>
+      <button onclick="downloadReportPDF('final')" class="btn-sm">⬇ Download as PDF</button>
+      <button onclick="aiReportHelp()" class="btn-gold">Ask the guide for feedback on your draft ↗</button>
       <button onclick="prefillReport()">Pre-fill from my project data</button>
     </div>
     <div id="report-output" style="margin-top:14px;"></div>
@@ -1529,6 +1675,11 @@ function switchTab(name, btn){
   btn.classList.add('active');
   btn.setAttribute('aria-selected','true');
   document.getElementById('tab-'+name).classList.add('active');
+  if(name==='report'){
+    if(reportMode==='snapshot') prefillSnapshot();
+    else prefillReport();
+    updateReportTitlePreview();
+  }
 }
 
 // ═══════════════════════════════════════════════════════
@@ -2209,7 +2360,19 @@ function renderMilestones(){
       </div>`;
     }
 
+    // ── reflection helper ──────────────────────────────────────────
+    const reflections = data.milestone_reflections || {};
+    function buildReflectionPrompt(key, label){
+      const val = (reflections[key]||'').replace(/"/g,'&quot;');
+      return `<div class="milestone-reflection">
+        <label>Reflection: ${label} — What was the outcome? Did anything change from your original plan?</label>
+        <textarea placeholder="Add a brief reflection on this section's outcomes and any changes from your plan…"
+          onblur="saveMilestoneReflection('${key}',this.value)">${val}</textarea>
+      </div>`;
+    }
+
     // ── render ─────────────────────────────────────────────────────
+    const REFLECTION_GROUPS = ['IRB','Content Development','Technology','Learning Analytics'];
     let html = '';
     if(m==='m1'){
       const byGroup = {};
@@ -2219,10 +2382,22 @@ function renderMilestones(){
         html += `<div style="margin:14px 0 4px;font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--navy);opacity:0.65;padding-bottom:3px;border-bottom:1px solid rgba(26,39,68,0.12);">${group}</div>`;
         byGroup[group].forEach(t=>{ html += buildTaskRow(t); });
         html += buildAddRow(m, group);
+        // Show reflection prompt for tracked groups once any task is done
+        if(REFLECTION_GROUPS.includes(group)){
+          const groupTasks = byGroup[group];
+          const anyDone = groupTasks.some(t=>taskStates[t.id]==='done'||taskStates[t.id]===true);
+          if(anyDone) html += buildReflectionPrompt(`m1_${group.replace(/\s+/g,'_')}`, group);
+        }
       });
     } else {
       allTasks.forEach(t=>{ html += buildTaskRow(t); });
       html += buildAddRow(m, null);
+      // Show reflection prompt for M3/M4 once any task is done
+      if(m==='m3'||m==='m4'){
+        const milestoneLabels = {m3:'Analyze & Share Findings',m4:'Reflect, Iterate & Scale'};
+        const anyDone = allTasks.some(t=>taskStates[t.id]==='done'||taskStates[t.id]===true);
+        if(anyDone) html += buildReflectionPrompt(m, milestoneLabels[m]);
+      }
     }
     container.innerHTML = html;
 
@@ -2316,6 +2491,15 @@ function addCustomTask(){
   document.getElementById('ct-lead').value = '';
   document.getElementById('ct-date').value = '';
   renderMilestones();
+}
+
+function saveMilestoneReflection(key, value){
+  const data = loadAll();
+  data.milestone_reflections = data.milestone_reflections || {};
+  data.milestone_reflections[key] = value;
+  data.touched = data.touched||{};
+  data.touched.milestones = true;
+  saveAll(data);
 }
 
 function saveMilestones(){
@@ -2866,11 +3050,26 @@ function updateReportTitlePreview(){
     start: document.getElementById('s-start').value,
     end: document.getElementById('s-end').value,
   };
-  const el = document.getElementById('report-title-preview');
-  el.innerHTML = `<strong>${s.title||'[Project title]'}</strong><br/>
+  const html = `<strong>${s.title||'[Project title]'}</strong><br/>
     ${s.dept||'[Department]'} · Faculty lead: ${s.lead||'[Name]'}<br/>
     Project period: ${s.start ? fmtDate(s.start) : '[Start]'} – ${s.end ? fmtDate(s.end) : '[End]'}<br/>
-    <span style="color:var(--text3);font-size:12px;">Report generated: ${new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'})}</span>`;
+    <span style="color:var(--text3);font-size:12px;">Generated: ${new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'})}</span>`;
+  ['report-title-preview','snapshot-title-preview'].forEach(id=>{
+    const el = document.getElementById(id);
+    if(el) el.innerHTML = html;
+  });
+}
+
+let reportMode = 'snapshot';
+
+function switchReportMode(mode){
+  reportMode = mode;
+  document.getElementById('report-snapshot').style.display = mode==='snapshot' ? 'block' : 'none';
+  document.getElementById('report-final').style.display = mode==='final' ? 'block' : 'none';
+  document.getElementById('rmode-snapshot').classList.toggle('active', mode==='snapshot');
+  document.getElementById('rmode-final').classList.toggle('active', mode==='final');
+  if(mode==='snapshot') prefillSnapshot();
+  else prefillReport();
 }
 
 function saveReport(){
@@ -2887,34 +3086,207 @@ function saveReport(){
     next: document.getElementById('r-next').value,
   };
   saveAll(data);
+  updatePrefillNotes('final');
+}
+
+function saveSnapshot(){
+  const data = loadAll();
+  data.touched = data.touched||{};
+  data.touched.snapshot = true;
+  data.snapshot = {
+    overview: document.getElementById('rs-overview').value,
+    goals: document.getElementById('rs-goals').value,
+    assessment: document.getElementById('rs-assessment').value,
+    dissemination: document.getElementById('rs-dissemination').value,
+    support: document.getElementById('rs-support').value,
+    timeline: document.getElementById('rs-timeline').value,
+  };
+  saveAll(data);
+  updatePrefillNotes('snapshot');
 }
 
 function loadReport(){
   const data = loadAll();
   const r = data.report;
-  if(!r) return;
-  ['team','goals','milestones','impact','challenges','lessons','next'].forEach(f=>{
-    const el = document.getElementById('r-'+f);
-    if(el && r[f]) el.value = r[f];
-  });
+  if(r){
+    ['team','goals','milestones','impact','challenges','lessons','next'].forEach(f=>{
+      const el = document.getElementById('r-'+f);
+      if(el && r[f]) el.value = r[f];
+    });
+  }
+  const sn = data.snapshot;
+  if(sn){
+    ['overview','goals','assessment','dissemination','support','timeline'].forEach(f=>{
+      const el = document.getElementById('rs-'+f);
+      if(el && sn[f]) el.value = sn[f];
+    });
+  }
+  updatePrefillNotes('final');
+  updatePrefillNotes('snapshot');
+}
+
+// Track original prefill values to detect edits
+const _prefillOriginals = {};
+
+function setPrefillOriginal(id, val){
+  if(!_prefillOriginals[id]) _prefillOriginals[id] = val;
+}
+
+function isEdited(id){
+  const el = document.getElementById(id);
+  if(!el) return false;
+  if(!_prefillOriginals[id]) return el.value.trim().length > 0;
+  return el.value.trim() !== _prefillOriginals[id].trim();
+}
+
+function checkPrefillNote(fieldId, noteId){
+  const noteEl = document.getElementById(noteId);
+  if(!noteEl) return;
+  if(isEdited(fieldId)) noteEl.classList.add('hidden');
+  else noteEl.classList.remove('hidden');
+  checkFieldGuideBtn(fieldId, 'fgb-'+fieldId);
+}
+
+function checkFieldGuideBtn(fieldId, btnContainerId){
+  const el = document.getElementById(fieldId);
+  const btn = document.getElementById(btnContainerId);
+  if(!el||!btn) return;
+  const hasContent = el.value.trim().length > 0;
+  const edited = isEdited(fieldId);
+  // For prefilled fields show btn only after editing; for blank fields show when content exists
+  const isPrefilled = !!_prefillOriginals[fieldId];
+  if(isPrefilled ? edited : hasContent) btn.classList.add('visible');
+  else btn.classList.remove('visible');
+}
+
+function updatePrefillNotes(mode){
+  if(mode==='final'){
+    ['r-team','r-goals','r-milestones','r-impact','r-next'].forEach(id=>{
+      checkPrefillNote(id, 'pfn-'+id);
+    });
+    ['r-challenges','r-lessons'].forEach(id=>{
+      checkFieldGuideBtn(id,'fgb-'+id);
+    });
+  } else {
+    ['rs-goals','rs-assessment','rs-timeline'].forEach(id=>{
+      checkPrefillNote(id,'pfn-'+id);
+    });
+    ['rs-overview','rs-dissemination','rs-support'].forEach(id=>{
+      checkFieldGuideBtn(id,'fgb-'+id);
+    });
+  }
 }
 
 function prefillReport(){
   const data = loadAll();
   const s = data.setup || {};
   const fw = data.framework || {};
+  const reflections = data.milestone_reflections || {};
 
-  if(s.team && !document.getElementById('r-team').value)
-    document.getElementById('r-team').value = s.team;
-
-  if((s.vision || fw.objectives) && !document.getElementById('r-goals').value){
-    let goals = '';
-    if(s.challenge) goals += `Challenge addressed: ${s.challenge}\n\n`;
-    if(s.vision) goals += `Vision: ${s.vision}\n\n`;
-    if(fw.objectives) goals += `Objectives: ${fw.objectives}`;
-    document.getElementById('r-goals').value = goals.trim();
+  function fill(id, val){
+    const el = document.getElementById(id);
+    if(!el || !val) return;
+    if(!el.value.trim()){
+      el.value = val;
+      setPrefillOriginal(id, val);
+    }
   }
+
+  // Team
+  let team = '';
+  if(s.lead) team += `Faculty lead: ${s.lead}`;
+  if(s.dept) team += (team?'\n':'') + `Department: ${s.dept}`;
+  if(s.team) team += (team?'\n':'') + `Team members: ${s.team}`;
+  fill('r-team', team);
+
+  // Goals
+  let goals = '';
+  if(s.challenge) goals += `Teaching/learning challenge: ${s.challenge}\n\n`;
+  if(s.vision) goals += `Vision: ${s.vision}\n\n`;
+  if(s.audience) goals += `Target audience: ${s.audience}\n\n`;
+  if(fw.objectives) goals += `Objectives: ${fw.objectives}`;
+  fill('r-goals', goals.trim());
+
+  // Milestones — from reflection notes
+  let milestones = '';
+  const reflectionLabels = {
+    m1_IRB: 'IRB',
+    m1_Content_Development: 'Content Development',
+    m1_Technology: 'Technology',
+    m1_Learning_Analytics: 'Learning Analytics',
+    m3: 'Analyze & Share Findings',
+    m4: 'Reflect, Iterate & Scale',
+  };
+  Object.entries(reflectionLabels).forEach(([key,label])=>{
+    if(reflections[key]) milestones += `${label}:\n${reflections[key]}\n\n`;
+  });
+  fill('r-milestones', milestones.trim());
+
+  // Impact
+  let impact = '';
+  if(fw.impacts) impact += `Anticipated impacts: ${fw.impacts}\n\n`;
+  if(fw.measures) impact += `Measures & targets: ${fw.measures}\n\n`;
+  if(fw.collection) impact += `Data collection: ${fw.collection}\n\n`;
+  if(fw.analysis) impact += `Data analysis: ${fw.analysis}`;
+  fill('r-impact', impact.trim());
+
+  // Next steps — from snapshot dissemination if available
+  const sn = data.snapshot || {};
+  if(sn.dissemination) fill('r-next', sn.dissemination);
+
   saveReport();
+  updatePrefillNotes('final');
+  flashSave();
+}
+
+function prefillSnapshot(){
+  const data = loadAll();
+  const s = data.setup || {};
+  const fw = data.framework || {};
+  const reflections = data.milestone_reflections || {};
+
+  function fill(id, val){
+    const el = document.getElementById(id);
+    if(!el || !val) return;
+    if(!el.value.trim()){
+      el.value = val;
+      setPrefillOriginal(id, val);
+    }
+  }
+
+  // Goals
+  let goals = '';
+  if(s.challenge) goals += `Challenge: ${s.challenge}\n\n`;
+  if(s.vision) goals += `Vision: ${s.vision}\n\n`;
+  if(fw.objectives) goals += `Objectives: ${fw.objectives}`;
+  fill('rs-goals', goals.trim());
+
+  // Assessment
+  let assessment = '';
+  if(fw.measures) assessment += `Measures & targets: ${fw.measures}\n\n`;
+  if(fw.collection) assessment += `Data collection plan: ${fw.collection}\n\n`;
+  if(fw.analysis) assessment += `Data analysis plan: ${fw.analysis}`;
+  fill('rs-assessment', assessment.trim());
+
+  // Overview — from reflection notes
+  let overview = '';
+  const reflectionLabels = {
+    m1_IRB: 'IRB', m1_Content_Development: 'Content Development',
+    m1_Technology: 'Technology', m1_Learning_Analytics: 'Learning Analytics',
+    m3: 'Analyze & Share Findings', m4: 'Reflect, Iterate & Scale',
+  };
+  Object.entries(reflectionLabels).forEach(([key,label])=>{
+    if(reflections[key]) overview += `${label}: ${reflections[key]}\n\n`;
+  });
+  fill('rs-overview', overview.trim());
+
+  // Timeline
+  let timeline = '';
+  if(s.start&&s.end) timeline += `Project period: ${fmtDate(s.start)} – ${fmtDate(s.end)}\n\n`;
+  fill('rs-timeline', timeline.trim());
+
+  saveSnapshot();
+  updatePrefillNotes('snapshot');
   flashSave();
 }
 
@@ -3390,26 +3762,85 @@ async function aiReportHelp(){
   const out = document.getElementById('report-output');
   showThinking(out);
   const rFields = {
-    Team: document.getElementById('r-team').value,
-    Goals: document.getElementById('r-goals').value,
-    Milestones: document.getElementById('r-milestones').value,
-    Impact: document.getElementById('r-impact').value,
-    Challenges: document.getElementById('r-challenges').value,
-    Lessons: document.getElementById('r-lessons').value,
-    'Next steps': document.getElementById('r-next').value,
+    'Project Team': document.getElementById('r-team').value,
+    'Goals & Objectives': document.getElementById('r-goals').value,
+    'Milestones & Outcomes': document.getElementById('r-milestones').value,
+    'Impact': document.getElementById('r-impact').value,
+    'Challenges': document.getElementById('r-challenges').value,
+    'Lessons Learned': document.getElementById('r-lessons').value,
+    'Next Steps': document.getElementById('r-next').value,
   };
-  const filledReport = Object.entries(rFields).filter(([,v])=>v.trim()).map(([k,v])=>`${k}: ${v}`);
+  const filledReport = Object.entries(rFields).filter(([,v])=>v.trim()).map(([k,v])=>`${k}:\n${v}`);
   if(!filledReport.length){
     out.innerHTML=`<div class="ai-response"><strong>Nothing to review yet</strong> — fill in some report fields first.</div>`;
     return;
   }
-  const prompt = `You are a helpful guide for faculty managing a Shipley Academic Innovation Fund award from the Institute for Excellence in Teaching & Learning at Boston University. Help the faculty member draft or improve their project report based only on what they have written so far — do not comment on sections they haven't started yet. Do not reference the BU grants office or university policy. If something raises a concern that needs follow-up, direct the faculty member to contact the Institute team at excellence@bu.edu.\n\n${filledReport.join('\n\n')}\n\nHelp them strengthen what they have. Which sections could be improved and how?`;
+  const prompt = `You are a helpful guide for faculty managing a Shipley Academic Innovation Fund award from the Institute for Excellence in Teaching & Learning at Boston University. Review the draft project report sections below and give specific, constructive feedback on what has been written — do not comment on sections that haven't been started. Do not reference the BU grants office or university policy. If something raises a concern, direct the faculty member to contact the Institute team at excellence@bu.edu.\n\n${filledReport.join('\n\n')}`;
   try{
     const r = await callGuide(prompt);
     renderAIResponse(out, r);
   }catch(e){
     out.innerHTML=`<div class="ai-response" style="border-left-color:var(--red);">Something went wrong.</div>`;
   }
+}
+
+async function askFieldGuide(fieldId, fieldLabel){
+  const el = document.getElementById(fieldId);
+  const out = document.getElementById('fout-'+fieldId);
+  if(!el||!out) return;
+  const content = el.value.trim();
+  if(!content) return;
+  showThinking(out);
+  const data = loadAll();
+  const s = data.setup||{};
+  const ctx = s.title ? `Project: ${s.title}\nFaculty lead: ${s.lead||''}\n` : '';
+  const prompt = `You are a helpful guide for faculty managing a Shipley Academic Innovation Fund award from the Institute for Excellence in Teaching & Learning at Boston University. Review the following draft for the "${fieldLabel}" section of their project report. Give specific, constructive feedback on this section only. Do not reference the BU grants office or university policy. If something raises a concern, direct the faculty member to contact the Institute team at excellence@bu.edu.\n\n${ctx}\n${fieldLabel}:\n${content}`;
+  try{
+    const r = await callGuide(prompt);
+    renderAIResponse(out, r);
+  }catch(e){
+    out.innerHTML=`<div class="ai-response" style="border-left-color:var(--red);">Something went wrong.</div>`;
+  }
+}
+
+function downloadReportPDF(mode){
+  const data = loadAll();
+  const s = data.setup||{};
+  const title = mode==='snapshot' ? 'Milestone Snapshot' : 'Final Project Report';
+  const projectTitle = s.title||'Shipley Project';
+  const date = new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});
+
+  let content = `<html><head><style>
+    body{font-family:Georgia,serif;max-width:720px;margin:40px auto;color:#1a1916;font-size:14px;line-height:1.7;}
+    h1{font-size:22px;color:#1a2744;margin-bottom:4px;}
+    .meta{font-size:13px;color:#666;margin-bottom:24px;}
+    h2{font-size:16px;color:#1a2744;border-bottom:1px solid #ddd;padding-bottom:4px;margin-top:24px;}
+    p{white-space:pre-wrap;margin:8px 0 16px;}
+    .empty{color:#999;font-style:italic;}
+  </style></head><body>
+  <h1>${projectTitle}</h1>
+  <div class="meta">${title} · ${s.lead||''} · ${s.dept||''}<br/>Generated: ${date}</div>`;
+
+  const fields = mode==='snapshot'
+    ? [['Overview','rs-overview'],['Goals & Changes from Original Plan','rs-goals'],
+       ['Assessment & Sustainability','rs-assessment'],['Dissemination','rs-dissemination'],
+       ['Support Needed','rs-support'],['Timeline & Next Steps','rs-timeline']]
+    : [['Project Team and Roles','r-team'],['Project Goals and Objectives','r-goals'],
+       ['Milestones & Outcomes Achieved','r-milestones'],['Impact','r-impact'],
+       ['Challenges','r-challenges'],['Lessons Learned','r-lessons'],
+       ['Next Steps & Future Plans','r-next']];
+
+  fields.forEach(([label,id])=>{
+    const el = document.getElementById(id);
+    const val = el ? el.value.trim() : '';
+    content += `<h2>${label}</h2><p>${val||'<span class="empty">Not yet completed.</span>'}</p>`;
+  });
+  content += '</body></html>';
+
+  const w = window.open('','_blank');
+  w.document.write(content);
+  w.document.close();
+  w.print();
 }
 
 async function askGuide(){
