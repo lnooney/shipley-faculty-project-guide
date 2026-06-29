@@ -1438,8 +1438,8 @@ a:hover{color:var(--navy);}
     <div class="report-section">
       <h3>Assessment & Sustainability</h3>
       <div class="prompt">What progress have you made toward assessing the impact of your project on student learning? What is your current plan to sustain the innovations you are developing?</div>
-      <textarea id="rs-assessment" placeholder="This will pre-populate from your Impact Evaluation Framework. Describe your assessment progress and sustainability plan." style="width:100%;min-height:90px;" oninput="saveSnapshot()"></textarea>
-      <div class="prefill-note" id="pfn-rs-assessment">This was pre-filled from your Impact Evaluation Framework. Please describe your assessment progress and sustainability plan.</div>
+      <textarea id="rs-assessment" placeholder="Assessment progress will pre-populate from your Impact Evaluation Framework. Please also describe your plan for sustaining the innovations you are developing beyond the project period." style="width:100%;min-height:90px;" oninput="saveSnapshot()"></textarea>
+      <div class="prefill-note" id="pfn-rs-assessment">Assessment information has been pre-filled from your Impact Evaluation Framework. Please add your plan for sustaining the innovations you are developing beyond the project period.</div>
       <div class="field-guide-btn" id="fgb-rs-assessment">
         <button class="btn-sm btn-gold" onclick="askFieldGuide('rs-assessment','Assessment progress and sustainability plan')">Ask guide ↗</button>
         <div class="field-output" id="fout-rs-assessment"></div>
@@ -1469,8 +1469,8 @@ a:hover{color:var(--navy);}
     <div class="report-section">
       <h3>Timeline & Next Steps</h3>
       <div class="prompt">What is the remaining timeline for this project? What are your major next steps? Note any changes from your original timeline.</div>
-      <textarea id="rs-timeline" placeholder="This will pre-populate from your project dates and upcoming milestone tasks." style="width:100%;min-height:90px;" oninput="saveSnapshot()"></textarea>
-      <div class="prefill-note" id="pfn-rs-timeline">This was pre-filled from your project setup. Please describe your remaining timeline and next steps.</div>
+      <textarea id="rs-timeline" placeholder="This will pre-populate from your project dates and milestone task progress." style="width:100%;min-height:120px;" oninput="saveSnapshot()"></textarea>
+      <div class="prefill-note" id="pfn-rs-timeline">This was pre-filled from your project setup and milestone progress. Please review and add any context about changes from your original timeline.</div>
       <div class="field-guide-btn" id="fgb-rs-timeline">
         <button class="btn-sm btn-gold" onclick="askFieldGuide('rs-timeline','Remaining timeline and next steps')">Ask guide ↗</button>
         <div class="field-output" id="fout-rs-timeline"></div>
@@ -3141,9 +3141,13 @@ function isEdited(id){
 
 function checkPrefillNote(fieldId, noteId){
   const noteEl = document.getElementById(noteId);
-  if(!noteEl) return;
-  if(isEdited(fieldId)) noteEl.classList.add('hidden');
-  else noteEl.classList.remove('hidden');
+  const el = document.getElementById(fieldId);
+  if(!noteEl||!el) return;
+  const hasContent = el.value.trim().length > 0;
+  const edited = isEdited(fieldId);
+  // Only show note if field has content AND hasn't been edited from prefill
+  if(hasContent && !edited) noteEl.classList.remove('hidden');
+  else noteEl.classList.add('hidden');
   checkFieldGuideBtn(fieldId, 'fgb-'+fieldId);
 }
 
@@ -3280,9 +3284,30 @@ function prefillSnapshot(){
   });
   fill('rs-overview', overview.trim());
 
-  // Timeline
+  // Timeline — pull from project dates + milestone task progress
   let timeline = '';
   if(s.start&&s.end) timeline += `Project period: ${fmtDate(s.start)} – ${fmtDate(s.end)}\n\n`;
+  const taskStatesData = data.task_states || {};
+  const customTasksData = data.custom_tasks || [];
+  const milestoneNames = {
+    m1:'Prepare', m2:'Conduct Courses & Gather Data',
+    m3:'Analyze & Share Findings', m4:'Reflect, Iterate & Scale', m5:'Report & Close'
+  };
+  ['m1','m2','m3','m4','m5'].forEach(m=>{
+    const baseTasks = (MILESTONE_TASKS[m]||[]).map((t,i)=>({...t,id:m+'_'+i}));
+    const custom = customTasksData.filter(t=>t.milestone===m);
+    const all = [...baseTasks,...custom];
+    if(!all.length) return;
+    const done = all.filter(t=>taskStatesData[t.id]==='done'||taskStatesData[t.id]===true);
+    const inProg = all.filter(t=>taskStatesData[t.id]==='in_progress');
+    const notStarted = all.filter(t=>!taskStatesData[t.id]||taskStatesData[t.id]===null);
+    const pct = Math.round((done.length/all.length)*100);
+    timeline += `${milestoneNames[m]}: ${done.length} of ${all.length} tasks complete (${pct}%)\n`;
+    if(done.length) timeline += `  Complete: ${done.map(t=>t.name).join(', ')}\n`;
+    if(inProg.length) timeline += `  In progress: ${inProg.map(t=>t.name).join(', ')}\n`;
+    if(notStarted.length) timeline += `  Not started: ${notStarted.map(t=>t.name).join(', ')}\n`;
+    timeline += '\n';
+  });
   fill('rs-timeline', timeline.trim());
 
   saveSnapshot();
@@ -3325,7 +3350,8 @@ function setButtonLoading(btn, loading){
 
 function renderAIResponse(container, text){
   const id='ai-r-'+Date.now();
-  container.innerHTML=`<div class="ai-response" id="${id}">${text}</div><div class="ai-actions"><button class="btn-sm" onclick="copyAIResponse('${id}')">📋 Copy</button><button class="btn-sm" onclick="saveAIResponseAsPDF('${id}')">⬇ Save as PDF</button></div>`;
+  const wrapperId='ai-w-'+Date.now();
+  container.innerHTML=`<div id="${wrapperId}"><div class="ai-response" id="${id}">${text}</div><div class="ai-actions"><button class="btn-sm" onclick="copyAIResponse('${id}')">📋 Copy</button><button class="btn-sm" onclick="saveAIResponseAsPDF('${id}')">⬇ Save as PDF</button><button class="btn-sm" onclick="document.getElementById('${wrapperId}').innerHTML=''">✕ Close</button></div></div>`;
 }
 function copyAIResponse(id){
   const el=document.getElementById(id);if(!el)return;
@@ -3761,21 +3787,32 @@ async function aibudgethelp(){
 async function aiReportHelp(){
   const out = document.getElementById('report-output');
   showThinking(out);
-  const rFields = {
-    'Project Team': document.getElementById('r-team').value,
-    'Goals & Objectives': document.getElementById('r-goals').value,
-    'Milestones & Outcomes': document.getElementById('r-milestones').value,
-    'Impact': document.getElementById('r-impact').value,
-    'Challenges': document.getElementById('r-challenges').value,
-    'Lessons Learned': document.getElementById('r-lessons').value,
-    'Next Steps': document.getElementById('r-next').value,
-  };
-  const filledReport = Object.entries(rFields).filter(([,v])=>v.trim()).map(([k,v])=>`${k}:\n${v}`);
+  const fieldDefs = [
+    {key:'r-team',   label:'Project Team'},
+    {key:'r-goals',  label:'Goals & Objectives'},
+    {key:'r-milestones', label:'Milestones & Outcomes'},
+    {key:'r-impact', label:'Impact'},
+    {key:'r-challenges', label:'Challenges'},
+    {key:'r-lessons', label:'Lessons Learned'},
+    {key:'r-next',   label:'Next Steps'},
+  ];
+  const filledReport = [];
+  let goalsNote = '';
+  fieldDefs.forEach(({key,label})=>{
+    const el = document.getElementById(key);
+    if(!el||!el.value.trim()) return;
+    if(key==='r-goals' && !isEdited('r-goals')){
+      goalsNote = `Note: The "Goals & Objectives" section was automatically pre-filled from the faculty member's original project proposal and has not yet been revised. Do not give feedback on this section as if it were a completed reflection — instead briefly note that this section still needs to be updated to describe what was actually addressed and how it led to improved student learning.`;
+      filledReport.push(`${label} (pre-filled from proposal, not yet revised):\n${el.value}`);
+    } else {
+      filledReport.push(`${label}:\n${el.value}`);
+    }
+  });
   if(!filledReport.length){
     out.innerHTML=`<div class="ai-response"><strong>Nothing to review yet</strong> — fill in some report fields first.</div>`;
     return;
   }
-  const prompt = `You are a helpful guide for faculty managing a Shipley Academic Innovation Fund award from the Institute for Excellence in Teaching & Learning at Boston University. Review the draft project report sections below and give specific, constructive feedback on what has been written — do not comment on sections that haven't been started. Do not reference the BU grants office or university policy. If something raises a concern, direct the faculty member to contact the Institute team at excellence@bu.edu.\n\n${filledReport.join('\n\n')}`;
+  const prompt = `You are a helpful guide for faculty managing a Shipley Academic Innovation Fund award from the Institute for Excellence in Teaching & Learning at Boston University. Review the draft project report sections below and give specific, constructive feedback on what has been written — do not comment on sections that haven't been started. Do not reference the BU grants office or university policy. If something raises a concern, direct the faculty member to contact the Institute team at excellence@bu.edu.\n\n${goalsNote ? goalsNote+'\n\n' : ''}${filledReport.join('\n\n')}`;
   try{
     const r = await callGuide(prompt);
     renderAIResponse(out, r);
