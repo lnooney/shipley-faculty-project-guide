@@ -1288,17 +1288,17 @@ a:hover{color:var(--navy);}
       <div class="budget-tpl-card" id="btpl-5k" onclick="selectBudgetTemplate('5k')">
         <div class="tpl-amount">$5,000</div>
         <div class="tpl-label">Pilot award</div>
-        <div class="tpl-periods">2 terms · Fall + Spring</div>
+        <div class="tpl-periods">2 terms · 1 academic year</div>
       </div>
       <div class="budget-tpl-card" id="btpl-10k" onclick="selectBudgetTemplate('10k')">
         <div class="tpl-amount">$10,000</div>
         <div class="tpl-label">Standard award</div>
-        <div class="tpl-periods">3 terms · Full calendar year</div>
+        <div class="tpl-periods">4 terms · 18 months</div>
       </div>
       <div class="budget-tpl-card" id="btpl-25k" onclick="selectBudgetTemplate('25k')">
         <div class="tpl-amount">$25,000</div>
         <div class="tpl-label">Expanded award</div>
-        <div class="tpl-periods">4 terms · Fall → Fall</div>
+        <div class="tpl-periods">5 terms · 2 academic years</div>
       </div>
     </div>
   </div>
@@ -1937,6 +1937,8 @@ function getPriorityEntries(){ return priorityEntries; }
 
 function saveSetup(){
   const data = loadAll();
+  data.touched = data.touched||{};
+  data.touched.setup = true;
   data.setup = {
     title: document.getElementById('s-title').value,
     lead: document.getElementById('s-lead').value,
@@ -2007,6 +2009,8 @@ function autoSaveFramework(){
 
 function saveFramework(){
   const data = loadAll();
+  data.touched = data.touched||{};
+  data.touched.framework = true;
   data.framework = {
     problems: document.getElementById('fw-problems').value,
     objectives: document.getElementById('fw-objectives').value,
@@ -2316,6 +2320,8 @@ function addCustomTask(){
 
 function saveMilestones(){
   const data = loadAll();
+  data.touched = data.touched||{};
+  data.touched.milestones = true;
   data.milestone_notes = {
     m1: document.getElementById('m1-notes').value,
     m2: document.getElementById('m2-notes').value,
@@ -2339,7 +2345,7 @@ const BUDGET_DEFS = {
     max: 5000,
     defaultPeriods: [
       {label:'Fall 2026 (Sept–Dec)'},
-      {label:'Spring 2027 (Jan–May)'},
+      {label:'Spring 2027 (Jan–Jun)'},
     ],
     salaryRows: [
       {name:'Summer Stipend', fringeRate:0.31},
@@ -2358,8 +2364,9 @@ const BUDGET_DEFS = {
     max: 10000,
     defaultPeriods: [
       {label:'Fall 2026 (Sept–Dec)'},
-      {label:'Spring 2027 (Jan–May)'},
-      {label:'Summer 2027 (Jun–Aug)'},
+      {label:'Spring 2027 (Jan–Jun)'},
+      {label:'Summer 2027 (Jul–Aug)'},
+      {label:'Fall 2027 (Sept–Dec)'},
     ],
     salaryRows: [
       {name:'Summer Stipend (shared between PIs)', fringeRate:0.31},
@@ -2378,9 +2385,10 @@ const BUDGET_DEFS = {
     max: 25000,
     defaultPeriods: [
       {label:'Fall 2026 (Sept–Dec)'},
-      {label:'Spring 2027 (Jan–May)'},
-      {label:'Summer 2027 (Jun–Aug)'},
+      {label:'Spring 2027 (Jan–Jun)'},
+      {label:'Summer 2027 (Jul–Aug)'},
       {label:'Fall 2027 (Sept–Dec)'},
+      {label:'Spring 2028 (Jan–Jun)'},
     ],
     salaryRows: [
       {name:'Course Release', fringeRate:0.31},
@@ -2411,20 +2419,43 @@ let budgetState = {template:null, periods:[], salary:[], op:[]};
 const TERM_PATTERNS = {
   '5k': (yr) => [
     `Fall ${yr} (Sept–Dec)`,
-    `Spring ${yr+1} (Jan–May)`,
+    `Spring ${yr+1} (Jan–Jun)`,
   ],
   '10k': (yr) => [
     `Fall ${yr} (Sept–Dec)`,
-    `Spring ${yr+1} (Jan–May)`,
-    `Summer ${yr+1} (Jun–Aug)`,
+    `Spring ${yr+1} (Jan–Jun)`,
+    `Summer ${yr+1} (Jul–Aug)`,
+    `Fall ${yr+1} (Sept–Dec)`,
   ],
   '25k': (yr) => [
     `Fall ${yr} (Sept–Dec)`,
-    `Spring ${yr+1} (Jan–May)`,
-    `Summer ${yr+1} (Jun–Aug)`,
+    `Spring ${yr+1} (Jan–Jun)`,
+    `Summer ${yr+1} (Jul–Aug)`,
     `Fall ${yr+1} (Sept–Dec)`,
+    `Spring ${yr+2} (Jan–Jun)`,
   ],
 };
+
+// Generate the next term label in sequence after the last existing period
+function nextTermLabel(periods){
+  if(!periods.length) return 'Fall (Sept–Dec)';
+  const last = periods[periods.length-1].label || '';
+  // Extract year from label e.g. "Fall 2027 (Sept–Dec)" → 2027
+  const yrMatch = last.match(/\d{4}/);
+  const yr = yrMatch ? parseInt(yrMatch[0]) : new Date().getFullYear();
+  if(/^Fall/.test(last))   return `Spring ${yr+1} (Jan–Jun)`;
+  if(/^Spring/.test(last)) return `Summer ${yr} (Jul–Aug)`;
+  if(/^Summer/.test(last)) return `Fall ${yr} (Sept–Dec)`;
+  return `Fall ${yr+1} (Sept–Dec)`;
+}
+
+function addBudgetTerm(){
+  const label = nextTermLabel(budgetState.periods);
+  budgetState.periods.push({label});
+  budgetState.salary.forEach(s=>{ s.amounts.push(0); });
+  renderBudgetBuilder();
+  saveBudget();
+}
 
 function updateBudgetYear(yr){
   yr = parseInt(yr);
@@ -2475,6 +2506,9 @@ function renderBudgetBuilder(){
       <input type="text" value="${periods[p].label||''}" oninput="budgetState.periods[${p}].label=this.value;renderBudgetBuilder();saveBudget();" style="width:100%;font-size:13px;"/>
     </div>`;
   }
+  pInputs += `<div class="field" style="display:flex;align-items:flex-end;padding-bottom:2px;">
+    <button class="btn-sm" onclick="addBudgetTerm()" style="white-space:nowrap;">+ Add term</button>
+  </div>`;
   document.getElementById('budget-period-inputs').innerHTML = pInputs;
 
   // Calculate salary subtotals
@@ -2483,22 +2517,44 @@ function renderBudgetBuilder(){
   let salaryRowsHtml = '';
 
   def.salaryRows.forEach((row,ri)=>{
-    const s = budgetState.salary[ri]||{amounts:Array(nP).fill(0),desc:''};
+    const s = budgetState.salary[ri]||{amounts:Array(nP).fill(0),desc:'',fringeMode:null};
     budgetState.salary[ri]=s;
     if(s.amounts.length<nP) s.amounts = [...s.amounts,...Array(nP-s.amounts.length).fill(0)];
+    if(s.fringeMode===undefined) s.fringeMode=null;
     let rowTotal=0;
     let cells='';
     for(let p=0;p<nP;p++){
       const amt=parseFloat(s.amounts[p])||0;
-      rowTotal+=amt; salByP[p]+=amt; fringeByP[p]+=amt*row.fringeRate;
-      cells+=`<td class="bgt-input-cell"><input type="number" min="0" step="100" value="${amt||''}" placeholder="0" onchange="budgetState.salary[${ri}].amounts[${p}]=parseFloat(this.value)||0;renderBudgetBuilder();saveBudget();"/></td>`;
+      rowTotal+=amt;
+      // If fringe included: base = amt/(1+rate), fringe = amt - base; else add on top
+      const base = (s.fringeMode==='included' && row.fringeRate>0) ? amt/(1+row.fringeRate) : amt;
+      const fringe = (s.fringeMode==='included' && row.fringeRate>0) ? amt-base : amt*row.fringeRate;
+      salByP[p]+=base; fringeByP[p]+=fringe;
+      cells+=`<td class="bgt-input-cell"><input type="number" min="0" step="100" value="${amt||''}" placeholder="0"
+        onchange="budgetState.salary[${ri}].amounts[${p}]=parseFloat(this.value)||0;checkFringeMode(${ri});renderBudgetBuilder();saveBudget();"
+        onblur="checkFringePrompt(${ri},this)"/></td>`;
     }
     const frLabel = row.fringeRate===0 ? '0%' : (row.fringeRate*100).toFixed(1)+'%';
     const descHtml = row.hasDesc ? `<div class="bgt-desc-input"><input type="text" placeholder="Describe activity…" value="${s.desc||''}" oninput="budgetState.salary[${ri}].desc=this.value;" onblur="saveBudget();" /></div>` : '';
+    // Fringe toggle
+    let fringeToggle = '';
+    if(row.fringeRate>0){
+      const modeAdd = s.fringeMode==='add' ? 'style="background:var(--navy);color:#fff;border-color:var(--navy);"' : '';
+      const modeInc = s.fringeMode==='included' ? 'style="background:var(--navy);color:#fff;border-color:var(--navy);"' : '';
+      fringeToggle = `<div id="fringe-toggle-${ri}" style="display:${rowTotal>0?'flex':'none'};gap:4px;margin-top:5px;align-items:center;flex-wrap:wrap;">
+        <span style="font-size:11px;color:var(--text3);">Fringe:</span>
+        <button class="btn-sm" ${modeAdd} onclick="setFringeMode(${ri},'add')" style="font-size:11px;padding:2px 8px;">+ Calculate fringe</button>
+        <button class="btn-sm" ${modeInc} onclick="setFringeMode(${ri},'included')" style="font-size:11px;padding:2px 8px;">Included in amount</button>
+      </div>`;
+      const fringePrompt = s.fringeMode===null && rowTotal>0 ? `<div id="fringe-prompt-${ri}" class="alert alert-amber" style="font-size:12px;margin-top:5px;padding:7px 10px;">Does this amount include fringe benefits? <button class="btn-sm" onclick="setFringeMode(${ri},'included')" style="margin-left:6px;">Yes, included</button> <button class="btn-sm" onclick="setFringeMode(${ri},'add')" style="margin-left:4px;">No, calculate for me</button></div>` : '';
+      fringeToggle += fringePrompt;
+    }
+    const fringeNote = s.fringeMode==='included' && row.fringeRate>0 && rowTotal>0
+      ? `<span style="font-size:11px;color:var(--text3);font-style:italic;"> (fringe included)</span>` : '';
     salaryRowsHtml+=`<tr class="bgt-data-row">
-      <td class="bgt-label-cell">${row.name}${descHtml}</td>
+      <td class="bgt-label-cell">${row.name}${descHtml}${fringeToggle}</td>
       ${cells}
-      <td class="bgt-calc-cell">${rowTotal?fmt$(rowTotal):'—'}</td>
+      <td class="bgt-calc-cell">${rowTotal?fmt$(rowTotal):'—'}${fringeNote}</td>
       <td class="bgt-fringe-cell"><span class="fringe-badge">${frLabel}</span></td>
     </tr>`;
   });
@@ -2762,7 +2818,28 @@ function syncTechToMilestones(){
 function saveBudget(){
   const data=loadAll();
   data.budget_v2=budgetState;
+  data.touched = data.touched||{};
+  data.touched.budget = true;
   saveAll(data);
+}
+
+function setFringeMode(ri, mode){
+  if(!budgetState.salary[ri]) return;
+  budgetState.salary[ri].fringeMode = mode;
+  renderBudgetBuilder();
+  saveBudget();
+}
+
+function checkFringeMode(ri){
+  // Reset fringe mode when amount changes so prompt re-appears
+  if(budgetState.salary[ri] && budgetState.salary[ri].fringeMode !== null){
+    // keep existing selection — don't reset if already chosen
+  }
+}
+
+function checkFringePrompt(ri, input){
+  // Show prompt only if amounts exist and no mode set yet — handled in renderBudgetBuilder
+  saveBudget();
 }
 
 function loadBudget(){
@@ -2798,6 +2875,8 @@ function updateReportTitlePreview(){
 
 function saveReport(){
   const data = loadAll();
+  data.touched = data.touched||{};
+  data.touched.report = true;
   data.report = {
     team: document.getElementById('r-team').value,
     goals: document.getElementById('r-goals').value,
@@ -2920,7 +2999,7 @@ async function aiScopeReview(){
     return;
   }
 
-  const prompt = `You are reviewing a faculty member's project scoping information. Only give feedback on what has actually been provided — do not reference or flag omissions for fields that weren't shared with you. Be collegial, specific, and direct. Flag any risks or things worth thinking through more carefully based only on what is here.\n\n${filled.join('\n')}`;
+  const prompt = `You are a helpful guide for faculty managing a Shipley Academic Innovation Fund award from the Institute for Excellence in Teaching & Learning at Boston University. Review the project scoping information below. Only give feedback on what has actually been provided — do not reference or flag omissions for fields that weren't shared with you. Be collegial, specific, and direct. Do not reference the BU grants office or university policy. If something raises a concern that needs follow-up, direct the faculty member to contact the Institute team at excellence@bu.edu.\n\n${filled.join('\n')}`;
   try{
     const r = await callGuide(prompt);
     renderAIResponse(out, r);
@@ -2950,7 +3029,18 @@ async function reviewFramework(){
   saveFramework();
   const data = loadAll();
   const fw = data.framework || {};
-  const prompt = `Please review my Impact Evaluation Framework entries and give me specific, direct feedback. Are the objectives measurable? Do the measures align with the impacts? Is the data collection plan realistic? What's missing or underdeveloped?\n\nProblems: ${fw.problems||'empty'}\nObjectives: ${fw.objectives||'empty'}\nImpacts: ${fw.impacts||'empty'}\nMeasures & Targets: ${fw.measures||'empty'}\nData Collection: ${fw.collection||'empty'}\nData Analysis: ${fw.analysis||'empty'}`;
+  const filled = [];
+  if(fw.problems)   filled.push(`Problems: ${fw.problems}`);
+  if(fw.objectives) filled.push(`Objectives: ${fw.objectives}`);
+  if(fw.impacts)    filled.push(`Impacts: ${fw.impacts}`);
+  if(fw.measures)   filled.push(`Measures & Targets: ${fw.measures}`);
+  if(fw.collection) filled.push(`Data Collection: ${fw.collection}`);
+  if(fw.analysis)   filled.push(`Data Analysis: ${fw.analysis}`);
+  if(!filled.length){
+    out.innerHTML=`<div class="ai-response"><strong>Nothing to review yet</strong> — fill in some fields first.</div>`;
+    return;
+  }
+  const prompt = `You are a helpful guide for faculty managing a Shipley Academic Innovation Fund award from the Institute for Excellence in Teaching & Learning at Boston University. Please review only the Impact Evaluation Framework entries provided below — do not flag fields that haven't been filled in yet. Are the objectives measurable? Do the measures align with the impacts? Is the data collection plan realistic? Do not reference the BU grants office or university policy. If something raises a concern that needs follow-up, direct the faculty member to contact the Institute team at excellence@bu.edu.\n\n${filled.join('\n')}`;
   try{
     const r = await callGuide(prompt);
     renderAIResponse(out, r);
@@ -3207,7 +3297,7 @@ async function aiTimelineHelp(btn){
     if(inProgList.length) milestoneBreakdown += `\n  In progress: ${inProgList.join('; ')}`;
     if(notes[m]) milestoneBreakdown += `\n  Notes: ${notes[m]}`;
   });
-  const prompt = `A faculty member wants feedback on their Shipley project timeline. ${dateRange}\n\nTask status by milestone:${milestoneBreakdown}\n\nGive specific, practical feedback on their timeline progress. Reference specific completed and in-progress tasks by name where relevant. Note any sequencing risks, things that tend to take longer than faculty expect, and concrete next steps they should be thinking about now.`;
+  const prompt = `You are a helpful guide for faculty managing a Shipley Academic Innovation Fund award from the Institute for Excellence in Teaching & Learning at Boston University. A faculty member wants feedback on their project timeline. ${dateRange}\n\nTask status by milestone:${milestoneBreakdown}\n\nGive specific, practical feedback on their timeline progress. Reference specific completed and in-progress tasks by name where relevant. Note any sequencing risks and concrete next steps. Do not reference the BU grants office or university policy. If something raises a concern that needs follow-up, direct the faculty member to contact the Institute team at excellence@bu.edu.`;
   try{
     const r = await callGuide(prompt);
     renderAIResponse(out, r);
@@ -3250,14 +3340,28 @@ async function aibudgethelp(){
     out.innerHTML=`<div class="ai-response">Please select a budget template first.</div>`;
     return;
   }
-  let summary = `Grant award: $${def.max.toLocaleString()} (${budgetState.template==='10k'?'$10K':'$25K'} template)\n\nSalary line items:\n`;
+  const data = loadAll();
+  const s = data.setup || {};
+  // Project context
+  let projectContext = '';
+  if(s.title)    projectContext += `Project: ${s.title}\n`;
+  if(s.lead)     projectContext += `Faculty lead: ${s.lead}\n`;
+  if(s.dept)     projectContext += `Department: ${s.dept}\n`;
+  if(s.team)     projectContext += `Team: ${s.team}\n`;
+  if(s.challenge) projectContext += `Teaching challenge: ${s.challenge}\n`;
+  if(s.workers)  projectContext += `Student workers: ${s.workers}\n`;
+
+  let summary = `Grant award: $${def.max.toLocaleString()}\nTerms: ${budgetState.periods.map(p=>p.label).join(', ')}\n\nSalary line items (fringe rates are fixed institutional rates applied by this tool — do not flag them as errors):\n`;
   let salTotal=0, fringeTotal=0;
   def.salaryRows.forEach((row,ri)=>{
-    const s=budgetState.salary[ri]||{amounts:[]};
+    const s=budgetState.salary[ri]||{amounts:[],fringeMode:null};
     const rowTotal=s.amounts.reduce((a,b)=>a+(parseFloat(b)||0),0);
     if(rowTotal>0){
-      salTotal+=rowTotal; fringeTotal+=rowTotal*row.fringeRate;
-      summary+=`  ${row.name}: $${rowTotal.toFixed(2)} (fringe ${(row.fringeRate*100).toFixed(1)}%)\n`;
+      const base = (s.fringeMode==='included' && row.fringeRate>0) ? rowTotal/(1+row.fringeRate) : rowTotal;
+      const fringe = (s.fringeMode==='included' && row.fringeRate>0) ? rowTotal-base : rowTotal*row.fringeRate;
+      salTotal+=base; fringeTotal+=fringe;
+      const fringeNote = s.fringeMode==='included' ? '(fringe already included in amount)' : `(+${(row.fringeRate*100).toFixed(1)}% fringe calculated by tool)`;
+      summary+=`  ${row.name}: $${rowTotal.toFixed(2)} ${fringeNote}\n`;
     }
   });
   let opTotal=0;
@@ -3269,8 +3373,9 @@ async function aibudgethelp(){
   });
   const grand=salTotal+fringeTotal+opTotal;
   const rem=def.max-grand;
-  summary+=`\nSalaries subtotal: $${salTotal.toFixed(2)}\nFringe benefits: $${fringeTotal.toFixed(2)}\nOperating subtotal: $${opTotal.toFixed(2)}\nGrand total: $${grand.toFixed(2)}\nRemaining: $${rem.toFixed(2)}`;
-  const prompt=`Please review my Shipley project budget and give me specific, practical feedback. Flag concerns, common pitfalls for this type of grant, or categories I may have overlooked.\n\n${summary}`;
+  summary+=`\nSalaries subtotal: $${salTotal.toFixed(2)}\nFringe benefits (tool-calculated): $${fringeTotal.toFixed(2)}\nOperating subtotal: $${opTotal.toFixed(2)}\nGrand total: $${grand.toFixed(2)}\nRemaining: $${rem.toFixed(2)}`;
+
+  const prompt=`You are a helpful guide for faculty managing a Shipley Academic Innovation Fund award from the Institute for Excellence in Teaching & Learning at Boston University.\n\n${projectContext?'Project context:\n'+projectContext+'\n':''}${summary}\n\nPlease review this budget and give specific, practical feedback based on what has been entered. Only comment on what is actually present — do not flag missing items as problems unless they seem critically inconsistent with what is entered. Do not reference fringe rates as errors — they are automatically calculated by the tool using fixed institutional rates. Do not reference the BU grants office or university policy. If something raises a concern that needs follow-up, direct the faculty member to contact the Institute team at excellence@bu.edu.`;
   try{
     const r = await callGuide(prompt);
     budgetHistory.push({role:'user',content:prompt});
@@ -3284,7 +3389,21 @@ async function aibudgethelp(){
 async function aiReportHelp(){
   const out = document.getElementById('report-output');
   showThinking(out);
-  const prompt = `Help me draft or improve my project report. I'll share what I have:\n\nTeam: ${document.getElementById('r-team').value||'not yet written'}\nGoals: ${document.getElementById('r-goals').value||'not yet written'}\nMilestones: ${document.getElementById('r-milestones').value||'not yet written'}\nImpact: ${document.getElementById('r-impact').value||'not yet written'}\nChallenges: ${document.getElementById('r-challenges').value||'not yet written'}\nLessons: ${document.getElementById('r-lessons').value||'not yet written'}\nNext steps: ${document.getElementById('r-next').value||'not yet written'}\n\nWhich sections need the most work? Help me strengthen the weakest parts.`;
+  const rFields = {
+    Team: document.getElementById('r-team').value,
+    Goals: document.getElementById('r-goals').value,
+    Milestones: document.getElementById('r-milestones').value,
+    Impact: document.getElementById('r-impact').value,
+    Challenges: document.getElementById('r-challenges').value,
+    Lessons: document.getElementById('r-lessons').value,
+    'Next steps': document.getElementById('r-next').value,
+  };
+  const filledReport = Object.entries(rFields).filter(([,v])=>v.trim()).map(([k,v])=>`${k}: ${v}`);
+  if(!filledReport.length){
+    out.innerHTML=`<div class="ai-response"><strong>Nothing to review yet</strong> — fill in some report fields first.</div>`;
+    return;
+  }
+  const prompt = `You are a helpful guide for faculty managing a Shipley Academic Innovation Fund award from the Institute for Excellence in Teaching & Learning at Boston University. Help the faculty member draft or improve their project report based only on what they have written so far — do not comment on sections they haven't started yet. Do not reference the BU grants office or university policy. If something raises a concern that needs follow-up, direct the faculty member to contact the Institute team at excellence@bu.edu.\n\n${filledReport.join('\n\n')}\n\nHelp them strengthen what they have. Which sections could be improved and how?`;
   try{
     const r = await callGuide(prompt);
     renderAIResponse(out, r);
@@ -3299,7 +3418,8 @@ async function askGuide(){
   const out = document.getElementById('guide-output');
   showThinking(out);
   try{
-    const r = await callGuide(input);
+    const guidePrompt = `You are a helpful guide for faculty managing a Shipley Academic Innovation Fund award from the Institute for Excellence in Teaching & Learning at Boston University. Answer the faculty member's question below. Do not reference the BU grants office or university policy. If the question raises something that needs follow-up, direct the faculty member to contact the Institute team at excellence@bu.edu.\n\n${input}`;
+    const r = await callGuide(guidePrompt);
     renderAIResponse(out, r);
   }catch(e){
     out.innerHTML=`<div class="ai-response" style="border-left-color:var(--red);">Something went wrong — please try again.</div>`;
