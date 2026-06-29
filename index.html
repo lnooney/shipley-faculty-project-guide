@@ -270,25 +270,107 @@ a:hover{color:var(--navy);}
 .alert strong{font-weight:600;}
 
 /* ── IMPACT FRAMEWORK ── */
-.framework-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:0;border:0.5px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;}
-.fw-col{border-right:0.5px solid var(--border);}
-.fw-col:last-child{border-right:none;}
-.fw-header{
-  background:var(--navy);color:#fff;padding:10px 12px;
-  font-size:11px;font-weight:600;text-align:center;min-height:60px;
-  display:flex;align-items:center;justify-content:center;text-align:center;
-  line-height:1.3;
+.fw-stack{display:flex;flex-direction:column;gap:0;}
+.fw-section{border:0.5px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;margin-bottom:0;}
+.fw-connector{
+  display:flex;align-items:center;justify-content:center;
+  height:32px;color:var(--navy);font-size:20px;opacity:0.4;
+  user-select:none;
 }
-.fw-header.gold{background:var(--gold);}
-.fw-header.teal{background:#0f6b58;}
-.fw-body{padding:10px;background:#fff;}
+.fw-header{
+  background:var(--navy);color:#fff;padding:14px 18px;
+  display:flex;align-items:center;gap:14px;
+}
+.fw-header.fw-orange{background:var(--orange);color:var(--navy);}
+.fw-header.fw-orange .fw-header-num{background:rgba(26,39,68,0.15);}
+.fw-header.fw-orange-light{background:var(--orange-light);color:var(--navy);}
+.fw-header.fw-orange-light .fw-header-num{background:rgba(26,39,68,0.12);}
+.fw-header.fw-blue{background:var(--blue-text);color:#fff;}
+.fw-header.fw-blue .fw-header-num{background:rgba(255,255,255,0.2);}
+.fw-header.fw-green{background:var(--green);color:#fff;}
+.fw-header.fw-green .fw-header-num{background:rgba(255,255,255,0.2);}
+
+/* ── FRAMEWORK TABLE (Measures/Targets, Data Collection) ── */
+.fw-table{width:100%;border-collapse:collapse;font-size:13px;margin-top:4px;}
+.fw-table th{
+  background:rgba(26,39,68,0.06);color:var(--text2);
+  font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;
+  padding:7px 10px;text-align:left;border-bottom:1px solid var(--border2);
+}
+.fw-table td{padding:5px 6px;vertical-align:middle;border-bottom:0.5px solid var(--border);}
+.fw-table tr:last-child td{border-bottom:none;}
+.fw-table input[type="text"],.fw-table input[type="text"]:focus{
+  width:100%;background:var(--bg);border:1px dashed var(--border2);
+  border-radius:5px;padding:6px 8px;font-size:13px;color:var(--text);
+}
+.fw-table input[type="text"]:focus{background:#fff;border-color:var(--navy);}
+.fw-table input.placeholder-style{color:var(--text3);}
+.fw-table select{
+  width:100%;background:var(--bg);border:1px dashed var(--border2);
+  border-radius:5px;padding:6px 8px;font-size:13px;color:var(--text);
+}
+.fw-table select:focus{background:#fff;border-color:var(--navy);}
+.fw-table-remove{
+  background:none;border:none;color:var(--text3);font-size:16px;
+  padding:4px 6px;cursor:pointer;line-height:1;border-radius:0;
+}
+.fw-table-remove:hover{color:var(--red);background:none;}
+
+/* ── FRAMEWORK TRANSCRIPT ── */
+.fw-transcript{
+  max-height:320px;overflow-y:auto;
+  border:0.5px solid var(--border);border-radius:var(--radius);
+  padding:12px;background:#fff;margin-bottom:10px;
+  display:flex;flex-direction:column;gap:10px;
+}
+.fw-transcript:empty::before{
+  content:'Your conversation will appear here as you talk through your framework.';
+  font-size:13px;color:var(--text3);font-style:italic;
+}
+.fw-msg-user{
+  align-self:flex-end;background:var(--navy);color:#fff;
+  border-radius:12px 12px 2px 12px;padding:8px 12px;
+  font-size:13px;max-width:85%;line-height:1.5;
+}
+.fw-msg-guide{
+  align-self:flex-start;background:var(--gold-pale);
+  border-left:3px solid var(--gold);
+  border-radius:0 12px 12px 12px;padding:8px 12px;
+  font-size:13px;max-width:90%;line-height:1.6;white-space:pre-wrap;
+}
+
+/* ── PER-SECTION GUIDE REVEAL ── */
+.fw-section-guide{
+  border-top:0.5px solid var(--border);
+  padding:12px 16px;background:var(--gold-pale);
+  display:none;
+}
+.fw-section-guide.open{display:block;}
+.fw-section-guide textarea{
+  width:100%;min-height:55px;resize:vertical;font-size:13px;
+  background:#fff;border:1px solid var(--border2);border-radius:6px;
+  padding:8px 10px;
+}
+.fw-section-guide-output{margin-top:8px;}
+.fw-header-num{
+  width:28px;height:28px;border-radius:50%;
+  background:rgba(255,255,255,0.2);
+  display:flex;align-items:center;justify-content:center;
+  font-size:13px;font-weight:700;flex-shrink:0;
+}
+.fw-header.gold .fw-header-num{background:rgba(26,39,68,0.15);}
+.fw-header-text{}
+.fw-header-title{font-family:var(--serif);font-size:16px;font-weight:400;line-height:1.2;}
+.fw-header-sub{font-size:12px;opacity:0.75;margin-top:2px;line-height:1.4;}
+.fw-header.gold .fw-header-sub{opacity:0.7;}
+.fw-body{padding:16px;background:#fff;}
 .fw-body textarea{
-  width:100%;min-height:140px;font-size:12px;resize:vertical;
+  width:100%;min-height:100px;font-size:14px;resize:vertical;
   background:var(--bg);border:0.5px solid var(--border);
-  border-radius:6px;padding:8px;line-height:1.5;
+  border-radius:6px;padding:10px 12px;line-height:1.6;
 }
 .fw-body textarea:focus{border-color:var(--navy);background:#fff;}
-.fw-question{font-size:11px;color:var(--text3);margin-bottom:6px;line-height:1.4;font-style:italic;}
+.fw-question{font-size:13px;color:var(--text3);margin-bottom:8px;line-height:1.5;font-style:italic;}
 
 /* ── MILESTONES ── */
 .milestone{
@@ -611,8 +693,6 @@ a:hover{color:var(--navy);}
 /* ── RESPONSIVE ── */
 @media(max-width:700px){
   .grid2,.grid3{grid-template-columns:1fr;}
-  .framework-grid{grid-template-columns:1fr;}
-  .fw-col{border-right:none;border-bottom:0.5px solid var(--border);}
   .irb-options{grid-template-columns:1fr;}
   .main{padding:1rem;}
   .welcome-card{padding:1.5rem;}
@@ -1038,89 +1118,223 @@ a:hover{color:var(--navy);}
       </div>
     </div>
     <p style="font-size:14px;color:var(--text2);line-height:1.7;margin-bottom:16px;">
-      This framework is the backbone of your project's impact measurement. Work through each column from left to right — each one builds on the last. Use the guided conversation below to think through your responses before filling in the framework. You can return to this and refine it as your project evolves.
+      This framework is the backbone of your project's impact measurement. Work through each section from top to bottom — each one builds on the last. Use the guided conversation below to think through your responses before filling in the framework. You can return to this and refine it as your project evolves.
     </p>
     <div class="alert alert-blue">
-      <strong>How to use this:</strong> Start with the AI conversation below to talk through your thinking. Then fill in the framework columns. Your entries are saved automatically and will inform your survey design, data collection plan, and final report.
+      <strong>How to use this:</strong> Start with the AI conversation below to talk through your thinking. Then fill in each section from top to bottom. Your entries are saved automatically and will inform your survey design, data collection plan, and final report.
     </div>
   </div>
 
-  <!-- Guided AI Conversation -->
+  <!-- Guided Framework Conversation -->
   <div class="card">
     <div class="card-header">
       <div class="card-icon">💬</div>
-      <div><div class="card-title">Guided Framework Conversation</div><div class="card-sub">Talk through your thinking before filling in the framework</div></div>
+      <div>
+        <div class="card-title">Framework Conversation</div>
+        <div class="card-sub">Use these prompts to think through your whole framework before filling it in</div>
+      </div>
     </div>
     <div class="guide-chips">
-      <button class="chip" onclick="impactChip(this)">Help me identify my core objectives</button>
-      <button class="chip" onclick="impactChip(this)">What learning outcomes should I be measuring?</button>
-      <button class="chip" onclick="impactChip(this)">Help me think through what data to collect</button>
-      <button class="chip" onclick="impactChip(this)">What does a good survey question look like for this?</button>
-      <button class="chip" onclick="impactChip(this)">How do I set realistic targets?</button>
-      <button class="chip" onclick="impactChip(this)">Review my framework entries and give feedback</button>
+      <button class="chip" onclick="impactChip(this)">Help me think through what I want students to take away from this experience — at the end of the course and in 5 or 10 years?</button>
+      <button class="chip" onclick="impactChip(this)">Help me think through how I'll know students have achieved this goal.</button>
+      <button class="chip" onclick="impactChip(this)">Help me think through what learning experiences will help students get there.</button>
+      <button class="chip" onclick="impactChip(this)">Help me think through the challenge or problem my project addresses.</button>
+      <button class="chip" onclick="impactChip(this)">Help me think through what evidence of student success would look like.</button>
+      <button class="chip" onclick="impactChip(this)">Help me think through how I'll measure students' success.</button>
     </div>
-    <div class="field">
-      <textarea id="impact-input" placeholder="Describe your project's pedagogical goals or ask a specific question about measuring impact…" style="width:100%;min-height:65px;"></textarea>
+    <div class="fw-transcript" id="fw-transcript"></div>
+    <div class="field" style="margin-bottom:8px;">
+      <textarea id="impact-input" placeholder="Type your thoughts or use a prompt above to get started…" style="width:100%;min-height:65px;"></textarea>
     </div>
-    <div style="display:flex;gap:8px;">
-      <button class="btn-primary" onclick="askImpact()">Ask your guide ↗</button>
-      <button onclick="document.getElementById('impact-input').value='';document.getElementById('impact-output').innerHTML='';">Clear</button>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;">
+      <button class="btn-gold" onclick="askImpact()">Ask your guide ↗</button>
+      <button onclick="clearFrameworkConversation()">Clear conversation</button>
+      <button onclick="printFrameworkTranscript()">⬇ Save / Print conversation</button>
     </div>
-    <div id="impact-output" style="margin-top:14px;"></div>
   </div>
 
-  <!-- The Framework Grid -->
+  <!-- The Framework Stack -->
   <div class="card">
     <div class="card-header">
       <div class="card-icon">🗂️</div>
-      <div><div class="card-title">Your Framework</div><div class="card-sub">Fill in each column — save often</div></div>
+      <div><div class="card-title">Your Framework</div><div class="card-sub">Fill in each section from top to bottom — save often</div></div>
     </div>
 
-    <div style="overflow-x:auto;">
-      <div class="framework-grid" style="min-width:700px;">
-        <div class="fw-col">
-          <div class="fw-header">Problems<br/><span style="font-weight:300;font-size:10px;">What major learning/pedagogical challenges?</span></div>
-          <div class="fw-body">
-            <div class="fw-question">What specific problems are you observing in student learning or your teaching?</div>
-            <textarea id="fw-problems" placeholder="e.g. Students struggle to transfer conceptual understanding to novel problems; low engagement in large lecture format…" oninput="autoSaveFramework()"></textarea>
+    <div class="fw-stack">
+
+      <!-- 1. Problems -->
+      <div class="fw-section">
+        <div class="fw-header fw-orange">
+          <div class="fw-header-num">1</div>
+          <div class="fw-header-text">
+            <div class="fw-header-title">Problems</div>
+            <div class="fw-header-sub">What are your major learning and pedagogical challenges?</div>
           </div>
         </div>
-        <div class="fw-col">
-          <div class="fw-header gold">Objectives<br/><span style="font-weight:300;font-size:10px;">Core objectives in addressing these challenges?</span></div>
-          <div class="fw-body">
-            <div class="fw-question">What do you want to achieve? Write specific, observable objectives.</div>
-            <textarea id="fw-objectives" placeholder="e.g. Students will demonstrate improved ability to apply concepts to unfamiliar contexts; increase active participation by 40%…" oninput="autoSaveFramework()"></textarea>
-          </div>
+        <div class="fw-body">
+          <textarea id="fw-problems" placeholder="e.g. Students struggle to transfer conceptual understanding to novel problems; low engagement in large lecture format…" oninput="autoSaveFramework()"></textarea>
         </div>
-        <div class="fw-col">
-          <div class="fw-header">Impacts<br/><span style="font-weight:300;font-size:10px;">What impacts/outcomes to measure?<br/>(Learning constructs & skills)</span></div>
-          <div class="fw-body">
-            <div class="fw-question">Given your objectives, what changes in student learning or behavior do you want to observe?</div>
-            <textarea id="fw-impacts" placeholder="e.g. Increased self-efficacy in problem-solving; improved critical thinking; greater sense of belonging in STEM…" oninput="autoSaveFramework()"></textarea>
+        <div class="fw-section-guide" id="fsg-problems">
+          <div class="fw-question" style="margin-bottom:8px;">Ask your guide for help with this section</div>
+          <textarea id="fsg-input-problems" placeholder="What would you like help thinking through about your challenges?" style="width:100%;min-height:55px;font-size:13px;"></textarea>
+          <div style="display:flex;gap:8px;margin-top:6px;">
+            <button class="btn-sm btn-gold" onclick="askSectionGuide('problems')">Ask your guide ↗</button>
           </div>
+          <div class="fw-section-guide-output" id="fsg-out-problems"></div>
         </div>
-        <div class="fw-col">
-          <div class="fw-header gold">Measures & Targets<br/><span style="font-weight:300;font-size:10px;">What data points are good indicators? What targets to hit?</span></div>
-          <div class="fw-body">
-            <div class="fw-question">How will you know change has occurred? Set specific, measurable indicators and targets.</div>
-            <textarea id="fw-measures" placeholder="e.g. Pre/post survey (self-efficacy scale); exam performance on transfer questions; attendance; 75% of students score 3+ on rubric…" oninput="autoSaveFramework()"></textarea>
-          </div>
-        </div>
-        <div class="fw-col">
-          <div class="fw-header teal">Data Collection<br/><span style="font-weight:300;font-size:10px;">How to collect the data? Source & frequency?</span></div>
-          <div class="fw-body">
-            <div class="fw-question">Where will your data come from and how often will you collect it?</div>
-            <textarea id="fw-collection" placeholder="e.g. Qualtrics survey (pre: week 1, post: week 15); Blackboard grade exports; course observation notes (bi-weekly); student focus group (end of semester)…" oninput="autoSaveFramework()"></textarea>
-          </div>
-        </div>
-        <div class="fw-col">
-          <div class="fw-header">Data Analysis<br/><span style="font-weight:300;font-size:10px;">How to measure outcomes with collected data?</span></div>
-          <div class="fw-body">
-            <div class="fw-question">How will you analyze the data? Who will do it? Do you need analytical support?</div>
-            <textarea id="fw-analysis" placeholder="e.g. Paired t-test on pre/post scores; thematic coding of open-ended responses; descriptive statistics on participation rates; graduate student will lead analysis with faculty oversight…" oninput="autoSaveFramework()"></textarea>
-          </div>
+        <div style="padding:10px 16px;border-top:0.5px solid var(--border);">
+          <button class="btn-sm" onclick="toggleSectionGuide('problems')">Ask your guide for help with this section</button>
         </div>
       </div>
+      <div class="fw-connector">↓</div>
+
+      <!-- 2. Objectives -->
+      <div class="fw-section">
+        <div class="fw-header fw-blue">
+          <div class="fw-header-num">2</div>
+          <div class="fw-header-text">
+            <div class="fw-header-title">Objectives</div>
+            <div class="fw-header-sub">What are your core objectives in addressing teaching/learning challenges?</div>
+          </div>
+        </div>
+        <div class="fw-body">
+          <textarea id="fw-objectives" placeholder="e.g. Students will demonstrate improved ability to apply concepts to unfamiliar contexts; increase active participation by 40%…" oninput="autoSaveFramework()"></textarea>
+        </div>
+        <div class="fw-section-guide" id="fsg-objectives">
+          <div class="fw-question" style="margin-bottom:8px;">Ask your guide for help with this section</div>
+          <textarea id="fsg-input-objectives" placeholder="What would you like help thinking through about your objectives?" style="width:100%;min-height:55px;font-size:13px;"></textarea>
+          <div style="display:flex;gap:8px;margin-top:6px;">
+            <button class="btn-sm btn-gold" onclick="askSectionGuide('objectives')">Ask your guide ↗</button>
+          </div>
+          <div class="fw-section-guide-output" id="fsg-out-objectives"></div>
+        </div>
+        <div style="padding:10px 16px;border-top:0.5px solid var(--border);">
+          <button class="btn-sm" onclick="toggleSectionGuide('objectives')">Ask your guide for help with this section</button>
+        </div>
+      </div>
+      <div class="fw-connector">↓</div>
+
+      <!-- 3. Impacts -->
+      <div class="fw-section">
+        <div class="fw-header fw-blue">
+          <div class="fw-header-num">3</div>
+          <div class="fw-header-text">
+            <div class="fw-header-title">Impacts</div>
+            <div class="fw-header-sub">Given the objectives, what impacts/outcomes do we want to measure?</div>
+          </div>
+        </div>
+        <div class="fw-body">
+          <textarea id="fw-impacts" placeholder="e.g. Increased self-efficacy in problem-solving; improved critical thinking; greater sense of belonging in STEM…" oninput="autoSaveFramework()"></textarea>
+        </div>
+        <div class="fw-section-guide" id="fsg-impacts">
+          <div class="fw-question" style="margin-bottom:8px;">Ask your guide for help with this section</div>
+          <textarea id="fsg-input-impacts" placeholder="What would you like help thinking through about your impacts?" style="width:100%;min-height:55px;font-size:13px;"></textarea>
+          <div style="display:flex;gap:8px;margin-top:6px;">
+            <button class="btn-sm btn-gold" onclick="askSectionGuide('impacts')">Ask your guide ↗</button>
+          </div>
+          <div class="fw-section-guide-output" id="fsg-out-impacts"></div>
+        </div>
+        <div style="padding:10px 16px;border-top:0.5px solid var(--border);">
+          <button class="btn-sm" onclick="toggleSectionGuide('impacts')">Ask your guide for help with this section</button>
+        </div>
+      </div>
+      <div class="fw-connector">↓</div>
+
+      <!-- 4. Measures & Targets -->
+      <div class="fw-section">
+        <div class="fw-header fw-orange-light">
+          <div class="fw-header-num">4</div>
+          <div class="fw-header-text">
+            <div class="fw-header-title">Measures & Targets</div>
+            <div class="fw-header-sub">What data points are good indicators of such impacts? · What targets do we want to hit?</div>
+          </div>
+        </div>
+        <div class="fw-body">
+          <table class="fw-table" id="fw-measures-table">
+            <thead><tr>
+              <th style="width:55%;">Measure</th>
+              <th style="width:35%;">Target</th>
+              <th style="width:10%;"></th>
+            </tr></thead>
+            <tbody id="fw-measures-tbody"></tbody>
+          </table>
+          <button class="btn-sm" style="margin-top:8px;" onclick="addMeasureRow()">+ Add row</button>
+          <input type="hidden" id="fw-measures"/>
+        </div>
+        <div class="fw-section-guide" id="fsg-measures">
+          <div class="fw-question" style="margin-bottom:8px;">Ask your guide for help with this section</div>
+          <textarea id="fsg-input-measures" placeholder="What would you like help thinking through about your measures and targets?" style="width:100%;min-height:55px;font-size:13px;"></textarea>
+          <div style="display:flex;gap:8px;margin-top:6px;">
+            <button class="btn-sm btn-gold" onclick="askSectionGuide('measures')">Ask your guide ↗</button>
+          </div>
+          <div class="fw-section-guide-output" id="fsg-out-measures"></div>
+        </div>
+        <div style="padding:10px 16px;border-top:0.5px solid var(--border);">
+          <button class="btn-sm" onclick="toggleSectionGuide('measures')">Ask your guide for help with this section</button>
+        </div>
+      </div>
+      <div class="fw-connector">↓</div>
+
+      <!-- 5. Data Collection -->
+      <div class="fw-section">
+        <div class="fw-header fw-green">
+          <div class="fw-header-num">5</div>
+          <div class="fw-header-text">
+            <div class="fw-header-title">Data Collection</div>
+            <div class="fw-header-sub">How do we collect the data points we want?</div>
+          </div>
+        </div>
+        <div class="fw-body">
+          <table class="fw-table" id="fw-collection-table">
+            <thead><tr>
+              <th style="width:55%;">Source</th>
+              <th style="width:35%;">Frequency</th>
+              <th style="width:10%;"></th>
+            </tr></thead>
+            <tbody id="fw-collection-tbody"></tbody>
+          </table>
+          <button class="btn-sm" style="margin-top:8px;" onclick="addCollectionRow()">+ Add row</button>
+          <input type="hidden" id="fw-collection"/>
+        </div>
+        <div class="fw-section-guide" id="fsg-collection">
+          <div class="fw-question" style="margin-bottom:8px;">Ask your guide for help with this section</div>
+          <textarea id="fsg-input-collection" placeholder="What would you like help thinking through about your data collection?" style="width:100%;min-height:55px;font-size:13px;"></textarea>
+          <div style="display:flex;gap:8px;margin-top:6px;">
+            <button class="btn-sm btn-gold" onclick="askSectionGuide('collection')">Ask your guide ↗</button>
+          </div>
+          <div class="fw-section-guide-output" id="fsg-out-collection"></div>
+        </div>
+        <div style="padding:10px 16px;border-top:0.5px solid var(--border);">
+          <button class="btn-sm" onclick="toggleSectionGuide('collection')">Ask your guide for help with this section</button>
+        </div>
+      </div>
+      <div class="fw-connector">↓</div>
+
+      <!-- 6. Data Analysis -->
+      <div class="fw-section">
+        <div class="fw-header fw-green">
+          <div class="fw-header-num">6</div>
+          <div class="fw-header-text">
+            <div class="fw-header-title">Data Analysis</div>
+            <div class="fw-header-sub">How do we measure the outcomes with the data collected?</div>
+          </div>
+        </div>
+        <div class="fw-body">
+          <textarea id="fw-analysis" placeholder="e.g. Paired t-test on pre/post scores; thematic coding of open-ended responses; descriptive statistics on participation rates; graduate student will lead analysis with faculty oversight…" oninput="autoSaveFramework()"></textarea>
+        </div>
+        <div class="fw-section-guide" id="fsg-analysis">
+          <div class="fw-question" style="margin-bottom:8px;">Ask your guide for help with this section</div>
+          <textarea id="fsg-input-analysis" placeholder="What would you like help thinking through about your data analysis?" style="width:100%;min-height:55px;font-size:13px;"></textarea>
+          <div style="display:flex;gap:8px;margin-top:6px;">
+            <button class="btn-sm btn-gold" onclick="askSectionGuide('analysis')">Ask your guide ↗</button>
+          </div>
+          <div class="fw-section-guide-output" id="fsg-out-analysis"></div>
+        </div>
+        <div style="padding:10px 16px;border-top:0.5px solid var(--border);">
+          <button class="btn-sm" onclick="toggleSectionGuide('analysis')">Ask your guide for help with this section</button>
+        </div>
+      </div>
+
     </div>
 
     <div style="display:flex;gap:10px;margin-top:16px;justify-content:flex-end;">
@@ -1377,7 +1591,7 @@ a:hover{color:var(--navy);}
             onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();aiBudgetChat();}"></textarea>
           <button class="btn-gold" onclick="aiBudgetChat()" style="white-space:nowrap;">Send ↗</button>
         </div>
-        <button class="btn-primary" onclick="aibudgethelp()" style="margin-top:8px;">Ask guide about my budget ↗</button>
+        <button class="btn-gold" onclick="aibudgethelp()" style="margin-top:8px;">Ask guide about my budget ↗</button>
       </div>
     </div>
   </div>
@@ -1603,7 +1817,7 @@ a:hover{color:var(--navy);}
       <textarea id="guide-input" placeholder="Ask your guide anything about your project…" style="width:100%;min-height:80px;"></textarea>
     </div>
     <div style="display:flex;gap:8px;">
-      <button class="btn-primary" onclick="askGuide()">Ask ↗</button>
+      <button class="btn-gold" onclick="askGuide()">Ask ↗</button>
       <button onclick="document.getElementById('guide-input').value='';document.getElementById('guide-output').innerHTML='';">Clear</button>
     </div>
     <div id="guide-output" style="margin-top:16px;"></div>
@@ -2158,6 +2372,79 @@ function autoSaveFramework(){
   fwSaveTimer = setTimeout(saveFramework, 1500);
 }
 
+const FW_COLLECTION_EXAMPLES = [
+  {source:'Qualtrics survey', freq:'Pre/Post only'},
+  {source:'Course grade export', freq:'End of semester'},
+  {source:'Course observation notes', freq:'Bi-weekly'},
+  {source:'Student focus group', freq:'End of semester'},
+  {source:'Instructor reflection log', freq:'Weekly'},
+];
+const FW_FREQ_OPTIONS = ['','Pre/Post only','Weekly','Bi-weekly','Monthly','End of semester','Once'];
+
+let fwMeasureRows = [];
+let fwCollectionRows = [];
+
+function renderMeasuresTable(){
+  const tbody = document.getElementById('fw-measures-tbody');
+  if(!tbody) return;
+  if(!fwMeasureRows.length) fwMeasureRows = [{measure:'',target:''}];
+  tbody.innerHTML = fwMeasureRows.map((row,i)=>`
+    <tr>
+      <td><input type="text" value="${(row.measure||'').replace(/"/g,'&quot;')}" placeholder="e.g. Pre/post self-efficacy survey score" oninput="fwMeasureRows[${i}].measure=this.value;autoSaveFramework();" onfocus="clearFwPlaceholder(this)" onblur="autoSaveFramework()"/></td>
+      <td><input type="text" value="${(row.target||'').replace(/"/g,'&quot;')}" placeholder="e.g. 75% score 3+ on rubric" oninput="fwMeasureRows[${i}].target=this.value;autoSaveFramework();" onfocus="clearFwPlaceholder(this)" onblur="autoSaveFramework()"/></td>
+      <td><button class="fw-table-remove" onclick="removeMeasureRow(${i})" title="Remove">×</button></td>
+    </tr>`).join('');
+}
+
+function addMeasureRow(){
+  fwMeasureRows.push({measure:'',target:''});
+  renderMeasuresTable();
+}
+function removeMeasureRow(i){
+  fwMeasureRows.splice(i,1);
+  if(!fwMeasureRows.length) fwMeasureRows=[{measure:'',target:''}];
+  renderMeasuresTable();
+  autoSaveFramework();
+}
+
+function renderCollectionTable(){
+  const tbody = document.getElementById('fw-collection-tbody');
+  if(!tbody) return;
+  if(!fwCollectionRows.length){
+    fwCollectionRows = FW_COLLECTION_EXAMPLES.map(e=>({source:'',freq:'',placeholder_source:e.source,placeholder_freq:e.freq}));
+  }
+  tbody.innerHTML = fwCollectionRows.map((row,i)=>{
+    const srcVal = (row.source||'').replace(/"/g,'&quot;');
+    const srcPh = row.placeholder_source||'e.g. Qualtrics survey';
+    const freqOpts = FW_FREQ_OPTIONS.map(o=>`<option value="${o}"${row.freq===o?' selected':''}>${o||'Select…'}</option>`).join('');
+    return `<tr>
+      <td><input type="text" value="${srcVal}" placeholder="${srcPh}" class="${srcVal?'':'placeholder-style'}" oninput="fwCollectionRows[${i}].source=this.value;this.classList.remove('placeholder-style');autoSaveFramework();" onblur="autoSaveFramework()"/></td>
+      <td><select onchange="fwCollectionRows[${i}].freq=this.value;autoSaveFramework();">${freqOpts}</select></td>
+      <td><button class="fw-table-remove" onclick="removeCollectionRow(${i})" title="Remove">×</button></td>
+    </tr>`;
+  }).join('');
+}
+
+function addCollectionRow(){
+  fwCollectionRows.push({source:'',freq:''});
+  renderCollectionTable();
+}
+function removeCollectionRow(i){
+  fwCollectionRows.splice(i,1);
+  if(!fwCollectionRows.length) fwCollectionRows=[{source:'',freq:''}];
+  renderCollectionTable();
+  autoSaveFramework();
+}
+
+function clearFwPlaceholder(el){ el.classList.remove('placeholder-style'); }
+
+function getMeasuresText(){
+  return fwMeasureRows.filter(r=>r.measure||r.target).map(r=>`${r.measure}${r.target?' → target: '+r.target:''}`).join('; ');
+}
+function getCollectionText(){
+  return fwCollectionRows.filter(r=>r.source).map(r=>`${r.source}${r.freq?' ('+r.freq+')':''}`).join('; ');
+}
+
 function saveFramework(){
   const data = loadAll();
   data.touched = data.touched||{};
@@ -2166,8 +2453,10 @@ function saveFramework(){
     problems: document.getElementById('fw-problems').value,
     objectives: document.getElementById('fw-objectives').value,
     impacts: document.getElementById('fw-impacts').value,
-    measures: document.getElementById('fw-measures').value,
-    collection: document.getElementById('fw-collection').value,
+    measures: getMeasuresText(),
+    measures_rows: fwMeasureRows,
+    collection: getCollectionText(),
+    collection_rows: fwCollectionRows,
     analysis: document.getElementById('fw-analysis').value,
   };
   saveAll(data);
@@ -2177,10 +2466,103 @@ function loadFramework(){
   const data = loadAll();
   const fw = data.framework;
   if(!fw) return;
-  ['problems','objectives','impacts','measures','collection','analysis'].forEach(f=>{
+  ['problems','objectives','impacts','analysis'].forEach(f=>{
     const el = document.getElementById('fw-'+f);
     if(el && fw[f]) el.value = fw[f];
   });
+  if(fw.measures_rows && fw.measures_rows.length){ fwMeasureRows = fw.measures_rows; }
+  renderMeasuresTable();
+  if(fw.collection_rows && fw.collection_rows.length){ fwCollectionRows = fw.collection_rows; }
+  else if(!fw.collection_rows){ fwCollectionRows = []; }
+  renderCollectionTable();
+  loadFrameworkTranscript();
+}
+
+// ── Framework transcript ──────────────────────────────────
+let frameworkTranscript = [];
+
+function loadFrameworkTranscript(){
+  const data = loadAll();
+  frameworkTranscript = data.framework_transcript || [];
+  renderTranscript();
+}
+
+function renderTranscript(){
+  const el = document.getElementById('fw-transcript');
+  if(!el) return;
+  el.innerHTML = frameworkTranscript.map(msg=>
+    `<div class="${msg.role==='user'?'fw-msg-user':'fw-msg-guide'}">${msg.content}</div>`
+  ).join('');
+  el.scrollTop = el.scrollHeight;
+}
+
+function saveTranscript(){
+  const data = loadAll();
+  data.framework_transcript = frameworkTranscript;
+  saveAll(data);
+}
+
+function clearFrameworkConversation(){
+  frameworkTranscript = [];
+  saveTranscript();
+  renderTranscript();
+  document.getElementById('impact-input').value = '';
+}
+
+function printFrameworkTranscript(){
+  const data = loadAll();
+  const title = (data.setup&&data.setup.title)||'Shipley Project';
+  const date = new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});
+  let html = `<html><head><style>
+    body{font-family:Georgia,serif;max-width:680px;margin:40px auto;color:#222;font-size:14px;line-height:1.7;}
+    h1{font-size:18px;color:#1a2744;margin-bottom:4px;}.meta{font-size:12px;color:#888;margin-bottom:24px;}
+    .user{background:#1a2744;color:#fff;padding:8px 12px;border-radius:8px;margin:8px 0;}
+    .guide{background:#fff7ed;border-left:3px solid #ed974f;padding:8px 12px;margin:8px 0;white-space:pre-wrap;}
+    .label{font-size:11px;font-weight:600;color:#888;margin-bottom:2px;}
+  </style></head><body>
+  <h1>${title}</h1>
+  <div class="meta">Impact Framework Conversation · ${date}</div>`;
+  frameworkTranscript.forEach(msg=>{
+    if(msg.role==='user') html+=`<div class="label">You</div><div class="user">${msg.content}</div>`;
+    else html+=`<div class="label">Guide</div><div class="guide">${msg.content}</div>`;
+  });
+  html+='</body></html>';
+  const w=window.open('','_blank');w.document.write(html);w.document.close();w.print();
+}
+
+// ── Section guide ─────────────────────────────────────────
+function toggleSectionGuide(section){
+  const el = document.getElementById('fsg-'+section);
+  if(!el) return;
+  el.classList.toggle('open');
+  if(el.classList.contains('open')) document.getElementById('fsg-input-'+section)?.focus();
+}
+
+async function askSectionGuide(section){
+  const inputEl = document.getElementById('fsg-input-'+section);
+  const out = document.getElementById('fsg-out-'+section);
+  if(!inputEl||!out) return;
+  const question = inputEl.value.trim();
+  if(!question) return;
+  showThinking(out);
+  const data = loadAll();
+  const fw = data.framework||{};
+  const s = data.setup||{};
+  const sectionLabels = {problems:'Problems',objectives:'Objectives',impacts:'Impacts',measures:'Measures & Targets',collection:'Data Collection',analysis:'Data Analysis'};
+  // Build context from sections above
+  const ctx = [];
+  if(s.title) ctx.push(`Project: ${s.title}`);
+  if(fw.problems && section!=='problems') ctx.push(`Problems: ${fw.problems}`);
+  if(fw.objectives && !['problems','objectives'].includes(section)) ctx.push(`Objectives: ${fw.objectives}`);
+  if(fw.impacts && !['problems','objectives','impacts'].includes(section)) ctx.push(`Impacts: ${fw.impacts}`);
+  if(fw.measures && !['problems','objectives','impacts','measures'].includes(section)) ctx.push(`Measures & Targets: ${fw.measures}`);
+  const prompt = `You are a helpful guide for faculty managing a Shipley Academic Innovation Fund award from the Institute for Excellence in Teaching & Learning at Boston University. The faculty member is working on the "${sectionLabels[section]}" section of their Impact Evaluation Framework and needs help thinking it through.\n\n${ctx.length?'Context from earlier sections:\n'+ctx.join('\n')+'\n\n':''}Focus your response specifically on helping with the "${sectionLabels[section]}" section. Do not reference the BU grants office or university policy. If something raises a concern, direct the faculty member to contact the Institute team at excellence@bu.edu.\n\nFaculty question: ${question}`;
+  try{
+    const r = await callGuide(prompt);
+    renderAIResponse(out, r);
+  }catch(e){
+    out.innerHTML=`<div class="ai-response" style="border-left-color:var(--red);">Something went wrong.</div>`;
+  }
 }
 
 // ═══════════════════════════════════════════════════════
@@ -3407,19 +3789,43 @@ async function aiScopeReview(){
 }
 
 async function askImpact(){
-  const input = document.getElementById('impact-input').value.trim();
+  const inputEl = document.getElementById('impact-input');
+  const input = inputEl.value.trim();
   if(!input) return;
-  const out = document.getElementById('impact-output');
-  showThinking(out);
+  frameworkTranscript.push({role:'user', content:input});
+  inputEl.value = '';
+  renderTranscript();
+  const transcriptEl = document.getElementById('fw-transcript');
+  // Show thinking in transcript
+  const thinkingId = 'fw-thinking-'+Date.now();
+  const thinkDiv = document.createElement('div');
+  thinkDiv.id = thinkingId;
+  thinkDiv.className = 'fw-msg-guide';
+  thinkDiv.innerHTML = '<div class="dots"><span></span><span></span><span></span></div>';
+  transcriptEl.appendChild(thinkDiv);
+  transcriptEl.scrollTop = transcriptEl.scrollHeight;
+  const history = frameworkTranscript.slice(0,-1).map(m=>({role:m.role,content:m.content}));
+  const systemNote = 'You are a helpful guide for faculty managing a Shipley Academic Innovation Fund award from the Institute for Excellence in Teaching & Learning at Boston University. The faculty member is using a backwards design approach to think through their Impact Evaluation Framework. Help them think through their goals, evidence, and measurement approach. Be conversational, ask clarifying questions, and build on what they have said. Do not reference the BU grants office or university policy. If something raises a concern, direct the faculty member to contact the Institute team at excellence@bu.edu.';
   try{
-    const r = await callGuide(input + '\n\nContext: I am working on my Impact Evaluation Framework for my Shipley project.');
-    renderAIResponse(out, r);
+    const prompt = systemNote + '\n\nConversation so far:\n' + history.map(m=>`${m.role==='user'?'Faculty':'Guide'}: ${m.content}`).join('\n') + '\n\nFaculty: ' + input;
+    const r = await callGuide(prompt);
+    document.getElementById(thinkingId)?.remove();
+    frameworkTranscript.push({role:'assistant', content:r});
+    saveTranscript();
+    renderTranscript();
   }catch(e){
-    out.innerHTML=`<div class="ai-response" style="border-left-color:var(--red);">Something went wrong.</div>`;
+    document.getElementById(thinkingId)?.remove();
+    const errDiv = document.createElement('div');
+    errDiv.className = 'fw-msg-guide';
+    errDiv.textContent = 'Something went wrong — please try again.';
+    transcriptEl.appendChild(errDiv);
   }
 }
 
-function impactChip(el){ document.getElementById('impact-input').value = el.textContent.trim(); }
+function impactChip(el){
+  document.getElementById('impact-input').value = el.textContent.trim();
+  document.getElementById('impact-input').focus();
+}
 
 async function reviewFramework(){
   const out = document.getElementById('framework-review');
@@ -4137,6 +4543,9 @@ window.addEventListener('DOMContentLoaded',()=>{
   loadSetup();
   loadTechConsiderations();
   loadFramework();
+  renderMeasuresTable();
+  renderCollectionTable();
+  loadFrameworkTranscript();
   loadBudget();
   loadReport();
   renderMilestones();
