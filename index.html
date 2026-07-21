@@ -237,6 +237,28 @@ a:hover{color:var(--navy);}
 .radio-pill:has(input:checked){border-color:var(--orange);background:var(--orange-pale);color:var(--navy);}
 .radio-pill input[type="radio"]{accent-color:var(--orange);width:15px;height:15px;}
 
+/* ── PROPOSAL REVIEW RUBRIC ── */
+.rubric-check-row{display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:0.5px solid var(--border);}
+.rubric-check-row:last-child{border-bottom:none;}
+.rubric-check-row input[type="checkbox"]{margin-top:3px;width:16px;height:16px;accent-color:var(--orange);flex-shrink:0;cursor:pointer;}
+.rubric-check-label{font-size:13px;color:var(--navy);font-weight:500;line-height:1.5;cursor:pointer;}
+.rubric-check-note{font-size:12px;color:var(--text3);margin-top:2px;line-height:1.5;}
+.rubric-check-note.rubric-autofail{color:var(--amber-text);font-weight:600;}
+.rc-criterion{border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin-bottom:12px;background:var(--bg);}
+.rc-criterion.threshold{border-color:var(--amber);border-width:1.5px;}
+.rc-head{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:6px;}
+.rc-title{font-weight:700;color:var(--navy);font-size:14px;}
+.rc-badge{font-size:12px;font-weight:700;color:var(--navy);background:#fff;border:1px solid var(--border);border-radius:20px;padding:2px 10px;white-space:nowrap;}
+.rc-question{font-size:13px;color:var(--text2);margin-bottom:10px;line-height:1.5;}
+.rc-scale{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:4px;}
+.rc-scale label{display:flex;align-items:center;gap:5px;padding:6px 12px;border:1.5px solid var(--border);border-radius:20px;font-size:12px;font-weight:600;color:var(--navy);cursor:pointer;background:#fff;}
+.rc-scale label:has(input:checked){border-color:var(--orange);background:var(--orange-pale);}
+.rc-scale input{accent-color:var(--orange);}
+.rc-guide{font-size:12px;color:var(--text2);margin-top:8px;}
+.rc-guide summary{cursor:pointer;color:var(--blue-text);font-weight:500;}
+.rc-tier{margin-top:8px;line-height:1.5;}
+.rubric-summary-band{font-family:var(--serif);font-size:20px;color:var(--navy);}
+
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
 .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;}
 
@@ -813,7 +835,7 @@ a:hover{color:var(--navy);}
   <div class="welcome-card">
     <h2>Welcome to your Project Guide.</h2>
     <div class="gold-line"></div>
-    <p>This guide will walk you through every stage of your Shipley Academic Innovation project — from initial scoping through impact reporting. Each section builds on the last. Start by telling us about your project, and your guide will personalize everything to your work.</p>
+    <p>This guide will walk you through every stage of a Shipley Academic Innovation project — from initial scoping through impact reporting — as you support the faculty lead running it. Each section builds on the last. Start by telling us about the project, and your guide will personalize everything to the work you're supporting.</p>
   </div>
 
   <!-- Proposal Import -->
@@ -874,11 +896,101 @@ a:hover{color:var(--navy);}
     </div>
   </div>
 
+  <!-- Proposal Review Rubric -->
+  <div class="card" id="rubric-card">
+    <div class="card-header">
+      <div class="card-icon" aria-hidden="true">🧭</div>
+      <div>
+        <div class="card-title">Proposal Review Rubric</div>
+        <div class="card-sub">Health Education Innovation Grants, AY 2026–27 — RFP scoring rubric</div>
+      </div>
+      <button onclick="toggleRubricCard()" style="margin-left:auto;" aria-expanded="false" aria-controls="rubric-body" id="rubric-toggle">Expand ▼</button>
+    </div>
+    <div id="rubric-body" style="display:none;">
+      <div class="alert alert-blue">
+        This is the Institute's RFP scoring rubric for this grant cycle. Score the project against it to flag risk areas early and identify where the plan may need to be strengthened — this isn't about revisiting the funding decision, which has already been made. Entries here are pulled in automatically when you request scoping feedback below.
+      </div>
+
+      <div class="section-label" style="margin-top:6px;">Part 2 — Eligibility Screen</div>
+      <div class="hint" style="margin-bottom:10px;">From the original RFP review process. Use this to note anything that may still need documentation or follow-up.</div>
+      <div id="rubric-eligibility"></div>
+      <div id="rubric-eligibility-alert"></div>
+
+      <div class="section-label" style="margin-top:20px;">Scoring Bands</div>
+      <div class="hint" style="margin-bottom:10px;">Total score is out of 28 points across the seven criteria below.</div>
+      <table style="width:100%;border-collapse:collapse;font-size:13px;margin-bottom:16px;">
+        <tr style="border-bottom:0.5px solid var(--border);"><td style="padding:6px 4px;font-weight:700;white-space:nowrap;">22–28</td><td style="padding:6px 4px;font-weight:600;">Competitive</td><td style="padding:6px 4px;color:var(--text3);">Advance for funding consideration</td></tr>
+        <tr style="border-bottom:0.5px solid var(--border);"><td style="padding:6px 4px;font-weight:700;white-space:nowrap;">15–21</td><td style="padding:6px 4px;font-weight:600;">Conditionally Competitive</td><td style="padding:6px 4px;color:var(--text3);">HOLD — flag for follow-up with the faculty team</td></tr>
+        <tr><td style="padding:6px 4px;font-weight:700;white-space:nowrap;">≤ 14</td><td style="padding:6px 4px;font-weight:600;">Not Competitive</td><td style="padding:6px 4px;color:var(--text3);">Would not have moved forward</td></tr>
+      </table>
+
+      <div class="section-label" style="margin-top:20px;">Part 3 — Scoring Rubric</div>
+      <div class="hint" style="margin-bottom:10px;">Score each criterion 1–4. A score of 1 on Digital Innovation is disqualifying per the CFP, regardless of total score.</div>
+      <div id="rubric-criteria"></div>
+      <div class="alert alert-navy" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
+        <span>Total rubric score</span>
+        <span class="rubric-summary-band" id="rubric-total-display">— / 28</span>
+      </div>
+      <div id="rubric-band-display" style="margin-bottom:14px;"></div>
+
+      <div class="section-label" style="margin-top:20px;">Part 4 — Red Flag Reference</div>
+      <div class="hint" style="margin-bottom:10px;">Flag any concerns identified. Flags 1 and 2 are the most disqualifying per the CFP's explicit language.</div>
+      <div id="rubric-redflags"></div>
+
+      <div class="section-label" style="margin-top:20px;">Part 5 — Recommendation Summary</div>
+      <div class="hint" style="margin-bottom:10px;">One form per application, from the original review. Kept here as reference as you support this project going forward.</div>
+      <div class="grid2">
+        <div class="field"><label>Applicant name(s)</label><input type="text" id="rub-applicant" style="width:100%;" oninput="saveRubric()"/></div>
+        <div class="field"><label>Project title</label><input type="text" id="rub-title" style="width:100%;" oninput="saveRubric()"/></div>
+      </div>
+      <div class="grid2">
+        <div class="field"><label>Reviewer</label><input type="text" id="rub-reviewer" style="width:100%;" oninput="saveRubric()"/></div>
+        <div class="field"><label>Date of review</label><input type="date" id="rub-date" style="width:100%;" oninput="saveRubric()"/></div>
+      </div>
+      <div class="field">
+        <label>Grant type recommendation</label>
+        <div class="radio-pill-group" role="radiogroup" aria-label="Grant type recommendation">
+          <label class="radio-pill"><input type="radio" name="rub-granttype" value="seed" onchange="saveRubric()"/> Seed Grant ($10K)</label>
+          <label class="radio-pill"><input type="radio" name="rub-granttype" value="innovation" onchange="saveRubric()"/> Innovation Grant ($25K)</label>
+          <label class="radio-pill"><input type="radio" name="rub-granttype" value="none" onchange="saveRubric()"/> Do Not Fund</label>
+        </div>
+      </div>
+      <div class="field">
+        <label>Funding recommendation</label>
+        <div class="radio-pill-group" role="radiogroup" aria-label="Funding recommendation">
+          <label class="radio-pill"><input type="radio" name="rub-fundingrec" value="fund" onchange="saveRubric()"/> Fund</label>
+          <label class="radio-pill"><input type="radio" name="rub-fundingrec" value="hold" onchange="saveRubric()"/> HOLD</label>
+          <label class="radio-pill"><input type="radio" name="rub-fundingrec" value="decline" onchange="saveRubric()"/> Do Not Fund</label>
+        </div>
+      </div>
+      <div class="field">
+        <label>Key strengths (2–3)</label>
+        <textarea id="rub-strengths" style="width:100%;min-height:60px;" oninput="saveRubric()"></textarea>
+      </div>
+      <div class="field">
+        <label>Key concerns (2–3)</label>
+        <textarea id="rub-concerns" style="width:100%;min-height:60px;" oninput="saveRubric()"></textarea>
+      </div>
+      <div class="field">
+        <label>Email outreach needed? (Conditionally Competitive only)</label>
+        <select id="rub-outreach" style="width:100%;" onchange="saveRubric()">
+          <option value="">— Select —</option>
+          <option value="no">No — sufficient competitive applications received</option>
+          <option value="yes">Yes — reach out to the faculty team to strengthen or clarify weak areas</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Notes</label>
+        <textarea id="rub-notes" style="width:100%;min-height:70px;" oninput="saveRubric()"></textarea>
+      </div>
+    </div>
+  </div>
+
   <!-- Project Basics -->
   <div class="card">
     <div class="card-header">
       <div class="card-icon">📌</div>
-      <div><div class="card-title">Project Basics</div><div class="card-sub">Name your project and introduce your team</div></div>
+      <div><div class="card-title">Project Basics</div><div class="card-sub">Name the project and introduce its team</div></div>
     </div>
 
     <div class="field">
@@ -888,7 +1000,7 @@ a:hover{color:var(--navy);}
     <div class="grid2">
       <div class="field">
         <label>Faculty lead name</label>
-        <input type="text" id="s-lead" placeholder="Your name" style="width:100%;"/>
+        <input type="text" id="s-lead" placeholder="e.g. Dr. Jane Smith" style="width:100%;"/>
       </div>
       <div class="field">
         <label>Department / School / College</label>
@@ -916,7 +1028,7 @@ a:hover{color:var(--navy);}
         <label class="radio-pill"><input type="radio" name="s-grant" value="10000" onchange="onGrantAmountChange(this)"/> $10,000</label>
         <label class="radio-pill"><input type="radio" name="s-grant" value="25000" onchange="onGrantAmountChange(this)"/> $25,000</label>
       </div>
-      <div class="hint">This selects your budget template.</div>
+      <div class="hint">This selects the project's budget template.</div>
     </div>
   </div>
 
@@ -928,19 +1040,19 @@ a:hover{color:var(--navy);}
     </div>
 
     <div class="field">
-      <label>What teaching or learning challenge are you trying to address?</label>
-      <textarea id="s-challenge" placeholder="Describe the problem you've observed in your teaching or your students' learning. What isn't working the way you'd like? What gap exists between where students are and where you want them to be?" style="width:100%;min-height:80px;"></textarea>
+      <label>What teaching or learning challenge is the faculty lead trying to address?</label>
+      <textarea id="s-challenge" placeholder="Describe the problem the faculty lead has observed in their teaching or their students' learning. What isn't working the way they'd like? What gap exists between where students are and where the faculty lead wants them to be?" style="width:100%;min-height:80px;"></textarea>
     </div>
     <div class="field">
-      <label>What is your vision? What would be true about your teaching and learning context if you were successful in addressing this learning challenge?</label>
-      <textarea id="s-vision" placeholder="Describe what would be different for you and for your students if your project successfully addresses your teaching or learning challenge." style="width:100%;min-height:70px;"></textarea>
+      <label>What is the faculty lead's vision? What would be true about their teaching and learning context if the project succeeds in addressing this learning challenge?</label>
+      <textarea id="s-vision" placeholder="Describe what would be different for the faculty lead and their students if this project successfully addresses the teaching or learning challenge." style="width:100%;min-height:70px;"></textarea>
     </div>
     <div class="field">
       <label>Who is the target audience for this project?</label>
       <textarea id="s-audience" placeholder="e.g. Undergraduate students in introductory biology courses; approximately 120 students per semester across 3 sections" style="width:100%;min-height:60px;"></textarea>
     </div>
     <div class="field">
-      <label>Have you done anything like this before? What did or didn't work?</label>
+      <label>Has the faculty lead done anything like this before? What did or didn't work?</label>
       <textarea id="s-prior" placeholder="Any prior experience with similar interventions, even informally, is useful context." style="width:100%;min-height:60px;"></textarea>
     </div>
   </div>
@@ -950,28 +1062,28 @@ a:hover{color:var(--navy);}
     <div class="card-header">
       <div class="card-icon">⚖️</div>
       <div>
-        <div class="card-title">IRB Consideration — Do you need ethics approval?</div>
-        <div class="card-sub">Required reading before your project begins</div>
+        <div class="card-title">IRB Consideration — Does this project need ethics approval?</div>
+        <div class="card-sub">Required reading before the project begins</div>
       </div>
     </div>
 
     <div class="alert alert-blue">
-      <strong>What is IRB?</strong> The Institutional Review Board (IRB) is the university body that reviews research involving human subjects to ensure it is conducted ethically. You may be required to obtain IRB approval before collecting any data from students — even surveys.
+      <strong>What is IRB?</strong> The Institutional Review Board (IRB) is the university body that reviews research involving human subjects to ensure it is conducted ethically. The faculty lead may be required to obtain IRB approval before collecting any data from students — even surveys.
     </div>
 
     <div class="alert alert-amber">
-      <strong>Projects that research teaching and learning require IRB approval</strong>, even if many are deemed exempt. If you plan to collect, analyze, or publish findings from student data (surveys, grades, work samples, interviews), IRB review is required. You will need to complete <a href="https://www.bu.edu/research/ethics-compliance/human-subjects/human-subjects-training/" target="_blank" style="color:var(--blue-text);font-weight:600;">CITI Training</a> and receive certification as well. Starting data collection before approval can invalidate your findings entirely and put you and your students at risk.
+      <strong>Projects that research teaching and learning require IRB approval</strong>, even if many are deemed exempt. If the project plans to collect, analyze, or publish findings from student data (surveys, grades, work samples, interviews), IRB review is required. The faculty lead will need to complete <a href="https://www.bu.edu/research/ethics-compliance/human-subjects/human-subjects-training/" target="_blank" style="color:var(--blue-text);font-weight:600;">CITI Training</a> and receive certification as well. Starting data collection before approval can invalidate the findings entirely and put the faculty lead and their students at risk.
     </div>
 
-    <div class="section-label" style="margin-bottom:10px;">What data will you collect? How will you use it?</div>
+    <div class="section-label" style="margin-bottom:10px;">What data will the project collect? How will it be used?</div>
     <div class="irb-options" role="radiogroup" aria-label="IRB status">
       <div class="irb-option" id="irb-opt-yes" role="radio" aria-checked="false" tabindex="0" onclick="selectIRB('yes')" onkeydown="if(event.key==='Enter'||event.key===' ')selectIRB('yes')">
         <div class="opt-icon" aria-hidden="true">📋</div>
-        <div class="opt-label"><strong>I plan to collect student data and publish findings</strong></div>
+        <div class="opt-label"><strong>The faculty lead plans to collect student data and publish findings</strong></div>
       </div>
       <div class="irb-option" id="irb-opt-maybe" role="radio" aria-checked="false" tabindex="0" onclick="selectIRB('maybe')" onkeydown="if(event.key==='Enter'||event.key===' ')selectIRB('maybe')">
         <div class="opt-icon" aria-hidden="true">🤔</div>
-        <div class="opt-label">I'm not sure what data I will collect or how I will use it</div>
+        <div class="opt-label">Not sure yet what data will be collected or how it will be used</div>
       </div>
       <div class="irb-option" id="irb-opt-no" role="radio" aria-checked="false" tabindex="0" onclick="selectIRB('no')" onkeydown="if(event.key==='Enter'||event.key===' ')selectIRB('no')">
         <div class="opt-icon" aria-hidden="true">✅</div>
@@ -995,16 +1107,16 @@ a:hover{color:var(--navy);}
   <div class="card">
     <div class="card-header">
       <div class="card-icon">🛠️</div>
-      <div><div class="card-title">Project Support Needs & Capacity</div><div class="card-sub">Think through what your project will require</div></div>
+      <div><div class="card-title">Project Support Needs & Capacity</div><div class="card-sub">Think through what this project will require</div></div>
     </div>
 
     <div class="alert alert-navy">
-      Answer honestly — these questions help you identify gaps early, before they become mid-project blockers.
+      Answer honestly — these questions help identify gaps early, before they become mid-project blockers.
     </div>
 
     <div class="section-label">Media &amp; Content Production <a href="#" class="service-link" aria-label="Learn more about media and content production support (link coming soon)" onclick="return false;" title="Link coming soon">Learn more ↗</a></div>
     <div class="field">
-      <label>Will your project require creating videos, graphics, or other media?</label>
+      <label>Will this project require creating videos, graphics, or other media?</label>
       <select id="s-media" style="width:100%;" onchange="showMediaNote()">
         <option value="">— Select —</option>
         <option value="yes">Yes — video, animation, graphics, or other media</option>
@@ -1012,43 +1124,43 @@ a:hover{color:var(--navy);}
         <option value="no">No — no media production needed</option>
       </select>
       <div id="media-note" class="conditional-note" style="display:none;">
-        <div class="hint" style="color:var(--amber-text);margin-top:4px;">Media production involves real costs and lead time. Budget for this early — production support, licensing stock footage or music, accessibility requirements (captions, audio descriptions) can all add up. Factor this into your timeline.</div>
+        <div class="hint" style="color:var(--amber-text);margin-top:4px;">Media production involves real costs and lead time. Budget for this early — production support, licensing stock footage or music, accessibility requirements (captions, audio descriptions) can all add up. Factor this into the timeline.</div>
         <div class="field" style="margin-top:8px;">
           <label>Estimated media production cost ($)</label>
           <input type="number" id="s-media-cost" min="0" step="100" placeholder="0" style="width:180px;" oninput="syncMediaToProjectPlan()"/>
-          <div class="hint">Added to your budget as a media production line item.</div>
+          <div class="hint">Added to the budget as a media production line item.</div>
         </div>
       </div>
     </div>
 
     <div class="section-label" style="margin-top:14px;">Data &amp; Analytics <a href="#" class="service-link" aria-label="Learn more about data and analytics support (link coming soon)" onclick="return false;" title="Link coming soon">Learn more ↗</a></div>
     <div class="field">
-      <label>Will you need to analyze learning data (grades, LMS data, survey results)?</label>
+      <label>Will the project need to analyze learning data (grades, LMS data, survey results)?</label>
       <select id="s-data" style="width:100%;" onchange="showDataNote()">
         <option value="">— Select —</option>
-        <option value="yes-support">Yes — and I will need analytical support</option>
-        <option value="yes-self">Yes — and my team can handle the analysis</option>
+        <option value="yes-support">Yes — and will need analytical support</option>
+        <option value="yes-self">Yes — and the team can handle the analysis</option>
         <option value="maybe">Possibly — still determining scope</option>
         <option value="no">No data analysis anticipated</option>
       </select>
       <div id="data-note" class="conditional-note" style="display:none;">
-        <div class="hint" style="color:var(--amber-text);margin-top:4px;">If you need data analysis support, plan for this well in advance. Options include hiring a graduate student with quantitative skills, collaborating with a colleague who has that expertise, or consulting with BU's Institutional Research office. This should be factored into your budget and timeline from the start.</div>
+        <div class="hint" style="color:var(--amber-text);margin-top:4px;">If the project needs data analysis support, plan for this well in advance. Options include hiring a graduate student with quantitative skills, collaborating with a colleague who has that expertise, or consulting with BU's Institutional Research office. This should be factored into the budget and timeline from the start.</div>
         <div class="field" style="margin-top:8px;">
           <label>Estimated data &amp; analytics cost ($)</label>
           <input type="number" id="s-data-cost" min="0" step="100" placeholder="0" style="width:180px;" oninput="syncDataToProjectPlan()"/>
-          <div class="hint">Added to your budget as a data &amp; analytics line item.</div>
+          <div class="hint">Added to the budget as a data &amp; analytics line item.</div>
         </div>
       </div>
     </div>
 
     <div class="section-label" style="margin-top:14px;">Technology <a href="#" class="service-link" aria-label="Learn more about technology support (link coming soon)" onclick="return false;" title="Link coming soon">Learn more ↗</a></div>
 
-    <div class="alert alert-navy" style="margin-bottom:8px;">Each tool will appear as its own line item in your budget and its own set of considerations below.</div>
+    <div class="alert alert-navy" style="margin-bottom:8px;">Each tool will appear as its own line item in the budget and its own set of considerations below.</div>
     <div id="tech-tool-entries"></div>
     <button class="btn-sm" onclick="addTechToolEntry()" style="margin-bottom:12px;">+ Add tool</button>
 
     <div class="section-label" style="margin-top:14px;">Technology considerations</div>
-    <div class="alert alert-navy" style="margin-bottom:10px;">For each item to consider, mark your status and add notes. Items marked "Needs attention" will be added as tasks in Milestone 1.</div>
+    <div class="alert alert-navy" style="margin-bottom:10px;">For each item to consider, mark the status and add notes. Items marked "Needs attention" will be added as tasks in Milestone 1.</div>
     <div id="tech-considerations">
       <!-- rendered by renderTechConsiderations() -->
     </div>
@@ -1056,7 +1168,7 @@ a:hover{color:var(--navy);}
 
     <div class="section-label" style="margin-top:14px;">Student Workers</div>
     <div class="field">
-      <label>Do you plan to hire student workers (undergraduate or graduate)?</label>
+      <label>Does this project plan to hire student workers (undergraduate or graduate)?</label>
       <select id="s-workers" style="width:100%;" onchange="showWorkerNote();syncWorkersToProjectPlan();">
         <option value="">— Select —</option>
         <option value="yes-grad">Yes — graduate student(s)</option>
@@ -1064,7 +1176,7 @@ a:hover{color:var(--navy);}
         <option value="yes-both">Yes — both graduate and undergraduate</option>
         <option value="no">No student workers planned</option>
       </select>
-      <div id="worker-note" class="conditional-note hint" style="display:none;color:var(--amber-text);">Hiring student workers involves administrative steps that take longer than most faculty expect. You will need to post positions, conduct interviews, complete HR onboarding paperwork, and set up payroll — plan for 4–6 weeks minimum before a student worker can begin paid work. If your project depends on student worker contributions early in the semester, begin this process before the semester starts. Also confirm with your department whether a stipend or hourly employment is more appropriate for your project.</div>
+      <div id="worker-note" class="conditional-note hint" style="display:none;color:var(--amber-text);">Hiring student workers involves administrative steps that take longer than most faculty teams expect. Someone will need to post positions, conduct interviews, complete HR onboarding paperwork, and set up payroll — plan for 4–6 weeks minimum before a student worker can begin paid work. If this project depends on student worker contributions early in the semester, begin this process before the semester starts. Also confirm with the department whether a stipend or hourly employment is more appropriate for this project.</div>
     </div>
 
     <div id="worker-details" style="display:none;">
@@ -1073,7 +1185,7 @@ a:hover{color:var(--navy);}
           <label>Estimated total compensation ($)</label>
           <input type="number" id="s-worker-cost" min="0" step="100" placeholder="0" style="width:100%;"
             oninput="syncWorkersToProjectPlan()"/>
-          <div class="hint">Added to your budget as a salary line item.</div>
+          <div class="hint">Added to the budget as a salary line item.</div>
         </div>
         <div class="field">
           <label>Target hire date</label>
@@ -1097,7 +1209,7 @@ a:hover{color:var(--navy);}
 
   <div style="display:flex;gap:10px;justify-content:flex-end;">
     <button onclick="saveSetup()" class="btn-primary">Save project setup</button>
-    <button onclick="aiScopeReview()" class="btn-gold" id="btn-scope-feedback">Get scoping feedback ↗</button>
+    <button onclick="aiScopeReview()" class="btn-gold" id="btn-scope-feedback">Get scoping &amp; rubric feedback ↗</button>
   </div>
   <div id="scope-output" style="margin-top:16px;"></div>
 
@@ -1118,7 +1230,7 @@ a:hover{color:var(--navy);}
       </div>
     </div>
     <p style="font-size:14px;color:var(--text2);line-height:1.7;margin-bottom:16px;">
-      This framework is the backbone of your project's impact measurement. Work through each section from top to bottom — each one builds on the last. Use the guided conversation below to think through your responses before filling in the framework. You can return to this and refine it as your project evolves.
+      This framework is the backbone of this project's impact measurement. Work through each section from top to bottom — each one builds on the last. Use the guided conversation below to think through responses before filling in the framework. You can return to this and refine it as the project evolves.
     </p>
     <div class="alert alert-blue">
       <strong>How to use this:</strong> Start with the AI conversation below to talk through your thinking. Then fill in each section from top to bottom. Your entries are saved automatically and will inform your survey design, data collection plan, and final report.
@@ -1138,7 +1250,7 @@ a:hover{color:var(--navy);}
       <button class="chip" onclick="impactChip(this)">Help me think through what I want students to take away from this experience — at the end of the course and in 5 or 10 years?</button>
       <button class="chip" onclick="impactChip(this)">Help me think through how I'll know students have achieved this goal.</button>
       <button class="chip" onclick="impactChip(this)">Help me think through what learning experiences will help students get there.</button>
-      <button class="chip" onclick="impactChip(this)">Help me think through the challenge or problem my project addresses.</button>
+      <button class="chip" onclick="impactChip(this)">Help me think through the challenge or problem this project addresses.</button>
       <button class="chip" onclick="impactChip(this)">Help me think through what evidence of student success would look like.</button>
       <button class="chip" onclick="impactChip(this)">Help me think through how I'll measure students' success.</button>
     </div>
@@ -1168,7 +1280,7 @@ a:hover{color:var(--navy);}
           <div class="fw-header-num">1</div>
           <div class="fw-header-text">
             <div class="fw-header-title">Problems</div>
-            <div class="fw-header-sub">What are your major learning and pedagogical challenges?</div>
+            <div class="fw-header-sub">What are the major learning and pedagogical challenges?</div>
           </div>
         </div>
         <div class="fw-body">
@@ -1194,7 +1306,7 @@ a:hover{color:var(--navy);}
           <div class="fw-header-num">2</div>
           <div class="fw-header-text">
             <div class="fw-header-title">Objectives</div>
-            <div class="fw-header-sub">What are your core objectives in addressing teaching/learning challenges?</div>
+            <div class="fw-header-sub">What are the core objectives in addressing these teaching/learning challenges?</div>
           </div>
         </div>
         <div class="fw-body">
@@ -1371,7 +1483,7 @@ a:hover{color:var(--navy);}
     </div>
     <div class="milestone-body" id="m1-body">
       <div class="alert alert-amber" style="margin-bottom:14px;">
-        <strong>Key blockers to watch:</strong> IRB approval, student worker hiring, confirming technology meets BU standards, and securing vendor contracts all take longer than expected. If your project depends on any of these, begin these processes immediately — before the semester starts if possible.
+        <strong>Key blockers to watch:</strong> IRB approval, student worker hiring, confirming technology meets BU standards, and securing vendor contracts all take longer than expected. If this project depends on any of these, begin these processes immediately — before the semester starts if possible.
       </div>
       <div id="m1-tasks"></div>
       <div style="margin-top:12px;">
@@ -1390,7 +1502,7 @@ a:hover{color:var(--navy);}
     </div>
     <div class="milestone-body" id="m2-body" style="display:none;">
       <div class="alert alert-blue" style="margin-bottom:14px;">
-        <strong>Data collection reminder:</strong> Do not begin collecting data from students until IRB approval (if required) is confirmed. Make sure your survey instrument has been piloted before full deployment.
+        <strong>Data collection reminder:</strong> Do not begin collecting data from students until IRB approval (if required) is confirmed. Make sure the survey instrument has been piloted before full deployment.
       </div>
       <div id="m2-tasks"></div>
       <div style="margin-top:12px;">
@@ -1409,7 +1521,7 @@ a:hover{color:var(--navy);}
     </div>
     <div class="milestone-body" id="m3-body" style="display:none;">
       <div class="alert alert-blue" style="margin-bottom:14px;">
-        <strong>Dissemination tip:</strong> The Institute Showcase is a key opportunity to share your work with the BU community. Conference submissions and journal articles reach broader audiences — the Institute team can help you identify appropriate venues for teaching and learning research publication.
+        <strong>Dissemination tip:</strong> The Institute Showcase is a key opportunity to share the faculty team's work with the BU community. Conference submissions and journal articles reach broader audiences — the Institute team can help identify appropriate venues for teaching and learning research publication.
       </div>
       <div id="m3-tasks"></div>
       <div style="margin-top:12px;">
@@ -1525,9 +1637,9 @@ a:hover{color:var(--navy);}
       <div class="card-icon">💰</div>
       <div><div class="card-title">Budget Builder</div><div class="card-sub">Based on official Shipley Award budget templates</div></div>
     </div>
-    <div class="alert alert-navy" style="margin-bottom:14px;">Select your grant award amount to load the appropriate budget template. Yellow cells are your input fields — fringe benefits calculate automatically. Adjust the timeline labels to match your project start year.</div>
+    <div class="alert alert-navy" style="margin-bottom:14px;">Select the grant award amount to load the appropriate budget template. Yellow cells are input fields — fringe benefits calculate automatically. Adjust the timeline labels to match the project's start year.</div>
     <div class="alert alert-amber" style="margin-bottom:14px;">
-      <strong>Before you spend:</strong> Contact your department grants administrator before making large purchases or hiring decisions. Keep receipts for all expenditures. Unspent funds at project close may need to be returned.
+      <strong>Before spending:</strong> Contact the department grants administrator before making large purchases or hiring decisions. Keep receipts for all expenditures. Unspent funds at project close may need to be returned.
     </div>
 
     <div class="section-label">My Shipley award is:</div>
@@ -1586,7 +1698,7 @@ a:hover{color:var(--navy);}
       <div style="margin-top:16px;">
         <div id="budget-output" style="margin-bottom:12px;"></div>
         <div style="display:flex;gap:8px;align-items:flex-end;">
-          <textarea id="budget-input" placeholder="Ask about your budget, spending categories, or fringe rates…" rows="2"
+          <textarea id="budget-input" placeholder="Ask about this project's budget, spending categories, or fringe rates…" rows="2"
             style="flex:1;font-size:13px;resize:vertical;"
             onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();aiBudgetChat();}"></textarea>
           <button class="btn-gold" onclick="aiBudgetChat()" style="white-space:nowrap;">Send ↗</button>
@@ -1616,7 +1728,7 @@ a:hover{color:var(--navy);}
       Use the <strong>Milestone Snapshot</strong> throughout the project for progress check-ins. Switch to the <strong>Final Report</strong> at any time to build your end-of-project impact report. Both can be downloaded as a PDF.
     </p>
     <div class="alert alert-blue">
-      <strong>Dissemination goals:</strong> Beyond the project report, consider whether your findings are appropriate for conference presentation or journal publication. Teaching and learning research venues like the International Society for the Scholarship of Teaching and Learning (ISSOTL) and discipline-specific teaching journals are good starting points. Ask the Institute team for suggestions relevant to your field at excellence@bu.edu.
+      <strong>Dissemination goals:</strong> Beyond the project report, consider whether the findings are appropriate for conference presentation or journal publication. Teaching and learning research venues like the International Society for the Scholarship of Teaching and Learning (ISSOTL) and discipline-specific teaching journals are good starting points.
     </div>
     <div class="report-mode-toggle" role="group" aria-label="Report mode">
       <button id="rmode-snapshot" class="active" onclick="switchReportMode('snapshot')">Milestone Snapshot</button>
@@ -1630,8 +1742,8 @@ a:hover{color:var(--navy);}
 
     <div class="report-section">
       <h3>Overview</h3>
-      <div class="prompt">Provide a brief overview of what you have accomplished to date, including any preliminary evidence of impact.</div>
-      <textarea id="rs-overview" placeholder="Summarize your progress so far. This will pre-populate from milestone reflections you've entered." style="width:100%;min-height:90px;" oninput="saveSnapshot()"></textarea>
+      <div class="prompt">Provide a brief overview of what has been accomplished to date, including any preliminary evidence of impact.</div>
+      <textarea id="rs-overview" placeholder="Summarize progress so far. This will pre-populate from milestone reflections already entered." style="width:100%;min-height:90px;" oninput="saveSnapshot()"></textarea>
       <div class="field-guide-btn" id="fgb-rs-overview">
         <button class="btn-sm btn-gold" onclick="askFieldGuide('rs-overview','Overview of project progress to date')">Ask guide ↗</button>
         <div class="field-output" id="fout-rs-overview"></div>
@@ -1640,9 +1752,9 @@ a:hover{color:var(--navy);}
 
     <div class="report-section">
       <h3>Goals & Changes from Original Plan</h3>
-      <div class="prompt">Describe progress on your original goals. Note any goals that have changed and why.</div>
-      <textarea id="rs-goals" placeholder="This will pre-populate from your project setup. Describe progress and any changes from your original goals." style="width:100%;min-height:90px;" oninput="saveSnapshot()"></textarea>
-      <div class="prefill-note" id="pfn-rs-goals">This was pre-filled from your project setup. Please describe your progress and note any changes from your original goals.</div>
+      <div class="prompt">Describe progress on the original goals. Note any goals that have changed and why.</div>
+      <textarea id="rs-goals" placeholder="This will pre-populate from the project setup. Describe progress and any changes from the original goals." style="width:100%;min-height:90px;" oninput="saveSnapshot()"></textarea>
+      <div class="prefill-note" id="pfn-rs-goals">This was pre-filled from the project setup. Please describe progress and note any changes from the original goals.</div>
       <div class="field-guide-btn" id="fgb-rs-goals">
         <button class="btn-sm btn-gold" onclick="askFieldGuide('rs-goals','Goals and changes from original project plan')">Ask guide ↗</button>
         <div class="field-output" id="fout-rs-goals"></div>
@@ -1651,9 +1763,9 @@ a:hover{color:var(--navy);}
 
     <div class="report-section">
       <h3>Assessment & Sustainability</h3>
-      <div class="prompt">What progress have you made toward assessing the impact of your project on student learning? What is your current plan to sustain the innovations you are developing?</div>
-      <textarea id="rs-assessment" placeholder="Assessment progress will pre-populate from your Impact Evaluation Framework. Please also describe your plan for sustaining the innovations you are developing beyond the project period." style="width:100%;min-height:90px;" oninput="saveSnapshot()"></textarea>
-      <div class="prefill-note" id="pfn-rs-assessment">Assessment information has been pre-filled from your Impact Evaluation Framework. Please add your plan for sustaining the innovations you are developing beyond the project period.</div>
+      <div class="prompt">What progress has been made toward assessing this project's impact on student learning? What is the current plan to sustain the innovations being developed?</div>
+      <textarea id="rs-assessment" placeholder="Assessment progress will pre-populate from the Impact Evaluation Framework. Please also describe the plan for sustaining the innovations beyond the project period." style="width:100%;min-height:90px;" oninput="saveSnapshot()"></textarea>
+      <div class="prefill-note" id="pfn-rs-assessment">Assessment information has been pre-filled from the Impact Evaluation Framework. Please add the plan for sustaining the innovations beyond the project period.</div>
       <div class="field-guide-btn" id="fgb-rs-assessment">
         <button class="btn-sm btn-gold" onclick="askFieldGuide('rs-assessment','Assessment progress and sustainability plan')">Ask guide ↗</button>
         <div class="field-output" id="fout-rs-assessment"></div>
@@ -1662,7 +1774,7 @@ a:hover{color:var(--navy);}
 
     <div class="report-section">
       <h3>Dissemination</h3>
-      <div class="prompt">Have you presented your project or shared your findings inside or outside of BU? Describe any current or future dissemination efforts.</div>
+      <div class="prompt">Has the faculty team presented this project or shared findings inside or outside of BU? Describe any current or future dissemination efforts.</div>
       <textarea id="rs-dissemination" placeholder="e.g. Presented work-in-progress at the Institute Showcase. Planning to submit to ISSOTL 2027…" style="width:100%;min-height:80px;" oninput="saveSnapshot()"></textarea>
       <div class="field-guide-btn" id="fgb-rs-dissemination">
         <button class="btn-sm btn-gold" onclick="askFieldGuide('rs-dissemination','Dissemination of project findings')">Ask guide ↗</button>
@@ -1672,7 +1784,7 @@ a:hover{color:var(--navy);}
 
     <div class="report-section">
       <h3>Support Needed</h3>
-      <div class="prompt">What support can the Institute provide to help you accomplish your project goals? (e.g., course design resources, educational technology consultation, teaching strategies)</div>
+      <div class="prompt">What support can the Institute provide to help accomplish this project's goals? (e.g., course design resources, educational technology consultation, teaching strategies)</div>
       <textarea id="rs-support" placeholder="e.g. Would benefit from a consultation on survey instrument design and guidance on statistical analysis options…" style="width:100%;min-height:80px;" oninput="saveSnapshot()"></textarea>
       <div class="field-guide-btn" id="fgb-rs-support">
         <button class="btn-sm btn-gold" onclick="askFieldGuide('rs-support','Support needed from the Institute')">Ask guide ↗</button>
@@ -1682,9 +1794,9 @@ a:hover{color:var(--navy);}
 
     <div class="report-section">
       <h3>Timeline & Next Steps</h3>
-      <div class="prompt">What is the remaining timeline for this project? What are your major next steps? Note any changes from your original timeline.</div>
-      <textarea id="rs-timeline" placeholder="This will pre-populate from your project dates and milestone task progress." style="width:100%;min-height:120px;" oninput="saveSnapshot()"></textarea>
-      <div class="prefill-note" id="pfn-rs-timeline">This was pre-filled from your project setup and milestone progress. Please review and add any context about changes from your original timeline.</div>
+      <div class="prompt">What is the remaining timeline for this project? What are the major next steps? Note any changes from the original timeline.</div>
+      <textarea id="rs-timeline" placeholder="This will pre-populate from the project dates and milestone task progress." style="width:100%;min-height:120px;" oninput="saveSnapshot()"></textarea>
+      <div class="prefill-note" id="pfn-rs-timeline">This was pre-filled from the project setup and milestone progress. Please review and add any context about changes from the original timeline.</div>
       <div class="field-guide-btn" id="fgb-rs-timeline">
         <button class="btn-sm btn-gold" onclick="askFieldGuide('rs-timeline','Remaining timeline and next steps')">Ask guide ↗</button>
         <div class="field-output" id="fout-rs-timeline"></div>
@@ -1694,7 +1806,7 @@ a:hover{color:var(--navy);}
     <div style="display:flex;gap:10px;margin-top:8px;flex-wrap:wrap;">
       <button onclick="saveSnapshot()" class="btn-primary">Save snapshot</button>
       <button onclick="downloadReportPDF('snapshot')" class="btn-sm">⬇ Download as PDF</button>
-      <button onclick="prefillSnapshot()">Pre-fill from my project data</button>
+      <button onclick="prefillSnapshot()">Pre-fill from project data</button>
     </div>
     <div id="snapshot-output" style="margin-top:14px;"></div>
   </div>
@@ -1706,8 +1818,8 @@ a:hover{color:var(--navy);}
     <div class="report-section">
       <h3>Project Team and Roles</h3>
       <div class="prompt">List all team members, their titles, and their roles within the project.</div>
-      <textarea id="r-team" placeholder="This will pre-populate from your Project Setup." style="width:100%;min-height:80px;" oninput="saveReport();checkPrefillNote('r-team','pfn-r-team');checkFieldGuideBtn('r-team','fgb-r-team')"></textarea>
-      <div class="prefill-note" id="pfn-r-team">This was pre-filled from your project setup. Review and edit as needed.</div>
+      <textarea id="r-team" placeholder="This will pre-populate from Project Setup." style="width:100%;min-height:80px;" oninput="saveReport();checkPrefillNote('r-team','pfn-r-team');checkFieldGuideBtn('r-team','fgb-r-team')"></textarea>
+      <div class="prefill-note" id="pfn-r-team">This was pre-filled from the project setup. Review and edit as needed.</div>
       <div class="field-guide-btn" id="fgb-r-team">
         <button class="btn-sm btn-gold" onclick="askFieldGuide('r-team','Project team and roles')">Ask guide ↗</button>
         <div class="field-output" id="fout-r-team"></div>
@@ -1716,9 +1828,9 @@ a:hover{color:var(--navy);}
 
     <div class="report-section">
       <h3>Project Goals and Objectives</h3>
-      <div class="prompt">Describe the need you addressed and how your intervention led to improved learning for students.</div>
-      <textarea id="r-goals" placeholder="This will pre-populate from your Project Setup." style="width:100%;min-height:90px;" oninput="saveReport();checkPrefillNote('r-goals','pfn-r-goals');checkFieldGuideBtn('r-goals','fgb-r-goals')"></textarea>
-      <div class="prefill-note" id="pfn-r-goals">This was pre-filled from your project setup. Please describe the need you actually addressed and how your intervention led to improved learning for students.</div>
+      <div class="prompt">Describe the need addressed and how the intervention led to improved learning for students.</div>
+      <textarea id="r-goals" placeholder="This will pre-populate from Project Setup." style="width:100%;min-height:90px;" oninput="saveReport();checkPrefillNote('r-goals','pfn-r-goals');checkFieldGuideBtn('r-goals','fgb-r-goals')"></textarea>
+      <div class="prefill-note" id="pfn-r-goals">This was pre-filled from the project setup. Please describe the need actually addressed and how the intervention led to improved learning for students.</div>
       <div class="field-guide-btn" id="fgb-r-goals">
         <button class="btn-sm btn-gold" onclick="askFieldGuide('r-goals','Project goals and objectives — actual outcomes')">Ask guide ↗</button>
         <div class="field-output" id="fout-r-goals"></div>
@@ -1727,7 +1839,7 @@ a:hover{color:var(--navy);}
 
     <div class="report-section">
       <h3>Milestones & Outcomes Achieved</h3>
-      <div class="prompt">What was achieved across the major areas of your project? Note anything that changed from your original plan.</div>
+      <div class="prompt">What was achieved across the major areas of this project? Note anything that changed from the original plan.</div>
       <textarea id="r-milestones" placeholder="This will pre-populate from reflections you've entered in the Milestones tab." style="width:100%;min-height:100px;" oninput="saveReport();checkPrefillNote('r-milestones','pfn-r-milestones');checkFieldGuideBtn('r-milestones','fgb-r-milestones')"></textarea>
       <div class="prefill-note" id="pfn-r-milestones">This was pre-filled from your milestone reflections. Please expand with a narrative on what was achieved and what changed from your original plan.</div>
       <div class="field-guide-btn" id="fgb-r-milestones">
@@ -1738,9 +1850,9 @@ a:hover{color:var(--navy);}
 
     <div class="report-section">
       <h3>Impact</h3>
-      <div class="prompt">What changed as a result of this project? Describe changes observed by the course team or reported by students. Reference your Impact Evaluation Framework data.</div>
-      <textarea id="r-impact" placeholder="This will pre-populate from your Impact Evaluation Framework." style="width:100%;min-height:100px;" oninput="saveReport();checkPrefillNote('r-impact','pfn-r-impact');checkFieldGuideBtn('r-impact','fgb-r-impact')"></textarea>
-      <div class="prefill-note" id="pfn-r-impact">This was pre-filled from your Impact Evaluation Framework. Please describe the actual impact observed — what changed for students and instructors as a result of this project.</div>
+      <div class="prompt">What changed as a result of this project? Describe changes observed by the course team or reported by students. Reference the Impact Evaluation Framework data.</div>
+      <textarea id="r-impact" placeholder="This will pre-populate from the Impact Evaluation Framework." style="width:100%;min-height:100px;" oninput="saveReport();checkPrefillNote('r-impact','pfn-r-impact');checkFieldGuideBtn('r-impact','fgb-r-impact')"></textarea>
+      <div class="prefill-note" id="pfn-r-impact">This was pre-filled from the Impact Evaluation Framework. Please describe the actual impact observed — what changed for students and instructors as a result of this project.</div>
       <div class="field-guide-btn" id="fgb-r-impact">
         <button class="btn-sm btn-gold" onclick="askFieldGuide('r-impact','Project impact on student learning')">Ask guide ↗</button>
         <div class="field-output" id="fout-r-impact"></div>
@@ -1749,8 +1861,8 @@ a:hover{color:var(--navy);}
 
     <div class="report-section">
       <h3>Challenges</h3>
-      <div class="prompt">What operational or logistical challenges arose? How did you address them?</div>
-      <textarea id="r-challenges" placeholder="e.g. Vendor contract negotiations took longer than anticipated, delaying technology implementation by 6 weeks. We addressed this by…" style="width:100%;min-height:90px;" oninput="saveReport();checkFieldGuideBtn('r-challenges','fgb-r-challenges')"></textarea>
+      <div class="prompt">What operational or logistical challenges arose? How were they addressed?</div>
+      <textarea id="r-challenges" placeholder="e.g. Vendor contract negotiations took longer than anticipated, delaying technology implementation by 6 weeks. The team addressed this by…" style="width:100%;min-height:90px;" oninput="saveReport();checkFieldGuideBtn('r-challenges','fgb-r-challenges')"></textarea>
       <div class="field-guide-btn" id="fgb-r-challenges">
         <button class="btn-sm btn-gold" onclick="askFieldGuide('r-challenges','Challenges and how they were addressed')">Ask guide ↗</button>
         <div class="field-output" id="fout-r-challenges"></div>
@@ -1759,7 +1871,7 @@ a:hover{color:var(--navy);}
 
     <div class="report-section">
       <h3>Lessons Learned</h3>
-      <div class="prompt">What pedagogical insights emerged from this project? What worked or didn't work in the classroom? What would you do differently in course design? What are your best practices for teaching with this innovation?</div>
+      <div class="prompt">What pedagogical insights emerged from this project? What worked or didn't work in the classroom? What would the faculty lead do differently in course design? What are the best practices for teaching with this innovation?</div>
       <textarea id="r-lessons" placeholder="e.g. Students engaged more deeply with the AI simulation tool when given structured reflection prompts before and after. Pairing the technology with explicit metacognitive activities significantly improved…" style="width:100%;min-height:90px;" oninput="saveReport();checkFieldGuideBtn('r-lessons','fgb-r-lessons')"></textarea>
       <div class="field-guide-btn" id="fgb-r-lessons">
         <button class="btn-sm btn-gold" onclick="askFieldGuide('r-lessons','Pedagogical lessons learned')">Ask guide ↗</button>
@@ -1770,8 +1882,8 @@ a:hover{color:var(--navy);}
     <div class="report-section">
       <h3>Next Steps & Future Plans</h3>
       <div class="prompt">How will the impact of this project continue beyond its funding period? Will it be sustained, scaled to other courses or departments, adapted for other contexts, or published?</div>
-      <textarea id="r-next" placeholder="This will pre-populate from your dissemination notes if available. Describe how this project's impact will continue beyond its funding period." style="width:100%;min-height:90px;" oninput="saveReport();checkPrefillNote('r-next','pfn-r-next');checkFieldGuideBtn('r-next','fgb-r-next')"></textarea>
-      <div class="prefill-note" id="pfn-r-next">This was pre-filled from your dissemination notes. Please expand on how the impact of this project will continue — through scaling, adaptation, publication, or integration into ongoing practice.</div>
+      <textarea id="r-next" placeholder="This will pre-populate from dissemination notes if available. Describe how this project's impact will continue beyond its funding period." style="width:100%;min-height:90px;" oninput="saveReport();checkPrefillNote('r-next','pfn-r-next');checkFieldGuideBtn('r-next','fgb-r-next')"></textarea>
+      <div class="prefill-note" id="pfn-r-next">This was pre-filled from dissemination notes. Please expand on how the impact of this project will continue — through scaling, adaptation, publication, or integration into ongoing practice.</div>
       <div class="field-guide-btn" id="fgb-r-next">
         <button class="btn-sm btn-gold" onclick="askFieldGuide('r-next','Next steps and future plans beyond the project')">Ask guide ↗</button>
         <div class="field-output" id="fout-r-next"></div>
@@ -1781,8 +1893,8 @@ a:hover{color:var(--navy);}
     <div style="display:flex;gap:10px;margin-top:8px;flex-wrap:wrap;">
       <button onclick="saveReport()" class="btn-primary">Save report</button>
       <button onclick="downloadReportPDF('final')" class="btn-sm">⬇ Download as PDF</button>
-      <button onclick="aiReportHelp()" class="btn-gold">Ask the guide for feedback on your draft ↗</button>
-      <button onclick="prefillReport()">Pre-fill from my project data</button>
+      <button onclick="aiReportHelp()" class="btn-gold">Ask the guide for feedback on this draft ↗</button>
+      <button onclick="prefillReport()">Pre-fill from project data</button>
     </div>
     <div id="report-output" style="margin-top:14px;"></div>
   </div>
@@ -1798,23 +1910,23 @@ a:hover{color:var(--navy);}
   <div class="welcome-card">
     <h2>Your Guide</h2>
     <div class="gold-line"></div>
-    <p>Ask anything about your project — planning, impact measurement, navigating blockers, drafting survey questions, thinking through your data, or preparing for dissemination. Your guide understands the Shipley project framework and will draw on your project details to give you relevant, specific advice.</p>
+    <p>Ask anything about this project — planning, impact measurement, navigating blockers, drafting survey questions, thinking through the data, or preparing for dissemination. Your guide understands the Shipley project framework and will draw on the project details to give you relevant, specific advice for supporting the faculty lead.</p>
   </div>
 
   <div class="card">
     <div class="guide-chips">
-      <button class="chip" onclick="guideChip(this)">How do I write a good survey for my project?</button>
-      <button class="chip" onclick="guideChip(this)">We're behind on our timeline — help me think through options</button>
-      <button class="chip" onclick="guideChip(this)">What teaching and learning research journals should I consider?</button>
-      <button class="chip" onclick="guideChip(this)">Help me think through my data analysis plan</button>
-      <button class="chip" onclick="guideChip(this)">We need to hire a graduate student — what should I know?</button>
+      <button class="chip" onclick="guideChip(this)">How do I help the faculty lead write a good survey?</button>
+      <button class="chip" onclick="guideChip(this)">This project is behind on its timeline — help me think through options</button>
+      <button class="chip" onclick="guideChip(this)">What teaching and learning research journals should the faculty lead consider?</button>
+      <button class="chip" onclick="guideChip(this)">Help me think through this project's data analysis plan</button>
+      <button class="chip" onclick="guideChip(this)">The project needs to hire a graduate student — what should I know?</button>
       <button class="chip" onclick="guideChip(this)">How do I approach a vendor contract at BU?</button>
-      <button class="chip" onclick="guideChip(this)">What accessibility requirements apply to my technology?</button>
+      <button class="chip" onclick="guideChip(this)">What accessibility requirements apply to this project's technology?</button>
       <button class="chip" onclick="guideChip(this)">Help me think through incentivizing students to complete surveys</button>
-      <button class="chip" onclick="guideChip(this)">What should I present at the Institute Showcase?</button>
+      <button class="chip" onclick="guideChip(this)">What should the faculty team present at the Institute Showcase?</button>
     </div>
     <div class="field">
-      <textarea id="guide-input" placeholder="Ask your guide anything about your project…" style="width:100%;min-height:80px;"></textarea>
+      <textarea id="guide-input" placeholder="Ask your guide anything about this project…" style="width:100%;min-height:80px;"></textarea>
     </div>
     <div style="display:flex;gap:8px;">
       <button class="btn-gold" onclick="askGuide()">Ask ↗</button>
@@ -1834,9 +1946,9 @@ a:hover{color:var(--navy);}
 // ═══════════════════════════════════════════════════════
 // SYSTEM PROMPT
 // ═══════════════════════════════════════════════════════
-const SYSTEM = `You are the Shipley Academic Innovation Project Guide — a seasoned advisor for faculty teams at Boston University running Shipley Academic Innovation projects. You have over 15 years of experience managing faculty projects in higher education settings.
+const SYSTEM = `You are the Shipley Academic Innovation Project Guide — a seasoned advisor for Institute for Excellence in Teaching & Learning staff at Boston University who manage Shipley Academic Innovation grants. You have over 15 years of experience managing faculty projects in higher education settings.
 
-Your role: help faculty teams plan, execute, measure, and report on innovative teaching and learning projects. You are a trusted colleague — warm, direct, and experienced. You treat faculty as capable professionals who need specific guidance in areas outside their typical expertise: project management, impact measurement, data collection, and educational research methodology.
+Your role: help Institute staff plan, execute, measure, and report on the Shipley projects they support. Faculty lead these projects; the person you're advising is the staff member managing the relationship, tracking progress, and keeping the project on track. You are a trusted colleague — warm, direct, and experienced. Staff bring a wide range of grant management experience, from decades of experience to none — meet each person at the level they need without over-explaining to the ones who don't need it.
 
 When you give feedback, make it specific and grounded. Move toward something useful — name problems clearly when you see them, the way an experienced colleague would, without fanfare or excessive hedging. Avoid rhetorical parallel constructions ("you're not just doing X, you're doing Y") — they read as performative rather than genuine. Say what you see, flag what matters, and point toward the next useful step.
 
@@ -1853,7 +1965,7 @@ Key knowledge you bring:
 
 Never refer to the Institute for Excellence in Teaching & Learning as "IETL" — always use "the Institute" or "the Institute team."
 
-Always draw on the faculty's specific project context when available. Reference their project title, goals, team, and framework entries to give relevant, personalized advice.`;
+Always draw on the specific project context available to you — the faculty lead's name, project title, goals, team, and framework entries — to give the staff member relevant, personalized advice about the project they are supporting.`;
 
 // ═══════════════════════════════════════════════════════
 // STORAGE
@@ -1908,6 +2020,290 @@ function toggleImportCard(){
   body.style.display = collapsed ? 'block' : 'none';
   btn.textContent = collapsed ? 'Collapse ▲' : 'Expand ▼';
   btn.setAttribute('aria-expanded', collapsed ? 'true' : 'false');
+}
+
+// ═══════════════════════════════════════════════════════
+// PROPOSAL REVIEW RUBRIC — Health Education Innovation Grants, AY 2026–27
+// ═══════════════════════════════════════════════════════
+const RUBRIC_ELIGIBILITY = [
+  {id:'faculty_status', label:'Applicant holds faculty or program director status at BU', note:'Faculty status required; educational leaders and program directors eligible'},
+  {id:'health_focus', label:'Project is focused on health education, not health research', note:'Primary outcome must be improvement in teaching and learning, not knowledge generation'},
+  {id:'digital_component', label:'Project includes a meaningful digital innovation component', note:'Technology must be central, not decorative or supplementary — explicit CFP requirement'},
+  {id:'twelve_month', label:'Project can be completed before the start of Fall 2027 (within 12 months of award)', note:'AUTO-FAIL — Projects that cannot be completed within a 12-month window do not proceed', autoFail:true},
+  {id:'components_present', label:'All required application components are present', note:'Challenge, innovation, budget rationale, timeline, assessment plan, dissemination plan, target learners'},
+  {id:'letter_support', label:'Letter of support from chair, dean, or senior BU leadership is included', note:'AUTO-FAIL — Missing or ineligible letter of support; signer must be senior to all applicants', autoFail:true},
+  {id:'interdisciplinary', label:'Interdisciplinary team or confirmed collaboration plan', note:'Strongly emphasized in CFP; single-discipline projects are at a significant competitive disadvantage'},
+];
+
+const RUBRIC_CRITERIA = [
+  {id:'c1', num:1, title:'Health Education Focus', threshold:false,
+   question:'Is the project fundamentally about improving how health is taught or learned — not health research?',
+   tiers:[
+     {score:4,name:'Exemplary',text:'Proposal clearly and compellingly addresses a named, significant challenge in health education. The problem is well-defined, specific to learner needs, and distinct from healthcare research. The connection to teaching and learning is explicit and central.'},
+     {score:3,name:'Proficient',text:'Educational challenge is clearly stated and connected to health teaching and learning. Minor conflation with research goals may exist but does not dominate the proposal.'},
+     {score:2,name:'Developing',text:'Educational focus is present but vague or secondary to research or clinical outcomes. Unclear whether the primary goal is improving learning or generating knowledge.'},
+     {score:1,name:'Insufficient',text:'Proposal is primarily a healthcare or clinical research project with educational framing added. Educational challenge is absent, unclear, or incidental.'},
+   ]},
+  {id:'c2', num:2, title:'Digital Innovation', threshold:true,
+   question:'⚠ THRESHOLD: a score of 1 is disqualifying per the CFP. Is digital innovation central, meaningful, and specific — not decorative or supplementary?',
+   tiers:[
+     {score:4,name:'Exemplary',text:'Digital innovation is central, named, specific, and well-justified. Technology meaningfully changes how learners engage with content. Rationale connects the digital component directly to improved health education outcomes.'},
+     {score:3,name:'Proficient',text:'A clear digital component is proposed and connected to learning outcomes. Its role is explained, though not yet fully differentiated from existing tools or practices.'},
+     {score:2,name:'Developing',text:'Digital elements are mentioned but described vaguely or as supplementary. Reviewer cannot clearly identify the innovation or how it improves on current practice.'},
+     {score:1,name:'Insufficient',text:'No meaningful digital component. Project relies solely on established teaching practices. Per CFP, disqualifying — recommend decline regardless of total score.'},
+   ]},
+  {id:'c3', num:3, title:'Interdisciplinary Collaboration', threshold:false,
+   question:'Are multiple disciplines authentically involved, with differentiated contributions from each partner?',
+   tiers:[
+     {score:4,name:'Exemplary',text:'Two or more distinct disciplines are meaningfully involved with clear, differentiated contributions. Each partner brings expertise the others lack. Teams represent multiple schools, programs, or units.'},
+     {score:3,name:'Proficient',text:'Multiple disciplines are involved. Collaboration is plausible and described, though specific contributions of each partner may not be fully elaborated.'},
+     {score:2,name:'Developing',text:'Only one discipline is represented, or collaboration is nominal — co-listed names without clear differentiated roles. Cross-unit partnerships referenced but not confirmed.'},
+     {score:1,name:'Insufficient',text:'Project is single-discipline. No meaningful collaboration across fields or programs. Does not align with CFP emphasis on convergent, interdisciplinary approaches.'},
+   ]},
+  {id:'c4', num:4, title:'Scalability & Transferability', threshold:false,
+   question:'Can this grow beyond the originating course and team? Will it produce reusable outputs others can adopt?',
+   tiers:[
+     {score:4,name:'Exemplary',text:'Clear, specific plan for scaling beyond the original course or team. Project produces a named reusable artifact (toolkit, module, case study, framework) and articulates a dissemination pathway (publication, presentation, adoption by other programs).'},
+     {score:3,name:'Proficient',text:'Scaling potential is described and plausible. A reusable output is planned. Dissemination is mentioned but not yet fully detailed.'},
+     {score:2,name:'Developing',text:'Scaling is referenced as a goal but not planned. Outputs are unclear or confined to the originating context. Limited evidence that other programs could adopt the work.'},
+     {score:1,name:'Insufficient',text:"Project benefits only the applicant's course or team. No reusable products planned. No dissemination strategy. Impact ends when funding ends."},
+   ]},
+  {id:'c5', num:5, title:'Assessment & Evaluation', threshold:false,
+   question:'Is there a clear, rigorous plan to measure and document impact on learners?',
+   tiers:[
+     {score:4,name:'Exemplary',text:'Specific, measurable learning outcomes are identified. Data collection methods are named and appropriate. Assessment connects to stated impacts and is feasible within the project timeline. IRB considerations addressed where applicable.'},
+     {score:3,name:'Proficient',text:'Learning outcomes are stated and an evaluation approach is described. Data collection methods are mentioned. Plan is reasonable but may lack specificity or methodological rigor.'},
+     {score:2,name:'Developing',text:'Vague references to measuring success or collecting feedback. No specific outcomes or measures identified. Reviewer cannot confirm that impact will be documented meaningfully.'},
+     {score:1,name:'Insufficient',text:'No assessment or evaluation plan. No indication of how success will be measured. Required application component is missing or essentially absent.'},
+   ]},
+  {id:'c6', num:6, title:'Implementation Feasibility', threshold:false,
+   question:'Is the scope realistic within a 12-month window (completion before Fall 2027)? Are staffing, technology, and required approvals addressed?',
+   tiers:[
+     {score:4,name:'Exemplary',text:'Timeline is detailed, realistic, and can be completed before Fall 2027. Key milestones, dependencies, and decision points are identified. Staffing, technology, and required approvals (IRB, IT, FERPA) are addressed. Budget aligns with scope.'},
+     {score:3,name:'Proficient',text:'Timeline is reasonable and scope is appropriate for completion before Fall 2027. Major milestones are identified. Some dependencies may not be fully addressed but do not represent significant project risk.'},
+     {score:2,name:'Developing',text:'Timeline is vague or potentially unrealistic within the 12-month window. Scope appears underestimated or overly ambitious. Key dependencies (IRB, IT vetting, hiring timelines) are not acknowledged.'},
+     {score:1,name:'Insufficient',text:'Timeline is absent or clearly cannot be completed before Fall 2027. Critical dependencies are unaddressed. Budget and scope are significantly misaligned.'},
+   ]},
+  {id:'c7', num:7, title:'Grant-Type Alignment', threshold:false,
+   question:'Does the project scope, budget, and readiness match the requested tier? Seed ($10K): early-stage pilots. Innovation ($25K): program-level, broader adoption.',
+   tiers:[
+     {score:4,name:'Exemplary',text:'Project scope, budget, and goals are well-matched to the requested grant type. Seed applications are clearly early-stage; Innovation applications demonstrate readiness for program-level work with measurable outcomes and broader adoption potential.'},
+     {score:3,name:'Proficient',text:'Scope generally aligns with the grant type. Minor recalibration may be suggested but overall fit is appropriate.'},
+     {score:2,name:'Developing',text:"Scope and grant type are somewhat misaligned — too ambitious for Seed or too preliminary for Innovation. Applicant may not have articulated which type fits best."},
+     {score:1,name:'Insufficient',text:'Clear mismatch between project scope and grant type. Scope far exceeds or falls significantly short of what the requested grant is designed to support.'},
+   ]},
+];
+
+const RUBRIC_REDFLAGS = [
+  {id:'f1', label:'Digital Innovation Is Absent or Superficial', desc:'Technology is decorative, supplementary, or not present. Per CFP language, this is disqualifying — score of 1 on Criterion 2.'},
+  {id:'f2', label:'Project Is Primarily Research, Not Education', desc:'Could be submitted unchanged to a research grant. Primary outcome is knowledge generation, not learning improvement.'},
+  {id:'f3', label:'Collaboration Is Nominal or Single-Discipline', desc:'Only one field represented, or interdisciplinary partners listed without clear differentiated contributions.'},
+  {id:'f4', label:'Impact Limited to One Course or Team', desc:'No reusable products, no dissemination plan, no pathway for other programs to adopt the work.'},
+  {id:'f5', label:'Assessment Plan Is Absent or Vague', desc:'No specific learning outcomes or data collection methods. Required application component not meaningfully addressed.'},
+  {id:'f6', label:'Scope Mismatch with Grant Type', desc:'Project is too ambitious for a Seed Grant or too preliminary for an Innovation Grant.'},
+  {id:'f7', label:'Sustainability Is Not Addressed', desc:'No plan for what happens when funding ends. No identified institutional home for the work.'},
+  {id:'f8', label:'Technology/Compliance Dependencies Unaddressed', desc:'Student data, voice data, or AI tools used without reference to IRB, FERPA, BU IT vetting, or accessibility requirements.'},
+];
+
+let rubricState = {eligibility:{}, scores:{}, redFlags:{}, summary:{}};
+
+function toggleRubricCard(){
+  const body = document.getElementById('rubric-body');
+  const btn = document.getElementById('rubric-toggle');
+  const collapsed = body.style.display==='none';
+  body.style.display = collapsed ? 'block' : 'none';
+  btn.textContent = collapsed ? 'Collapse ▲' : 'Expand ▼';
+  btn.setAttribute('aria-expanded', collapsed ? 'true' : 'false');
+}
+
+function renderRubricEligibility(){
+  const el = document.getElementById('rubric-eligibility');
+  if(!el) return;
+  el.innerHTML = RUBRIC_ELIGIBILITY.map(item=>{
+    const checked = rubricState.eligibility[item.id] ? 'checked' : '';
+    return `<div class="rubric-check-row">
+      <input type="checkbox" id="relig-${item.id}" ${checked} onchange="rubricState.eligibility['${item.id}']=this.checked;updateRubricEligibilityAlert();saveRubric();"/>
+      <div>
+        <label for="relig-${item.id}" class="rubric-check-label">${item.label}</label>
+        <div class="rubric-check-note${item.autoFail?' rubric-autofail':''}">${item.note}</div>
+      </div>
+    </div>`;
+  }).join('');
+  updateRubricEligibilityAlert();
+}
+
+function updateRubricEligibilityAlert(){
+  const el = document.getElementById('rubric-eligibility-alert');
+  if(!el) return;
+  const unmet = RUBRIC_ELIGIBILITY.filter(i=>!rubricState.eligibility[i.id]);
+  if(!unmet.length){ el.innerHTML=''; return; }
+  const autoFailUnmet = unmet.filter(i=>i.autoFail);
+  if(autoFailUnmet.length){
+    el.innerHTML = `<div class="alert alert-amber" style="margin-top:10px;"><strong>Automatic-fail item${autoFailUnmet.length!==1?'s':''} unmet:</strong> ${autoFailUnmet.map(i=>i.label).join('; ')}. Worth confirming this was resolved before or during award — flag it if not.</div>`;
+  } else {
+    el.innerHTML = `<div class="alert alert-navy" style="margin-top:10px;">${unmet.length} eligibility item${unmet.length!==1?'s':''} unmet: ${unmet.map(i=>i.label).join('; ')}.</div>`;
+  }
+}
+
+function renderRubricCriteria(){
+  const el = document.getElementById('rubric-criteria');
+  if(!el) return;
+  el.innerHTML = RUBRIC_CRITERIA.map(c=>{
+    const sortedTiers = c.tiers.slice().sort((a,b)=>b.score-a.score);
+    const scaleHtml = sortedTiers.map(t=>{
+      const checked = rubricState.scores[c.id]===t.score ? 'checked' : '';
+      return `<label><input type="radio" name="rc-${c.id}" value="${t.score}" ${checked} onchange="setRubricScore('${c.id}',${t.score})"/> ${t.score} — ${t.name}</label>`;
+    }).join('');
+    const guideHtml = sortedTiers.map(t=>`<div class="rc-tier"><strong>${t.score} — ${t.name}:</strong> ${t.text}</div>`).join('');
+    const curScore = rubricState.scores[c.id];
+    return `<div class="rc-criterion${c.threshold?' threshold':''}" id="rc-crit-${c.id}">
+      <div class="rc-head">
+        <span class="rc-title">${c.num}. ${c.title}${c.threshold?' ⚠':''}</span>
+        <span class="rc-badge" id="rc-badge-${c.id}">${curScore?curScore:'—'} / 4</span>
+      </div>
+      <div class="rc-question">${c.question}</div>
+      <div class="rc-scale" role="radiogroup" aria-label="Score for ${c.title}">${scaleHtml}</div>
+      <div id="rc-flag-${c.id}"></div>
+      <details class="rc-guide"><summary>View scoring guide</summary>${guideHtml}</details>
+    </div>`;
+  }).join('');
+  RUBRIC_CRITERIA.forEach(c=>updateRubricThresholdFlag(c.id));
+}
+
+function setRubricScore(critId, score){
+  rubricState.scores[critId] = score;
+  const badge = document.getElementById('rc-badge-'+critId);
+  if(badge) badge.textContent = score+' / 4';
+  updateRubricThresholdFlag(critId);
+  updateRubricTotal();
+  saveRubric();
+}
+
+function updateRubricThresholdFlag(critId){
+  const crit = RUBRIC_CRITERIA.find(c=>c.id===critId);
+  const flagEl = document.getElementById('rc-flag-'+critId);
+  if(!crit || !flagEl) return;
+  if(crit.threshold && rubricState.scores[critId]===1){
+    flagEl.innerHTML = `<div class="alert alert-amber" style="margin:8px 0 0;">Score of 1 is disqualifying per the CFP — flag this project regardless of total score.</div>`;
+  } else {
+    flagEl.innerHTML = '';
+  }
+}
+
+function updateRubricTotal(){
+  const scores = RUBRIC_CRITERIA.map(c=>rubricState.scores[c.id]).filter(s=>typeof s==='number');
+  const total = scores.reduce((a,b)=>a+b,0);
+  const answered = scores.length;
+  const totalDisplay = document.getElementById('rubric-total-display');
+  if(totalDisplay) totalDisplay.textContent = (answered ? total : '—') + ' / 28';
+  const bandEl = document.getElementById('rubric-band-display');
+  if(!bandEl) return;
+  if(answered < RUBRIC_CRITERIA.length){
+    const remaining = RUBRIC_CRITERIA.length - answered;
+    bandEl.innerHTML = `<div class="hint">${remaining} criteri${remaining!==1?'a':'on'} not yet scored.</div>`;
+    return;
+  }
+  let band, cls;
+  if(total>=22){ band='Competitive'; cls='alert-green'; }
+  else if(total>=15){ band='Conditionally Competitive — HOLD'; cls='alert-amber'; }
+  else { band='Not Competitive'; cls='alert-amber'; }
+  bandEl.innerHTML = `<div class="alert ${cls}"><strong>${total} / 28 — ${band}</strong></div>`;
+}
+
+function renderRubricRedFlags(){
+  const el = document.getElementById('rubric-redflags');
+  if(!el) return;
+  el.innerHTML = RUBRIC_REDFLAGS.map((f,i)=>{
+    const checked = rubricState.redFlags[f.id] ? 'checked' : '';
+    return `<div class="rubric-check-row">
+      <input type="checkbox" id="rflag-${f.id}" ${checked} onchange="rubricState.redFlags['${f.id}']=this.checked;saveRubric();"/>
+      <div>
+        <label for="rflag-${f.id}" class="rubric-check-label">${i+1}. ${f.label}</label>
+        <div class="rubric-check-note">${f.desc}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function saveRubric(){
+  rubricState.summary = {
+    applicant: document.getElementById('rub-applicant')?.value||'',
+    title: document.getElementById('rub-title')?.value||'',
+    reviewer: document.getElementById('rub-reviewer')?.value||'',
+    date: document.getElementById('rub-date')?.value||'',
+    grantType: document.querySelector('input[name="rub-granttype"]:checked')?.value||'',
+    fundingRec: document.querySelector('input[name="rub-fundingrec"]:checked')?.value||'',
+    strengths: document.getElementById('rub-strengths')?.value||'',
+    concerns: document.getElementById('rub-concerns')?.value||'',
+    outreach: document.getElementById('rub-outreach')?.value||'',
+    notes: document.getElementById('rub-notes')?.value||'',
+  };
+  const data = loadAll();
+  data.rubric = rubricState;
+  saveAll(data);
+}
+
+function loadRubric(){
+  const data = loadAll();
+  const r = data.rubric || {};
+  rubricState = {
+    eligibility: r.eligibility || {},
+    scores: r.scores || {},
+    redFlags: r.redFlags || {},
+    summary: r.summary || {},
+  };
+  renderRubricEligibility();
+  renderRubricCriteria();
+  renderRubricRedFlags();
+  updateRubricTotal();
+  const s = rubricState.summary;
+  const setup = data.setup || {};
+  const applicantEl = document.getElementById('rub-applicant');
+  if(applicantEl) applicantEl.value = s.applicant || setup.lead || '';
+  const titleEl = document.getElementById('rub-title');
+  if(titleEl) titleEl.value = s.title || setup.title || '';
+  const reviewerEl = document.getElementById('rub-reviewer');
+  if(reviewerEl) reviewerEl.value = s.reviewer || '';
+  const dateEl = document.getElementById('rub-date');
+  if(dateEl) dateEl.value = s.date || '';
+  if(s.grantType){ const r2=document.querySelector(`input[name="rub-granttype"][value="${s.grantType}"]`); if(r2) r2.checked=true; }
+  if(s.fundingRec){ const r3=document.querySelector(`input[name="rub-fundingrec"][value="${s.fundingRec}"]`); if(r3) r3.checked=true; }
+  const strengthsEl = document.getElementById('rub-strengths');
+  if(strengthsEl) strengthsEl.value = s.strengths || '';
+  const concernsEl = document.getElementById('rub-concerns');
+  if(concernsEl) concernsEl.value = s.concerns || '';
+  const outreachEl = document.getElementById('rub-outreach');
+  if(outreachEl) outreachEl.value = s.outreach || '';
+  const notesEl = document.getElementById('rub-notes');
+  if(notesEl) notesEl.value = s.notes || '';
+}
+
+// Builds a plain-text summary of the rubric for the AI prompt and exports.
+function buildRubricSummaryText(){
+  const lines = [];
+  const unmet = RUBRIC_ELIGIBILITY.filter(i=>!rubricState.eligibility[i.id]);
+  if(unmet.length){
+    lines.push(`Eligibility screen — unmet items: ${unmet.map(i=>i.label + (i.autoFail?' (AUTO-FAIL item)':'')).join('; ')}`);
+  } else {
+    lines.push('Eligibility screen: all items marked met.');
+  }
+  const scored = RUBRIC_CRITERIA.filter(c=>typeof rubricState.scores[c.id]==='number');
+  if(scored.length){
+    lines.push('Rubric scores: ' + scored.map(c=>`${c.title} ${rubricState.scores[c.id]}/4`).join('; '));
+    const total = scored.reduce((a,c)=>a+rubricState.scores[c.id],0);
+    if(scored.length===RUBRIC_CRITERIA.length){
+      let band = total>=22?'Competitive':total>=15?'Conditionally Competitive (HOLD)':'Not Competitive';
+      lines.push(`Total rubric score: ${total}/28 (${band})`);
+    }
+    if(rubricState.scores.c2===1) lines.push('Digital Innovation scored 1/4 — disqualifying per CFP, regardless of total score.');
+  }
+  const flagged = RUBRIC_REDFLAGS.filter(f=>rubricState.redFlags[f.id]);
+  if(flagged.length) lines.push('Red flags noted: ' + flagged.map(f=>f.label).join('; '));
+  const s = rubricState.summary || {};
+  if(s.strengths) lines.push(`Reviewer-noted strengths: ${s.strengths}`);
+  if(s.concerns) lines.push(`Reviewer-noted concerns: ${s.concerns}`);
+  if(s.notes) lines.push(`Reviewer notes: ${s.notes}`);
+  return lines.join('\n');
 }
 
 function togglePasteFallback(){
@@ -1976,7 +2372,7 @@ async function runProposalImport(){
   const out = document.getElementById('import-output');
   showThinking(out);
 
-  const prompt = `A faculty member has pasted their Shipley Academic Innovation project proposal. Extract the following information and return it as a single valid JSON object. Only populate fields where you find clear information — use null for anything you cannot confidently extract. Dates must be in YYYY-MM-DD format. Grant amount should be a number only (no $ sign). Be conservative: do not guess or infer details not present in the text.
+  const prompt = `An Institute staff member has pasted the faculty team's Shipley Academic Innovation project proposal. Extract the following information and return it as a single valid JSON object. Only populate fields where you find clear information — use null for anything you cannot confidently extract. Dates must be in YYYY-MM-DD format. Grant amount should be a number only (no $ sign). Be conservative: do not guess or infer details not present in the text.
 
 Return ONLY the JSON object with no other text, explanation, or markdown.
 
@@ -2056,7 +2452,7 @@ function applyProposalImport(data, out){
   saveSetup();
   const count=filled.length;
   out.innerHTML=`<div class="alert alert-green">
-    <strong>Import complete —</strong> ${count} field${count!==1?'s':''} pre-filled from your proposal.
+    <strong>Import complete —</strong> ${count} field${count!==1?'s':''} pre-filled from the proposal.
     Review each field below, then check the <strong>Budget tab</strong> if budget figures were found.
     ${data.budget_template?'<br/>💰 Budget figures were detected and pre-filled.':''}
   </div>`;
@@ -2087,9 +2483,9 @@ function selectIRB(val){
   const g = document.getElementById('irb-guidance');
   g.style.display='block';
   const msgs = {
-    yes:`<div class="alert alert-amber"><strong>Action required before data collection:</strong> You should submit an IRB application before collecting any data from students. Visit the BU IRB office website to determine whether your study qualifies for exempt, expedited, or full board review. Exempt review (the most common for teaching and learning research) is still a formal process — do not assume exemption without official confirmation. Plan for 4–8 weeks for the review process. Contact the BU IRB office: <a href="https://www.bu.edu/research/ethics-compliance/human-subjects/" target="_blank" style="color:var(--blue-text);">bu.edu/research/ethics-compliance/human-subjects</a></div>`,
-    maybe:`<div class="alert alert-amber"><strong>Seek clarification before proceeding:</strong> When in doubt, consult the BU IRB office. They can help you determine whether your project requires review. It is always safer to ask than to assume you don't need approval — collecting data without proper approval can invalidate your findings and create serious compliance issues. Contact: <a href="https://www.bu.edu/research/ethics-compliance/human-subjects/" target="_blank" style="color:var(--blue-text);">bu.edu/research/ethics-compliance/human-subjects</a></div>`,
-    no:`<div class="alert alert-amber"><strong>Be prepared.</strong> If your project later evolves to include data collection for research or publication, you will need to have IRB approval. It is best to seek this in advance of any data collection so you don't jeopardize your project or create compliance issues. Contact: <a href="https://www.bu.edu/research/ethics-compliance/human-subjects/" target="_blank" style="color:var(--blue-text);">bu.edu/research/ethics-compliance/human-subjects</a></div>`
+    yes:`<div class="alert alert-amber"><strong>Action required before data collection:</strong> The faculty lead should submit an IRB application before collecting any data from students. Visit the BU IRB office website to determine whether the study qualifies for exempt, expedited, or full board review. Exempt review (the most common for teaching and learning research) is still a formal process — do not assume exemption without official confirmation. Plan for 4–8 weeks for the review process. Contact the BU IRB office: <a href="https://www.bu.edu/research/ethics-compliance/human-subjects/" target="_blank" style="color:var(--blue-text);">bu.edu/research/ethics-compliance/human-subjects</a></div>`,
+    maybe:`<div class="alert alert-amber"><strong>Seek clarification before proceeding:</strong> When in doubt, consult the BU IRB office. They can help determine whether this project requires review. It is always safer to ask than to assume approval isn't needed — collecting data without proper approval can invalidate the findings and create serious compliance issues. Contact: <a href="https://www.bu.edu/research/ethics-compliance/human-subjects/" target="_blank" style="color:var(--blue-text);">bu.edu/research/ethics-compliance/human-subjects</a></div>`,
+    no:`<div class="alert alert-amber"><strong>Be prepared.</strong> If this project later evolves to include data collection for research or publication, the faculty lead will need IRB approval. It is best to seek this in advance of any data collection to avoid jeopardizing the project or creating compliance issues. Contact: <a href="https://www.bu.edu/research/ethics-compliance/human-subjects/" target="_blank" style="color:var(--blue-text);">bu.edu/research/ethics-compliance/human-subjects</a></div>`
   };
   g.innerHTML = msgs[val]||'';
   const data = loadAll();
@@ -2144,7 +2540,7 @@ function syncDataToProjectPlan(){
   const cost = parseFloat(document.getElementById('s-data-cost')?.value)||0;
   customTasks = customTasks.filter(t=>t.id!=='data_task');
   if(active){
-    customTasks.push({id:'data_task', name:'Establish data collection and analysis plan', lead:'Project team & data support', milestone:'m1', date:'', group:'Learning Analytics', blocker:'Identify data support resources and build this into your budget and timeline from the start.', custom:true});
+    customTasks.push({id:'data_task', name:'Establish data collection and analysis plan', lead:'Project team & data support', milestone:'m1', date:'', group:'Learning Analytics', blocker:'Identify data support resources and build this into the project budget and timeline from the start.', custom:true});
   }
   syncDynamicOpToBudget('data', active ? 'Data & Analytics Support' : null, cost);
   const data = loadAll();
@@ -2556,7 +2952,7 @@ async function askSectionGuide(section){
   if(fw.objectives && !['problems','objectives'].includes(section)) ctx.push(`Objectives: ${fw.objectives}`);
   if(fw.impacts && !['problems','objectives','impacts'].includes(section)) ctx.push(`Impacts: ${fw.impacts}`);
   if(fw.measures && !['problems','objectives','impacts','measures'].includes(section)) ctx.push(`Measures & Targets: ${fw.measures}`);
-  const prompt = `You are a helpful guide for faculty managing a Shipley Academic Innovation Fund award from the Institute for Excellence in Teaching & Learning at Boston University. The faculty member is working on the "${sectionLabels[section]}" section of their Impact Evaluation Framework and needs help thinking it through.\n\n${ctx.length?'Context from earlier sections:\n'+ctx.join('\n')+'\n\n':''}Focus your response specifically on helping with the "${sectionLabels[section]}" section. Do not reference the BU grants office or university policy. If something raises a concern, direct the faculty member to contact the Institute team at excellence@bu.edu.\n\nFaculty question: ${question}`;
+  const prompt = `You are a helpful guide for Institute for Excellence in Teaching & Learning staff supporting a faculty-led Shipley Academic Innovation Fund award at Boston University. The staff member is working with the faculty lead on the "${sectionLabels[section]}" section of the Impact Evaluation Framework and needs help thinking it through.\n\n${ctx.length?'Context from earlier sections:\n'+ctx.join('\n')+'\n\n':''}Focus your response specifically on helping with the "${sectionLabels[section]}" section. Do not reference the BU grants office or university policy. If something raises a concern, flag it clearly for follow-up with the faculty lead.\n\nStaff question: ${question}`;
   try{
     const r = await callGuide(prompt);
     renderAIResponse(out, r);
@@ -2602,7 +2998,7 @@ const MILESTONE_TASKS = {
     {name:'Finalize data plan', lead:'Project team', blocker:null},
     {name:'Implement pedagogical intervention in course(s)', lead:'Piloting instructors', blocker:null},
     {name:'Administer pre-intervention surveys and baseline measures', lead:'Project team', blocker:'Do not collect data until IRB approval is confirmed.'},
-    {name:'Collect ongoing data per your data collection plan', lead:'Project team', blocker:null},
+    {name:'Collect ongoing data per the data collection plan', lead:'Project team', blocker:null},
     {name:'Administer post-intervention surveys', lead:'Project team', blocker:null},
     {name:'Collect teaching materials and artifacts for analysis', lead:'Project team', blocker:null},
   ],
@@ -2620,7 +3016,7 @@ const MILESTONE_TASKS = {
     {name:'Refine intervention based on findings and faculty feedback', lead:'Faculty lead', blocker:null},
     {name:'Plan and implement second pilot (if applicable)', lead:'Piloting instructors', blocker:null},
     {name:'Analyze second iteration data', lead:'Project team', blocker:null},
-    {name:'Reflect on lessons learned — what would you do differently?', lead:'Full team', blocker:null},
+    {name:'Reflect on lessons learned — what would the team do differently?', lead:'Full team', blocker:null},
     {name:'Develop plan to sustain or scale the intervention', lead:'Faculty lead', blocker:null},
   ],
   m5: [
@@ -2747,7 +3143,7 @@ function renderMilestones(){
     function buildReflectionPrompt(key, label){
       const val = (reflections[key]||'').replace(/"/g,'&quot;');
       return `<div class="milestone-reflection">
-        <label>Reflection: ${label} — What was the outcome? Did anything change from your original plan?</label>
+        <label>Reflection: ${label} — What was the outcome? Did anything change from the original plan?</label>
         <textarea placeholder="Add a brief reflection on this section's outcomes and any changes from your plan…"
           onblur="saveMilestoneReflection('${key}',this.value)">${val}</textarea>
       </div>`;
@@ -3236,7 +3632,7 @@ const TECH_ITEMS = [
   {key:'accessibility', label:'Accessibility', desc:'Does it meet WCAG standards and work with screen readers?'},
   {key:'privacy',       label:'Privacy',       desc:'Does it comply with FERPA for student data?'},
   {key:'security',      label:'Security',      desc:'Does it meet BU\'s data security requirements?'},
-  {key:'cost',          label:'Cost',          desc:'Licenses, per-seat fees, renewal costs — have you confirmed total expense?'},
+  {key:'cost',          label:'Cost',          desc:'Licenses, per-seat fees, renewal costs — has total expense been confirmed?'},
   {key:'vendor',        label:'Vendor contracts', desc:'Some tools require a Statement of Work reviewed by BU\'s legal team, which takes time.'},
 ];
 
@@ -3755,9 +4151,10 @@ async function aiScopeReview(){
   setButtonLoading(btn, true);
   showThinking(out);
   saveSetup();
+  saveRubric();
   const data = loadAll();
   const s = data.setup || {};
-  // Build context only from fields the faculty has actually filled in
+  // Build context only from fields the staff member has actually filled in
   const filled = [];
   if(s.title)        filled.push(`Project title: ${s.title}`);
   if(s.lead)         filled.push(`Faculty lead: ${s.lead}`);
@@ -3773,13 +4170,18 @@ async function aiScopeReview(){
   if(s.availability) filled.push(`Availability constraints: ${s.availability}`);
   if(s.priorities)   filled.push(`Priorities: ${s.priorities}`);
 
-  if(filled.length === 0){
+  const rubricSummary = buildRubricSummaryText();
+  const rubricScored = RUBRIC_CRITERIA.some(c=>typeof rubricState.scores[c.id]==='number');
+  const rubricFlagged = RUBRIC_REDFLAGS.some(f=>rubricState.redFlags[f.id]) || RUBRIC_ELIGIBILITY.some(i=>!rubricState.eligibility[i.id]);
+  const hasRubricInput = rubricScored || rubricFlagged;
+
+  if(filled.length === 0 && !hasRubricInput){
     out.innerHTML = `<div class="ai-response"><strong>Nothing to review yet</strong> — fill in some fields on this page first, then ask for feedback.</div>`;
     setButtonLoading(btn, false);
     return;
   }
 
-  const prompt = `You are a helpful guide for faculty managing a Shipley Academic Innovation Fund award from the Institute for Excellence in Teaching & Learning at Boston University. Review the project scoping information below. Only give feedback on what has actually been provided — do not reference or flag omissions for fields that weren't shared with you. Be collegial, specific, and direct. Do not reference the BU grants office or university policy. If something raises a concern that needs follow-up, direct the faculty member to contact the Institute team at excellence@bu.edu.\n\n${filled.join('\n')}`;
+  const prompt = `You are a helpful guide for Institute for Excellence in Teaching & Learning staff supporting a faculty-led Shipley Academic Innovation Fund award (Health Education Innovation Grants, AY 2026–27) at Boston University. Review the project scoping information and RFP rubric assessment below, and give the staff member one combined set of feedback: identify potential challenges with the project as scoped, and make specific suggestions for strengthening the plan to mitigate the risks reflected in the rubric scores and flags. Only give feedback on what has actually been provided — do not reference or flag omissions for fields that weren't shared with you. Be collegial, specific, and direct. Do not reference the BU grants office or university policy. If something raises a concern that needs follow-up, flag it clearly for follow-up with the faculty lead.\n\nProject scoping information:\n${filled.length ? filled.join('\n') : '(none provided)'}\n\nRFP rubric assessment:\n${rubricSummary || '(not yet scored)'}`;
   try{
     const r = await callGuide(prompt);
     renderAIResponse(out, r);
@@ -3805,9 +4207,9 @@ async function askImpact(){
   transcriptEl.appendChild(thinkDiv);
   transcriptEl.scrollTop = transcriptEl.scrollHeight;
   const history = frameworkTranscript.slice(0,-1).map(m=>({role:m.role,content:m.content}));
-  const systemNote = 'You are a helpful guide for faculty managing a Shipley Academic Innovation Fund award from the Institute for Excellence in Teaching & Learning at Boston University. The faculty member is using a backwards design approach to think through their Impact Evaluation Framework. Help them think through their goals, evidence, and measurement approach. Be conversational, ask clarifying questions, and build on what they have said. Do not reference the BU grants office or university policy. If something raises a concern, direct the faculty member to contact the Institute team at excellence@bu.edu.';
+  const systemNote = 'You are a helpful guide for Institute for Excellence in Teaching & Learning staff supporting a faculty-led Shipley Academic Innovation Fund award at Boston University. The staff member is using a backwards design approach to help the faculty lead think through the Impact Evaluation Framework. Help them think through goals, evidence, and measurement approach. Be conversational, ask clarifying questions, and build on what has been said. Do not reference the BU grants office or university policy. If something raises a concern, flag it clearly for follow-up with the faculty lead.';
   try{
-    const prompt = systemNote + '\n\nConversation so far:\n' + history.map(m=>`${m.role==='user'?'Faculty':'Guide'}: ${m.content}`).join('\n') + '\n\nFaculty: ' + input;
+    const prompt = systemNote + '\n\nConversation so far:\n' + history.map(m=>`${m.role==='user'?'Staff':'Guide'}: ${m.content}`).join('\n') + '\n\nStaff: ' + input;
     const r = await callGuide(prompt);
     document.getElementById(thinkingId)?.remove();
     frameworkTranscript.push({role:'assistant', content:r});
@@ -3844,7 +4246,7 @@ async function reviewFramework(){
     out.innerHTML=`<div class="ai-response"><strong>Nothing to review yet</strong> — fill in some fields first.</div>`;
     return;
   }
-  const prompt = `You are a helpful guide for faculty managing a Shipley Academic Innovation Fund award from the Institute for Excellence in Teaching & Learning at Boston University. Please review only the Impact Evaluation Framework entries provided below — do not flag fields that haven't been filled in yet. Are the objectives measurable? Do the measures align with the impacts? Is the data collection plan realistic? Do not reference the BU grants office or university policy. If something raises a concern that needs follow-up, direct the faculty member to contact the Institute team at excellence@bu.edu.\n\n${filled.join('\n')}`;
+  const prompt = `You are a helpful guide for Institute for Excellence in Teaching & Learning staff supporting a faculty-led Shipley Academic Innovation Fund award at Boston University. Please review only the Impact Evaluation Framework entries provided below — do not flag fields that haven't been filled in yet. Are the objectives measurable? Do the measures align with the impacts? Is the data collection plan realistic? Do not reference the BU grants office or university policy. If something raises a concern that needs follow-up, flag it clearly for follow-up with the faculty lead.\n\n${filled.join('\n')}`;
   try{
     const r = await callGuide(prompt);
     renderAIResponse(out, r);
@@ -4101,7 +4503,7 @@ async function aiTimelineHelp(btn){
     if(inProgList.length) milestoneBreakdown += `\n  In progress: ${inProgList.join('; ')}`;
     if(notes[m]) milestoneBreakdown += `\n  Notes: ${notes[m]}`;
   });
-  const prompt = `You are a helpful guide for faculty managing a Shipley Academic Innovation Fund award from the Institute for Excellence in Teaching & Learning at Boston University. A faculty member wants feedback on their project timeline. ${dateRange}\n\nTask status by milestone:${milestoneBreakdown}\n\nGive specific, practical feedback on their timeline progress. Reference specific completed and in-progress tasks by name where relevant. Note any sequencing risks and concrete next steps. Do not reference the BU grants office or university policy. If something raises a concern that needs follow-up, direct the faculty member to contact the Institute team at excellence@bu.edu.`;
+  const prompt = `You are a helpful guide for Institute for Excellence in Teaching & Learning staff supporting a faculty-led Shipley Academic Innovation Fund award at Boston University. An Institute staff member wants feedback on this project's timeline. ${dateRange}\n\nTask status by milestone:${milestoneBreakdown}\n\nGive specific, practical feedback on timeline progress. Reference specific completed and in-progress tasks by name where relevant. Note any sequencing risks and concrete next steps. Do not reference the BU grants office or university policy. If something raises a concern that needs follow-up, flag it clearly for follow-up with the faculty lead.`;
   try{
     const r = await callGuide(prompt);
     renderAIResponse(out, r);
@@ -4179,7 +4581,7 @@ async function aibudgethelp(){
   const rem=def.max-grand;
   summary+=`\nSalaries subtotal: $${salTotal.toFixed(2)}\nFringe benefits (tool-calculated): $${fringeTotal.toFixed(2)}\nOperating subtotal: $${opTotal.toFixed(2)}\nGrand total: $${grand.toFixed(2)}\nRemaining: $${rem.toFixed(2)}`;
 
-  const prompt=`You are a helpful guide for faculty managing a Shipley Academic Innovation Fund award from the Institute for Excellence in Teaching & Learning at Boston University.\n\n${projectContext?'Project context:\n'+projectContext+'\n':''}${summary}\n\nPlease review this budget and give specific, practical feedback based on what has been entered. Only comment on what is actually present — do not flag missing items as problems unless they seem critically inconsistent with what is entered. Do not reference fringe rates as errors — they are automatically calculated by the tool using fixed institutional rates. Do not reference the BU grants office or university policy. If something raises a concern that needs follow-up, direct the faculty member to contact the Institute team at excellence@bu.edu.`;
+  const prompt=`You are a helpful guide for Institute for Excellence in Teaching & Learning staff supporting a faculty-led Shipley Academic Innovation Fund award at Boston University.\n\n${projectContext?'Project context:\n'+projectContext+'\n':''}${summary}\n\nPlease review this budget and give specific, practical feedback based on what has been entered. Only comment on what is actually present — do not flag missing items as problems unless they seem critically inconsistent with what is entered. Do not reference fringe rates as errors — they are automatically calculated by the tool using fixed institutional rates. Do not reference the BU grants office or university policy. If something raises a concern that needs follow-up, flag it clearly for follow-up with the faculty lead.`;
   try{
     const r = await callGuide(prompt);
     budgetHistory.push({role:'user',content:prompt});
@@ -4218,7 +4620,7 @@ async function aiReportHelp(){
     out.innerHTML=`<div class="ai-response"><strong>Nothing to review yet</strong> — fill in some report fields first.</div>`;
     return;
   }
-  const prompt = `You are a helpful guide for faculty managing a Shipley Academic Innovation Fund award from the Institute for Excellence in Teaching & Learning at Boston University. Review the draft project report sections below and give specific, constructive feedback on what has been written — do not comment on sections that haven't been started. Do not reference the BU grants office or university policy. If something raises a concern, direct the faculty member to contact the Institute team at excellence@bu.edu.\n\n${goalsNote ? goalsNote+'\n\n' : ''}${filledReport.join('\n\n')}`;
+  const prompt = `You are a helpful guide for Institute for Excellence in Teaching & Learning staff supporting a faculty-led Shipley Academic Innovation Fund award at Boston University. Review the draft project report sections below and give specific, constructive feedback on what has been written — do not comment on sections that haven't been started. Do not reference the BU grants office or university policy. If something raises a concern, flag it clearly for follow-up with the faculty lead.\n\n${goalsNote ? goalsNote+'\n\n' : ''}${filledReport.join('\n\n')}`;
   try{
     const r = await callGuide(prompt);
     renderAIResponse(out, r);
@@ -4237,7 +4639,7 @@ async function askFieldGuide(fieldId, fieldLabel){
   const data = loadAll();
   const s = data.setup||{};
   const ctx = s.title ? `Project: ${s.title}\nFaculty lead: ${s.lead||''}\n` : '';
-  const prompt = `You are a helpful guide for faculty managing a Shipley Academic Innovation Fund award from the Institute for Excellence in Teaching & Learning at Boston University. Review the following draft for the "${fieldLabel}" section of their project report. Give specific, constructive feedback on this section only. Do not reference the BU grants office or university policy. If something raises a concern, direct the faculty member to contact the Institute team at excellence@bu.edu.\n\n${ctx}\n${fieldLabel}:\n${content}`;
+  const prompt = `You are a helpful guide for Institute for Excellence in Teaching & Learning staff supporting a faculty-led Shipley Academic Innovation Fund award at Boston University. Review the following draft for the "${fieldLabel}" section of this project's report. Give specific, constructive feedback on this section only. Do not reference the BU grants office or university policy. If something raises a concern, flag it clearly for follow-up with the faculty lead.\n\n${ctx}\n${fieldLabel}:\n${content}`;
   try{
     const r = await callGuide(prompt);
     renderAIResponse(out, r);
@@ -4292,7 +4694,7 @@ async function askGuide(){
   const out = document.getElementById('guide-output');
   showThinking(out);
   try{
-    const guidePrompt = `You are a helpful guide for faculty managing a Shipley Academic Innovation Fund award from the Institute for Excellence in Teaching & Learning at Boston University. Answer the faculty member's question below. Do not reference the BU grants office or university policy. If the question raises something that needs follow-up, direct the faculty member to contact the Institute team at excellence@bu.edu.\n\n${input}`;
+    const guidePrompt = `You are a helpful guide for Institute for Excellence in Teaching & Learning staff supporting a faculty-led Shipley Academic Innovation Fund award at Boston University. Answer the staff member's question below. Do not reference the BU grants office or university policy. If the question raises something that needs follow-up, flag it clearly for follow-up with the faculty lead.\n\n${input}`;
     const r = await callGuide(guidePrompt);
     renderAIResponse(out, r);
   }catch(e){
@@ -4541,6 +4943,7 @@ window.addEventListener('DOMContentLoaded',()=>{
   renderPriorityEntries();
   renderTechToolEntries();
   loadSetup();
+  loadRubric();
   loadTechConsiderations();
   loadFramework();
   renderMeasuresTable();
