@@ -3824,7 +3824,7 @@ async function callGuide(userMsg, opts){
     headers:{'Content-Type':'application/json'},
     body:JSON.stringify({
       model:'claude-sonnet-4-5',
-      max_tokens:1000,
+      max_tokens: opts.maxTokens || 1000,
       system: SYSTEM,
       messages:[{role:'user',content: userMsg + ctx}]
     })
@@ -3919,15 +3919,27 @@ Below is the Institute's RFP scoring rubric for this grant cycle, followed by th
 - Identify potential challenges with the project as scoped, and make specific, practical suggestions for strengthening the plan to mitigate the risks the rubric surfaces.
 - Close with three clearly labeled sections, in this order: "What's exciting about this proposal", "What concerns does this proposal raise", and "What impact will this project have if selected".
 
+Format your entire response as bulleted lists, not narrative paragraphs — a busy staff reviewer needs to scan this and pull out action items, not read it like an essay. One point per bullet, short and specific. Use a bullet per criterion for the scores, a bullet per red flag, a bullet per challenge/suggestion, and short bullets (not paragraphs) under each of the three closing summary sections.
+
 Only give feedback on what has actually been provided — do not reference or flag omissions for fields that weren't shared with you. Be collegial, specific, and direct. Do not reference the BU grants office or university policy. If something raises a concern that needs follow-up, flag it clearly for follow-up with the faculty lead.
 
 RFP rubric:
 ${buildRubricReferenceText()}
 
 Project scoping information:
-${filled.join('\n')}`;
+${filled.join('\n')}
+
+Your response is required to include every one of the following, in this exact order — do not omit any of them, and do not stop before reaching the end of this list:
+1. A score (1–4) and one to two sentences of rationale for EACH of the 7 rubric criteria — Health Education Focus, Digital Innovation, Interdisciplinary Collaboration, Scalability & Transferability, Assessment & Evaluation, Implementation Feasibility, Grant-Type Alignment. All 7, not a subset.
+2. The total score out of 28 and the resulting band (or, if you couldn't score all 7, what's missing to complete it).
+3. Any red flags from the reference list that apply.
+4. Potential challenges with the project as scoped, and specific, practical suggestions for strengthening the plan.
+5. "What's exciting about this proposal"
+6. "What concerns does this proposal raise"
+7. "What impact will this project have if selected"
+Use bulleted lists throughout, not narrative paragraphs. Keep each section focused rather than exhaustive so the full response fits — a complete response covering all 7 sections briefly is far more useful than a partial response that covers only the first few in depth.`;
   try{
-    const r = await callGuide(prompt, {skipCtx:true});
+    const r = await callGuide(prompt, {skipCtx:true, maxTokens:3000});
     renderAIResponse(out, r);
   }catch(e){
     out.innerHTML=`<div class="ai-response" style="border-left-color:var(--red);">Something went wrong — please try again.</div>`;
