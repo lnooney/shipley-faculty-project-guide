@@ -3911,15 +3911,7 @@ async function aiScopeReview(){
 
 ${proposalTextSection}${sectionMap}
 
-Below is the Institute's RFP scoring rubric for this grant cycle, followed by the project scoping information entered so far. Using the rubric as your evaluative lens, give the staff member one combined set of feedback:
-- Score each of the 7 rubric criteria 1–4 based on the information provided, including the full proposal text above where included. If there isn't enough information to judge a criterion, say so explicitly rather than guessing — do not invent a score.
-- Where you can score all 7 criteria, give the total (out of 28) and the resulting band. If you can't score all 7, skip the total and note what additional information would be needed to complete it.
-- Flag clearly if Digital Innovation would score 1 — that is disqualifying per the CFP, regardless of total score.
-- Note any red flags from the reference list that the information suggests, if any.
-- Identify potential challenges with the project as scoped, and make specific, practical suggestions for strengthening the plan to mitigate the risks the rubric surfaces.
-- Close with three clearly labeled sections, in this order: "What's exciting about this proposal", "What concerns does this proposal raise", and "What impact will this project have if selected".
-
-Format your entire response as bulleted lists, not narrative paragraphs — a busy staff reviewer needs to scan this and pull out action items, not read it like an essay. One point per bullet, short and specific. Use a bullet per criterion for the scores, a bullet per red flag, a bullet per challenge/suggestion, and short bullets (not paragraphs) under each of the three closing summary sections.
+Below is the Institute's RFP scoring rubric for this grant cycle, followed by the project scoping information entered so far. Using the rubric as your evaluative lens and the information provided (including the full proposal text above where included), score this project and give the staff member one combined set of feedback. If there isn't enough information to judge a criterion, say so in that criterion's bullet rather than guessing — do not invent a score.
 
 Only give feedback on what has actually been provided — do not reference or flag omissions for fields that weren't shared with you. Be collegial, specific, and direct. Do not reference the BU grants office or university policy. If something raises a concern that needs follow-up, flag it clearly for follow-up with the faculty lead.
 
@@ -3929,15 +3921,34 @@ ${buildRubricReferenceText()}
 Project scoping information:
 ${filled.join('\n')}
 
-Your response is required to include every one of the following, in this exact order — do not omit any of them, and do not stop before reaching the end of this list:
-1. A score (1–4) and one to two sentences of rationale for EACH of the 7 rubric criteria — Health Education Focus, Digital Innovation, Interdisciplinary Collaboration, Scalability & Transferability, Assessment & Evaluation, Implementation Feasibility, Grant-Type Alignment. All 7, not a subset.
-2. The total score out of 28 and the resulting band (or, if you couldn't score all 7, what's missing to complete it).
-3. Any red flags from the reference list that apply.
-4. Potential challenges with the project as scoped, and specific, practical suggestions for strengthening the plan.
-5. "What's exciting about this proposal"
-6. "What concerns does this proposal raise"
-7. "What impact will this project have if selected"
-Use bulleted lists throughout, not narrative paragraphs. Keep each section focused rather than exhaustive so the full response fits — a complete response covering all 7 sections briefly is far more useful than a partial response that covers only the first few in depth.`;
+This feedback is for internal staff use and must be fast to scan, not narrative. Reply using EXACTLY this structure, with nothing added before, after, or between sections, and no narrative outside of it. Fill in every bracketed placeholder. Each criterion bullet is capped at ONE sentence of rationale — do not exceed it. Each of the three closing sections is capped at exactly 3 sentences of plain prose — not bullets, not more than 3 sentences:
+
+RUBRIC SCORES
+- Health Education Focus: [1-4]/4 — [one-sentence rationale]
+- Digital Innovation: [1-4]/4 — [one-sentence rationale]
+- Interdisciplinary Collaboration: [1-4]/4 — [one-sentence rationale]
+- Scalability & Transferability: [1-4]/4 — [one-sentence rationale]
+- Assessment & Evaluation: [1-4]/4 — [one-sentence rationale]
+- Implementation Feasibility: [1-4]/4 — [one-sentence rationale]
+- Grant-Type Alignment: [1-4]/4 — [one-sentence rationale]
+
+TOTAL: [total]/28 — [Competitive / Conditionally Competitive — HOLD / Not Competitive]
+(If you could not score all 7 criteria, replace the line above with: TOTAL: Not calculable — [one sentence on what's missing].)
+
+RED FLAGS
+- [one bullet per applicable red flag from the reference list — if none apply, a single bullet: "None identified."]
+
+CHALLENGES & SUGGESTIONS
+- [one bullet per challenge, each pairing the challenge with a specific, practical suggestion to address it]
+
+WHAT'S EXCITING ABOUT THIS PROPOSAL
+[Exactly 3 sentences of plain prose.]
+
+WHAT CONCERNS DOES THIS PROPOSAL RAISE
+[Exactly 3 sentences of plain prose.]
+
+WHAT IMPACT WILL THIS PROJECT HAVE IF SELECTED
+[Exactly 3 sentences of plain prose.]`;
   try{
     const r = await callGuide(prompt, {skipCtx:true, maxTokens:3000});
     renderAIResponse(out, r);
