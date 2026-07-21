@@ -1840,6 +1840,8 @@ Your role: help Institute staff plan, execute, measure, and report on the Shiple
 
 When you give feedback, make it specific and grounded. Move toward something useful — name problems clearly when you see them, the way an experienced colleague would, without fanfare or excessive hedging. Avoid rhetorical parallel constructions ("you're not just doing X, you're doing Y") — they read as performative rather than genuine. Say what you see, flag what matters, and point toward the next useful step.
 
+Ground every claim in what is actually stated in the project's materials — never invent or assume the capabilities of a specific tool, platform, or LMS (e.g., Blackboard, a named AI tool) that isn't described in the proposal itself. If a proposal states that no existing tool does what they're proposing, take that at face value — assume the faculty team has already surveyed the landscape rather than second-guessing their claim.
+
 Key knowledge you bring:
 - The Shipley project framework: five milestones (Prepare → Conduct & Gather Data → Analyze & Share Findings → Reflect/Iterate/Scale → Report & Close)
 - The Impact Evaluation Framework: Problems → Objectives → Impacts → Measures & Targets → Data Collection → Data Analysis
@@ -1853,7 +1855,7 @@ Key knowledge you bring:
 
 Never refer to the Institute for Excellence in Teaching & Learning as "IETL" — always use "the Institute" or "the Institute team."
 
-Always draw on the specific project context available to you — the faculty lead's name, project title, goals, team, and framework entries — to give the staff member relevant, personalized advice about the project they are supporting.`;
+Always draw on the specific project context available to you — the faculty lead's name, project title, goals, team, and framework entries — to give the staff member relevant, personalized advice about the project they are supporting. When the full original proposal text is included in your context, always refer to it directly rather than relying only on the structured fields — details like the full list of collaborators, the implementation timeline, and budget rationale are often only present in that full text.`;
 
 // ═══════════════════════════════════════════════════════
 // STORAGE
@@ -1926,6 +1928,7 @@ const RUBRIC_ELIGIBILITY = [
 const RUBRIC_CRITERIA = [
   {id:'c1', num:1, title:'Health Education Focus', threshold:false,
    question:'Is the project fundamentally about improving how health is taught or learned — not health research?',
+   note:'A proposal can still score a 4 even if the problem statement centers faculty (e.g., faculty training, faculty workflow), as long as the proposal clearly addresses health education and clearly describes how student learning would be positively impacted as a result. Faculty-centered framing alone should not cap the score if the downstream student-learning impact is clear.',
    tiers:[
      {score:4,name:'Exemplary',text:'Proposal clearly and compellingly addresses a named, significant challenge in health education. The problem is well-defined, specific to learner needs, and distinct from healthcare research. The connection to teaching and learning is explicit and central.'},
      {score:3,name:'Proficient',text:'Educational challenge is clearly stated and connected to health teaching and learning. Minor conflation with research goals may exist but does not dominate the proposal.'},
@@ -1934,6 +1937,7 @@ const RUBRIC_CRITERIA = [
    ]},
   {id:'c2', num:2, title:'Digital Innovation', threshold:true,
    question:'⚠ THRESHOLD: a score of 1 is disqualifying per the CFP. Is digital innovation central, meaningful, and specific — not decorative or supplementary?',
+   note:"If the proposal states that no existing tool does what they're proposing, take that at face value rather than second-guessing it — assume the faculty team has already surveyed the landscape. Do not justify a score by asserting what a specific tool or platform (an LLM, the campus LMS, etc.) can or cannot do unless that capability is actually described in the proposal — ground the score only in what the proposal states.",
    tiers:[
      {score:4,name:'Exemplary',text:'Digital innovation is central, named, specific, and well-justified. Technology meaningfully changes how learners engage with content. Rationale connects the digital component directly to improved health education outcomes.'},
      {score:3,name:'Proficient',text:'A clear digital component is proposed and connected to learning outcomes. Its role is explained, though not yet fully differentiated from existing tools or practices.'},
@@ -1942,6 +1946,7 @@ const RUBRIC_CRITERIA = [
    ]},
   {id:'c3', num:3, title:'Interdisciplinary Collaboration', threshold:false,
    question:'Are multiple disciplines authentically involved, with differentiated contributions from each partner?',
+   note:"Refer to the proposal's List of Collaborators section to identify co-PIs and other collaborators — it is often more complete than whatever team members are listed in the structured project fields.",
    tiers:[
      {score:4,name:'Exemplary',text:'Two or more distinct disciplines are meaningfully involved with clear, differentiated contributions. Each partner brings expertise the others lack. Teams represent multiple schools, programs, or units.'},
      {score:3,name:'Proficient',text:'Multiple disciplines are involved. Collaboration is plausible and described, though specific contributions of each partner may not be fully elaborated.'},
@@ -1950,6 +1955,7 @@ const RUBRIC_CRITERIA = [
    ]},
   {id:'c4', num:4, title:'Scalability & Transferability', threshold:false,
    question:'Can this grow beyond the originating course and team? Will it produce reusable outputs others can adopt?',
+   note:'A 4 does not require the proposal to name a specific dissemination venue (a particular journal, conference, etc.). What matters is a genuine plan for how the work would transfer and scale — the mechanism, not a named destination.',
    tiers:[
      {score:4,name:'Exemplary',text:'Clear, specific plan for scaling beyond the original course or team. Project produces a named reusable artifact (toolkit, module, case study, framework) and articulates a dissemination pathway (publication, presentation, adoption by other programs).'},
      {score:3,name:'Proficient',text:'Scaling potential is described and plausible. A reusable output is planned. Dissemination is mentioned but not yet fully detailed.'},
@@ -1966,6 +1972,7 @@ const RUBRIC_CRITERIA = [
    ]},
   {id:'c6', num:6, title:'Implementation Feasibility', threshold:false,
    question:'Is the scope realistic within a 12-month window (completion before Fall 2027)? Are staffing, technology, and required approvals addressed?',
+   note:"Base this criterion specifically on the proposal's Project Implementation & Timeline and Budget Rationale and Budget Summary sections. This information is typically present in the full proposal text even when it is not captured in the structured project fields — do not say this information is unavailable without checking the full proposal text first.",
    tiers:[
      {score:4,name:'Exemplary',text:'Timeline is detailed, realistic, and can be completed before Fall 2027. Key milestones, dependencies, and decision points are identified. Staffing, technology, and required approvals (IRB, IT, FERPA) are addressed. Budget aligns with scope.'},
      {score:3,name:'Proficient',text:'Timeline is reasonable and scope is appropriate for completion before Fall 2027. Major milestones are identified. Some dependencies may not be fully addressed but do not represent significant project risk.'},
@@ -2000,7 +2007,8 @@ function buildRubricReferenceText(){
   const critText = RUBRIC_CRITERIA.map(c=>{
     const tiers = c.tiers.slice().sort((a,b)=>b.score-a.score)
       .map(t=>`    ${t.score} (${t.name}): ${t.text}`).join('\n');
-    return `${c.num}. ${c.title}${c.threshold?' [THRESHOLD: a score of 1 here is disqualifying per the CFP, regardless of total score]':''}\n   Question: ${c.question}\n${tiers}`;
+    const noteLine = c.note ? `\n   Scoring note: ${c.note}` : '';
+    return `${c.num}. ${c.title}${c.threshold?' [THRESHOLD: a score of 1 here is disqualifying per the CFP, regardless of total score]':''}\n   Question: ${c.question}${noteLine}\n${tiers}`;
   }).join('\n\n');
   const flagsText = RUBRIC_REDFLAGS.map((f,i)=>`${i+1}. ${f.label} — ${f.desc}`).join('\n');
   return `Eligibility screen items:\n${eligText}\n\nScoring bands: 22–28 Competitive (advance for funding consideration); 15–21 Conditionally Competitive (HOLD — flag for follow-up with the faculty team); 14 or below Not Competitive (would not have moved forward).\n\nScoring rubric — 7 criteria, 1–4 scale each, 28 points total:\n${critText}\n\nRed flag reference:\n${flagsText}`;
@@ -2071,6 +2079,13 @@ async function runProposalImport(){
   if(!text) return;
   const out = document.getElementById('import-output');
   showThinking(out);
+
+  // Persist the full proposal text so the AI Guide can always refer back to it —
+  // details like the List of Collaborators or budget rationale live here even
+  // when they aren't captured in the structured fields below.
+  const persistData = loadAll();
+  persistData.proposalText = text;
+  saveAll(persistData);
 
   const prompt = `An Institute staff member has pasted the faculty team's Shipley Academic Innovation project proposal. Extract the following information and return it as a single valid JSON object. Only populate fields where you find clear information — use null for anything you cannot confidently extract. Dates must be in YYYY-MM-DD format. Grant amount should be a number only (no $ sign). Be conservative: do not guess or infer details not present in the text.
 
@@ -3800,7 +3815,8 @@ async function callGuide(userMsg){
   const data = loadAll();
   const s = data.setup || {};
   const fw = data.framework || {};
-  const ctx = s.title ? `\n\nProject context:\nTitle: ${s.title}\nFaculty lead: ${s.lead||'not specified'}\nDept: ${s.dept||'not specified'}\nChallenge: ${s.challenge||'not specified'}\nVision: ${s.vision||'not specified'}\nAudience: ${s.audience||'not specified'}\nMedia needs: ${s.media||'not specified'}\nData analysis needs: ${s.data_needs||'not specified'}\nTechnology: ${s.tech||'not specified'}\nStudent workers: ${s.workers||'not specified'}\nAvailability constraints: ${s.availability||'not specified'}\n\nImpact Framework:\nProblems: ${fw.problems||'not yet filled'}\nObjectives: ${fw.objectives||'not yet filled'}\nImpacts: ${fw.impacts||'not yet filled'}\nMeasures: ${fw.measures||'not yet filled'}\nData collection: ${fw.collection||'not yet filled'}\nData analysis: ${fw.analysis||'not yet filled'}` : '';
+  const proposalTextBlock = data.proposalText ? `\n\nFull original proposal text (always refer to this directly for details not captured in the structured fields above — e.g., the full List of Collaborators, Project Implementation & Timeline, Budget Rationale and Budget Summary):\n${data.proposalText}` : '';
+  const ctx = s.title ? `\n\nProject context:\nTitle: ${s.title}\nFaculty lead: ${s.lead||'not specified'}\nDept: ${s.dept||'not specified'}\nChallenge: ${s.challenge||'not specified'}\nVision: ${s.vision||'not specified'}\nAudience: ${s.audience||'not specified'}\nMedia needs: ${s.media||'not specified'}\nData analysis needs: ${s.data_needs||'not specified'}\nTechnology: ${s.tech||'not specified'}\nStudent workers: ${s.workers||'not specified'}\nAvailability constraints: ${s.availability||'not specified'}\n\nImpact Framework:\nProblems: ${fw.problems||'not yet filled'}\nObjectives: ${fw.objectives||'not yet filled'}\nImpacts: ${fw.impacts||'not yet filled'}\nMeasures: ${fw.measures||'not yet filled'}\nData collection: ${fw.collection||'not yet filled'}\nData analysis: ${fw.analysis||'not yet filled'}${proposalTextBlock}` : '';
 
   const res = await fetch('https://lnooney--b59323963f5711f1a86342b51c65c3df.web.val.run',{
     method:'POST',
@@ -3877,12 +3893,13 @@ async function aiScopeReview(){
 
   const prompt = `You are a helpful guide for Institute for Excellence in Teaching & Learning staff supporting a faculty-led Shipley Academic Innovation Fund award (Health Education Innovation Grants, AY 2026–27) at Boston University.
 
-Below is the Institute's RFP scoring rubric for this grant cycle, followed by the project scoping information entered so far. Using the rubric as your evaluative lens, give the staff member one combined set of feedback:
-- Score each of the 7 rubric criteria 1–4 based on the information provided. If there isn't enough information to judge a criterion, say so explicitly rather than guessing — do not invent a score.
+Below is the Institute's RFP scoring rubric for this grant cycle, followed by the project scoping information entered so far. Your context also includes the full original proposal text if it has been imported — always check it directly for details (like the full List of Collaborators, implementation timeline, and budget rationale) that may not appear in the structured fields below. Using the rubric as your evaluative lens, give the staff member one combined set of feedback:
+- Score each of the 7 rubric criteria 1–4 based on the information provided, including the full proposal text where available. If there isn't enough information to judge a criterion, say so explicitly rather than guessing — do not invent a score.
 - Where you can score all 7 criteria, give the total (out of 28) and the resulting band. If you can't score all 7, skip the total and note what additional information would be needed to complete it.
 - Flag clearly if Digital Innovation would score 1 — that is disqualifying per the CFP, regardless of total score.
 - Note any red flags from the reference list that the information suggests, if any.
 - Identify potential challenges with the project as scoped, and make specific, practical suggestions for strengthening the plan to mitigate the risks the rubric surfaces.
+- Close with three clearly labeled sections, in this order: "What's exciting about this proposal", "What concerns does this proposal raise", and "What impact will this project have if selected".
 
 Only give feedback on what has actually been provided — do not reference or flag omissions for fields that weren't shared with you. Be collegial, specific, and direct. Do not reference the BU grants office or university policy. If something raises a concern that needs follow-up, flag it clearly for follow-up with the faculty lead.
 
