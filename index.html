@@ -902,21 +902,21 @@ a:hover{color:var(--navy);}
     <div class="grid2">
       <div class="field">
         <label>Project start date</label>
-        <input type="date" id="s-start" style="width:100%;"/>
+        <input type="date" id="s-start" value="2026-09-01" style="width:100%;"/>
       </div>
       <div class="field">
         <label>Anticipated end date</label>
-        <input type="date" id="s-end" style="width:100%;"/>
+        <input type="date" id="s-end" value="2027-08-31" style="width:100%;"/>
       </div>
     </div>
+    <div class="hint" style="margin-top:-8px;margin-bottom:14px;">This grant cycle runs one calendar year, Fall 2026 – Summer 2027. Adjust these dates only if this project's actual timeline differs.</div>
     <div class="field">
       <label id="grant-amount-label">Grant award amount</label>
       <div class="radio-pill-group" role="radiogroup" aria-labelledby="grant-amount-label">
-        <label class="radio-pill"><input type="radio" name="s-grant" value="5000" onchange="onGrantAmountChange(this)"/> $5,000</label>
         <label class="radio-pill"><input type="radio" name="s-grant" value="10000" onchange="onGrantAmountChange(this)"/> $10,000</label>
         <label class="radio-pill"><input type="radio" name="s-grant" value="25000" onchange="onGrantAmountChange(this)"/> $25,000</label>
       </div>
-      <div class="hint">This selects the project's budget template.</div>
+      <div class="hint">This selects the project's budget template. (No $5,000 tier this funding round.)</div>
     </div>
   </div>
 
@@ -1532,11 +1532,6 @@ a:hover{color:var(--navy);}
 
     <div class="section-label">My Shipley award is:</div>
     <div class="budget-tpl-selector">
-      <div class="budget-tpl-card" id="btpl-5k" onclick="selectBudgetTemplate('5k')">
-        <div class="tpl-amount">$5,000</div>
-        <div class="tpl-label">Pilot award</div>
-        <div class="tpl-periods">2 terms · 1 academic year</div>
-      </div>
       <div class="budget-tpl-card" id="btpl-10k" onclick="selectBudgetTemplate('10k')">
         <div class="tpl-amount">$10,000</div>
         <div class="tpl-label">Standard award</div>
@@ -1928,7 +1923,7 @@ const RUBRIC_ELIGIBILITY = [
 const RUBRIC_CRITERIA = [
   {id:'c1', num:1, title:'Health Education Focus', threshold:false,
    question:'Is the project fundamentally about improving how health is taught or learned — not health research?',
-   note:'A proposal can still score a 4 even if the problem statement centers faculty (e.g., faculty training, faculty workflow), as long as the proposal clearly addresses health education and clearly describes how student learning would be positively impacted as a result. Faculty-centered framing alone should not cap the score if the downstream student-learning impact is clear.',
+   note:"Base this criterion on the proposal's \"Teaching & Learning Challenge/Opportunity\" and \"Proposed Academic Innovation\" sections specifically. A proposal can still score a 4 even if the problem statement centers faculty (e.g., faculty training, faculty workflow), as long as it clearly addresses health education and clearly describes how student learning would be positively impacted as a result — faculty-centered framing alone should not cap the score if the downstream student-learning impact is clear. A project also counts as health-education-focused even if the tool or approach could be used more generally — it does not need to be exclusive to health education. That generalizability is not a weakness here; it is a strength that should be credited under Scalability & Transferability (Criterion 4) instead, not held against this criterion.",
    tiers:[
      {score:4,name:'Exemplary',text:'Proposal clearly and compellingly addresses a named, significant challenge in health education. The problem is well-defined, specific to learner needs, and distinct from healthcare research. The connection to teaching and learning is explicit and central.'},
      {score:3,name:'Proficient',text:'Educational challenge is clearly stated and connected to health teaching and learning. Minor conflation with research goals may exist but does not dominate the proposal.'},
@@ -1946,7 +1941,7 @@ const RUBRIC_CRITERIA = [
    ]},
   {id:'c3', num:3, title:'Interdisciplinary Collaboration', threshold:false,
    question:'Are multiple disciplines authentically involved, with differentiated contributions from each partner?',
-   note:"Refer to the proposal's List of Collaborators section to identify co-PIs and other collaborators — it is often more complete than whatever team members are listed in the structured project fields.",
+   note:"Read the full proposal text for every person named and their role — check the List of Collaborators section AND any Letters of Support, not just one or the other. If a named collaborator's department or discipline differs from the lead's, count them as an interdisciplinary collaborator. This is often more complete than whatever team members are listed in the structured project fields.",
    tiers:[
      {score:4,name:'Exemplary',text:'Two or more distinct disciplines are meaningfully involved with clear, differentiated contributions. Each partner brings expertise the others lack. Teams represent multiple schools, programs, or units.'},
      {score:3,name:'Proficient',text:'Multiple disciplines are involved. Collaboration is plausible and described, though specific contributions of each partner may not be fully elaborated.'},
@@ -1955,7 +1950,7 @@ const RUBRIC_CRITERIA = [
    ]},
   {id:'c4', num:4, title:'Scalability & Transferability', threshold:false,
    question:'Can this grow beyond the originating course and team? Will it produce reusable outputs others can adopt?',
-   note:'A 4 does not require the proposal to name a specific dissemination venue (a particular journal, conference, etc.). What matters is a genuine plan for how the work would transfer and scale — the mechanism, not a named destination.',
+   note:"A 4 does not require a specific plan or a named dissemination venue (a particular journal, conference, etc.) — clear, valuable potential for the work to scale and transfer is sufficient on its own. A tool developed for health education that could also transfer to other disciplines should be credited highly here — that generalizability is a strength for this criterion, not a weakness for Criterion 1 (Health Education Focus).",
    tiers:[
      {score:4,name:'Exemplary',text:'Clear, specific plan for scaling beyond the original course or team. Project produces a named reusable artifact (toolkit, module, case study, framework) and articulates a dissemination pathway (publication, presentation, adoption by other programs).'},
      {score:3,name:'Proficient',text:'Scaling potential is described and plausible. A reusable output is planned. Dissemination is mentioned but not yet fully detailed.'},
@@ -1964,6 +1959,7 @@ const RUBRIC_CRITERIA = [
    ]},
   {id:'c5', num:5, title:'Assessment & Evaluation', threshold:false,
    question:'Is there a clear, rigorous plan to measure and document impact on learners?',
+   note:"Do not reference this project's Impact Evaluation Framework for this score — that framework is filled in later, during project execution, so it will always be empty at proposal-review time, and an empty framework is never a detriment. Base this criterion only on the proposal text's own stated intent to measure impact. A fully developed methodology is not expected at this stage — that gets built out after funding is received — so a clear, credible statement of intent to measure impact is sufficient for a strong score here.",
    tiers:[
      {score:4,name:'Exemplary',text:'Specific, measurable learning outcomes are identified. Data collection methods are named and appropriate. Assessment connects to stated impacts and is feasible within the project timeline. IRB considerations addressed where applicable.'},
      {score:3,name:'Proficient',text:'Learning outcomes are stated and an evaluation approach is described. Data collection methods are mentioned. Plan is reasonable but may lack specificity or methodological rigor.'},
@@ -1972,7 +1968,7 @@ const RUBRIC_CRITERIA = [
    ]},
   {id:'c6', num:6, title:'Implementation Feasibility', threshold:false,
    question:'Is the scope realistic within a 12-month window (completion before Fall 2027)? Are staffing, technology, and required approvals addressed?',
-   note:"Base this criterion specifically on the proposal's Project Implementation & Timeline and Budget Rationale and Budget Summary sections. This information is typically present in the full proposal text even when it is not captured in the structured project fields — do not say this information is unavailable without checking the full proposal text first.",
+   note:"Base this criterion specifically on the proposal's \"Budget Rationale\", \"Project Implementation & Timeline\", \"Shipley Center Health Education Innovation Award Proposal\", and \"Budget Summary\" sections. This information is typically present in the full proposal text even when it is not captured in the structured project fields — do not say this information is unavailable without checking the full proposal text first.",
    tiers:[
      {score:4,name:'Exemplary',text:'Timeline is detailed, realistic, and can be completed before Fall 2027. Key milestones, dependencies, and decision points are identified. Staffing, technology, and required approvals (IRB, IT, FERPA) are addressed. Budget aligns with scope.'},
      {score:3,name:'Proficient',text:'Timeline is reasonable and scope is appropriate for completion before Fall 2027. Major milestones are identified. Some dependencies may not be fully addressed but do not represent significant project risk.'},
@@ -1981,6 +1977,7 @@ const RUBRIC_CRITERIA = [
    ]},
   {id:'c7', num:7, title:'Grant-Type Alignment', threshold:false,
    question:'Does the project scope, budget, and readiness match the requested tier? Seed ($10K): early-stage pilots. Innovation ($25K): program-level, broader adoption.',
+   note:'Determine the grant type directly from the dollar amount given in the project scoping information below — $10,000 is a Seed Grant, $25,000 is an Innovation Grant. Do not infer the grant type from the narrative; the amount already tells you which tier was requested.',
    tiers:[
      {score:4,name:'Exemplary',text:'Project scope, budget, and goals are well-matched to the requested grant type. Seed applications are clearly early-stage; Innovation applications demonstrate readiness for program-level work with measurable outcomes and broader adoption potential.'},
      {score:3,name:'Proficient',text:'Scope generally aligns with the grant type. Minor recalibration may be suggested but overall fit is appropriate.'},
@@ -3811,12 +3808,16 @@ function prefillSnapshot(){
 // ═══════════════════════════════════════════════════════
 // CLAUDE API
 // ═══════════════════════════════════════════════════════
-async function callGuide(userMsg){
-  const data = loadAll();
-  const s = data.setup || {};
-  const fw = data.framework || {};
-  const proposalTextBlock = data.proposalText ? `\n\nFull original proposal text (always refer to this directly for details not captured in the structured fields above — e.g., the full List of Collaborators, Project Implementation & Timeline, Budget Rationale and Budget Summary):\n${data.proposalText}` : '';
-  const ctx = s.title ? `\n\nProject context:\nTitle: ${s.title}\nFaculty lead: ${s.lead||'not specified'}\nDept: ${s.dept||'not specified'}\nChallenge: ${s.challenge||'not specified'}\nVision: ${s.vision||'not specified'}\nAudience: ${s.audience||'not specified'}\nMedia needs: ${s.media||'not specified'}\nData analysis needs: ${s.data_needs||'not specified'}\nTechnology: ${s.tech||'not specified'}\nStudent workers: ${s.workers||'not specified'}\nAvailability constraints: ${s.availability||'not specified'}\n\nImpact Framework:\nProblems: ${fw.problems||'not yet filled'}\nObjectives: ${fw.objectives||'not yet filled'}\nImpacts: ${fw.impacts||'not yet filled'}\nMeasures: ${fw.measures||'not yet filled'}\nData collection: ${fw.collection||'not yet filled'}\nData analysis: ${fw.analysis||'not yet filled'}${proposalTextBlock}` : '';
+async function callGuide(userMsg, opts){
+  opts = opts || {};
+  let ctx = '';
+  if(!opts.skipCtx){
+    const data = loadAll();
+    const s = data.setup || {};
+    const fw = data.framework || {};
+    const proposalTextBlock = data.proposalText ? `\n\nFull original proposal text (always refer to this directly for details not captured in the structured fields above — e.g., the full List of Collaborators, Project Implementation & Timeline, Budget Rationale and Budget Summary):\n${data.proposalText}` : '';
+    ctx = s.title ? `\n\nProject context:\nTitle: ${s.title}\nFaculty lead: ${s.lead||'not specified'}\nDept: ${s.dept||'not specified'}\nChallenge: ${s.challenge||'not specified'}\nVision: ${s.vision||'not specified'}\nAudience: ${s.audience||'not specified'}\nMedia needs: ${s.media||'not specified'}\nData analysis needs: ${s.data_needs||'not specified'}\nTechnology: ${s.tech||'not specified'}\nStudent workers: ${s.workers||'not specified'}\nAvailability constraints: ${s.availability||'not specified'}\n\nImpact Framework:\nProblems: ${fw.problems||'not yet filled'}\nObjectives: ${fw.objectives||'not yet filled'}\nImpacts: ${fw.impacts||'not yet filled'}\nMeasures: ${fw.measures||'not yet filled'}\nData collection: ${fw.collection||'not yet filled'}\nData analysis: ${fw.analysis||'not yet filled'}${proposalTextBlock}` : '';
+  }
 
   const res = await fetch('https://lnooney--b59323963f5711f1a86342b51c65c3df.web.val.run',{
     method:'POST',
@@ -3860,6 +3861,8 @@ function saveAIResponseAsPDF(id){
   win.document.close();setTimeout(()=>win.print(),500);
 }
 
+const RUBRIC_GRANT_TYPE_BY_AMOUNT = {10000:'Seed Grant ($10,000)', 25000:'Innovation Grant ($25,000)'};
+
 async function aiScopeReview(){
   const btn = document.getElementById('btn-scope-feedback');
   if(!btn) return;
@@ -3874,6 +3877,7 @@ async function aiScopeReview(){
   if(s.title)        filled.push(`Project title: ${s.title}`);
   if(s.lead)         filled.push(`Faculty lead: ${s.lead}`);
   if(s.dept)         filled.push(`Department: ${s.dept}`);
+  if(s.grant)         filled.push(`Grant amount: $${Number(s.grant).toLocaleString()} — ${RUBRIC_GRANT_TYPE_BY_AMOUNT[s.grant] || 'grant type not determined from this amount'}`);
   if(s.challenge)    filled.push(`Teaching/learning challenge: ${s.challenge}`);
   if(s.vision)       filled.push(`Vision: ${s.vision}`);
   if(s.audience)     filled.push(`Target audience: ${s.audience}`);
@@ -3891,10 +3895,24 @@ async function aiScopeReview(){
     return;
   }
 
+  const proposalTextSection = data.proposalText
+    ? `FULL ORIGINAL PROPOSAL TEXT — read this in its entirety before scoring anything below. It is organized into named sections; locate each one explicitly rather than skimming:\n\n${data.proposalText}\n\n---\n\n`
+    : '';
+
+  const sectionMap = `Section-to-criterion map — find these named sections in the full proposal text above (if included) before scoring the corresponding criterion:
+- Health Education Focus (Criterion 1): "Teaching & Learning Challenge/Opportunity" and "Proposed Academic Innovation" sections
+- Digital Innovation (Criterion 2): the same sections — check what is actually described about the digital/technology component
+- Interdisciplinary Collaboration (Criterion 3): "List of Collaborators" section and any Letters of Support — note every named person and role
+- Assessment & Evaluation (Criterion 5): the proposal's own stated plan to measure impact — do not use this project's Impact Evaluation Framework, it is unrelated and filled in later
+- Implementation Feasibility (Criterion 6): "Budget Rationale", "Project Implementation & Timeline", "Shipley Center Health Education Innovation Award Proposal", and "Budget Summary" sections
+- Grant-Type Alignment (Criterion 7): determined directly from the grant amount in the project scoping information below — do not infer it from the narrative`;
+
   const prompt = `You are a helpful guide for Institute for Excellence in Teaching & Learning staff supporting a faculty-led Shipley Academic Innovation Fund award (Health Education Innovation Grants, AY 2026–27) at Boston University.
 
-Below is the Institute's RFP scoring rubric for this grant cycle, followed by the project scoping information entered so far. Your context also includes the full original proposal text if it has been imported — always check it directly for details (like the full List of Collaborators, implementation timeline, and budget rationale) that may not appear in the structured fields below. Using the rubric as your evaluative lens, give the staff member one combined set of feedback:
-- Score each of the 7 rubric criteria 1–4 based on the information provided, including the full proposal text where available. If there isn't enough information to judge a criterion, say so explicitly rather than guessing — do not invent a score.
+${proposalTextSection}${sectionMap}
+
+Below is the Institute's RFP scoring rubric for this grant cycle, followed by the project scoping information entered so far. Using the rubric as your evaluative lens, give the staff member one combined set of feedback:
+- Score each of the 7 rubric criteria 1–4 based on the information provided, including the full proposal text above where included. If there isn't enough information to judge a criterion, say so explicitly rather than guessing — do not invent a score.
 - Where you can score all 7 criteria, give the total (out of 28) and the resulting band. If you can't score all 7, skip the total and note what additional information would be needed to complete it.
 - Flag clearly if Digital Innovation would score 1 — that is disqualifying per the CFP, regardless of total score.
 - Note any red flags from the reference list that the information suggests, if any.
@@ -3909,7 +3927,7 @@ ${buildRubricReferenceText()}
 Project scoping information:
 ${filled.join('\n')}`;
   try{
-    const r = await callGuide(prompt);
+    const r = await callGuide(prompt, {skipCtx:true});
     renderAIResponse(out, r);
   }catch(e){
     out.innerHTML=`<div class="ai-response" style="border-left-color:var(--red);">Something went wrong — please try again.</div>`;
