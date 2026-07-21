@@ -237,28 +237,6 @@ a:hover{color:var(--navy);}
 .radio-pill:has(input:checked){border-color:var(--orange);background:var(--orange-pale);color:var(--navy);}
 .radio-pill input[type="radio"]{accent-color:var(--orange);width:15px;height:15px;}
 
-/* ── PROPOSAL REVIEW RUBRIC ── */
-.rubric-check-row{display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:0.5px solid var(--border);}
-.rubric-check-row:last-child{border-bottom:none;}
-.rubric-check-row input[type="checkbox"]{margin-top:3px;width:16px;height:16px;accent-color:var(--orange);flex-shrink:0;cursor:pointer;}
-.rubric-check-label{font-size:13px;color:var(--navy);font-weight:500;line-height:1.5;cursor:pointer;}
-.rubric-check-note{font-size:12px;color:var(--text3);margin-top:2px;line-height:1.5;}
-.rubric-check-note.rubric-autofail{color:var(--amber-text);font-weight:600;}
-.rc-criterion{border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin-bottom:12px;background:var(--bg);}
-.rc-criterion.threshold{border-color:var(--amber);border-width:1.5px;}
-.rc-head{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:6px;}
-.rc-title{font-weight:700;color:var(--navy);font-size:14px;}
-.rc-badge{font-size:12px;font-weight:700;color:var(--navy);background:#fff;border:1px solid var(--border);border-radius:20px;padding:2px 10px;white-space:nowrap;}
-.rc-question{font-size:13px;color:var(--text2);margin-bottom:10px;line-height:1.5;}
-.rc-scale{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:4px;}
-.rc-scale label{display:flex;align-items:center;gap:5px;padding:6px 12px;border:1.5px solid var(--border);border-radius:20px;font-size:12px;font-weight:600;color:var(--navy);cursor:pointer;background:#fff;}
-.rc-scale label:has(input:checked){border-color:var(--orange);background:var(--orange-pale);}
-.rc-scale input{accent-color:var(--orange);}
-.rc-guide{font-size:12px;color:var(--text2);margin-top:8px;}
-.rc-guide summary{cursor:pointer;color:var(--blue-text);font-weight:500;}
-.rc-tier{margin-top:8px;line-height:1.5;}
-.rubric-summary-band{font-family:var(--serif);font-size:20px;color:var(--navy);}
-
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
 .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;}
 
@@ -893,96 +871,6 @@ a:hover{color:var(--navy);}
         </div>
       </div>
       <div id="import-output" style="margin-top:14px;" aria-live="polite"></div>
-    </div>
-  </div>
-
-  <!-- Proposal Review Rubric -->
-  <div class="card" id="rubric-card">
-    <div class="card-header">
-      <div class="card-icon" aria-hidden="true">🧭</div>
-      <div>
-        <div class="card-title">Proposal Review Rubric</div>
-        <div class="card-sub">Health Education Innovation Grants, AY 2026–27 — RFP scoring rubric</div>
-      </div>
-      <button onclick="toggleRubricCard()" style="margin-left:auto;" aria-expanded="false" aria-controls="rubric-body" id="rubric-toggle">Expand ▼</button>
-    </div>
-    <div id="rubric-body" style="display:none;">
-      <div class="alert alert-blue">
-        This is the Institute's RFP scoring rubric for this grant cycle. Score the project against it to flag risk areas early and identify where the plan may need to be strengthened — this isn't about revisiting the funding decision, which has already been made. Entries here are pulled in automatically when you request scoping feedback below.
-      </div>
-
-      <div class="section-label" style="margin-top:6px;">Part 2 — Eligibility Screen</div>
-      <div class="hint" style="margin-bottom:10px;">From the original RFP review process. Use this to note anything that may still need documentation or follow-up.</div>
-      <div id="rubric-eligibility"></div>
-      <div id="rubric-eligibility-alert"></div>
-
-      <div class="section-label" style="margin-top:20px;">Scoring Bands</div>
-      <div class="hint" style="margin-bottom:10px;">Total score is out of 28 points across the seven criteria below.</div>
-      <table style="width:100%;border-collapse:collapse;font-size:13px;margin-bottom:16px;">
-        <tr style="border-bottom:0.5px solid var(--border);"><td style="padding:6px 4px;font-weight:700;white-space:nowrap;">22–28</td><td style="padding:6px 4px;font-weight:600;">Competitive</td><td style="padding:6px 4px;color:var(--text3);">Advance for funding consideration</td></tr>
-        <tr style="border-bottom:0.5px solid var(--border);"><td style="padding:6px 4px;font-weight:700;white-space:nowrap;">15–21</td><td style="padding:6px 4px;font-weight:600;">Conditionally Competitive</td><td style="padding:6px 4px;color:var(--text3);">HOLD — flag for follow-up with the faculty team</td></tr>
-        <tr><td style="padding:6px 4px;font-weight:700;white-space:nowrap;">≤ 14</td><td style="padding:6px 4px;font-weight:600;">Not Competitive</td><td style="padding:6px 4px;color:var(--text3);">Would not have moved forward</td></tr>
-      </table>
-
-      <div class="section-label" style="margin-top:20px;">Part 3 — Scoring Rubric</div>
-      <div class="hint" style="margin-bottom:10px;">Score each criterion 1–4. A score of 1 on Digital Innovation is disqualifying per the CFP, regardless of total score.</div>
-      <div id="rubric-criteria"></div>
-      <div class="alert alert-navy" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
-        <span>Total rubric score</span>
-        <span class="rubric-summary-band" id="rubric-total-display">— / 28</span>
-      </div>
-      <div id="rubric-band-display" style="margin-bottom:14px;"></div>
-
-      <div class="section-label" style="margin-top:20px;">Part 4 — Red Flag Reference</div>
-      <div class="hint" style="margin-bottom:10px;">Flag any concerns identified. Flags 1 and 2 are the most disqualifying per the CFP's explicit language.</div>
-      <div id="rubric-redflags"></div>
-
-      <div class="section-label" style="margin-top:20px;">Part 5 — Recommendation Summary</div>
-      <div class="hint" style="margin-bottom:10px;">One form per application, from the original review. Kept here as reference as you support this project going forward.</div>
-      <div class="grid2">
-        <div class="field"><label>Applicant name(s)</label><input type="text" id="rub-applicant" style="width:100%;" oninput="saveRubric()"/></div>
-        <div class="field"><label>Project title</label><input type="text" id="rub-title" style="width:100%;" oninput="saveRubric()"/></div>
-      </div>
-      <div class="grid2">
-        <div class="field"><label>Reviewer</label><input type="text" id="rub-reviewer" style="width:100%;" oninput="saveRubric()"/></div>
-        <div class="field"><label>Date of review</label><input type="date" id="rub-date" style="width:100%;" oninput="saveRubric()"/></div>
-      </div>
-      <div class="field">
-        <label>Grant type recommendation</label>
-        <div class="radio-pill-group" role="radiogroup" aria-label="Grant type recommendation">
-          <label class="radio-pill"><input type="radio" name="rub-granttype" value="seed" onchange="saveRubric()"/> Seed Grant ($10K)</label>
-          <label class="radio-pill"><input type="radio" name="rub-granttype" value="innovation" onchange="saveRubric()"/> Innovation Grant ($25K)</label>
-          <label class="radio-pill"><input type="radio" name="rub-granttype" value="none" onchange="saveRubric()"/> Do Not Fund</label>
-        </div>
-      </div>
-      <div class="field">
-        <label>Funding recommendation</label>
-        <div class="radio-pill-group" role="radiogroup" aria-label="Funding recommendation">
-          <label class="radio-pill"><input type="radio" name="rub-fundingrec" value="fund" onchange="saveRubric()"/> Fund</label>
-          <label class="radio-pill"><input type="radio" name="rub-fundingrec" value="hold" onchange="saveRubric()"/> HOLD</label>
-          <label class="radio-pill"><input type="radio" name="rub-fundingrec" value="decline" onchange="saveRubric()"/> Do Not Fund</label>
-        </div>
-      </div>
-      <div class="field">
-        <label>Key strengths (2–3)</label>
-        <textarea id="rub-strengths" style="width:100%;min-height:60px;" oninput="saveRubric()"></textarea>
-      </div>
-      <div class="field">
-        <label>Key concerns (2–3)</label>
-        <textarea id="rub-concerns" style="width:100%;min-height:60px;" oninput="saveRubric()"></textarea>
-      </div>
-      <div class="field">
-        <label>Email outreach needed? (Conditionally Competitive only)</label>
-        <select id="rub-outreach" style="width:100%;" onchange="saveRubric()">
-          <option value="">— Select —</option>
-          <option value="no">No — sufficient competitive applications received</option>
-          <option value="yes">Yes — reach out to the faculty team to strengthen or clarify weak areas</option>
-        </select>
-      </div>
-      <div class="field">
-        <label>Notes</label>
-        <textarea id="rub-notes" style="width:100%;min-height:70px;" oninput="saveRubric()"></textarea>
-      </div>
     </div>
   </div>
 
@@ -2105,205 +1993,17 @@ const RUBRIC_REDFLAGS = [
   {id:'f8', label:'Technology/Compliance Dependencies Unaddressed', desc:'Student data, voice data, or AI tools used without reference to IRB, FERPA, BU IT vetting, or accessibility requirements.'},
 ];
 
-let rubricState = {eligibility:{}, scores:{}, redFlags:{}, summary:{}};
-
-function toggleRubricCard(){
-  const body = document.getElementById('rubric-body');
-  const btn = document.getElementById('rubric-toggle');
-  const collapsed = body.style.display==='none';
-  body.style.display = collapsed ? 'block' : 'none';
-  btn.textContent = collapsed ? 'Collapse ▲' : 'Expand ▼';
-  btn.setAttribute('aria-expanded', collapsed ? 'true' : 'false');
-}
-
-function renderRubricEligibility(){
-  const el = document.getElementById('rubric-eligibility');
-  if(!el) return;
-  el.innerHTML = RUBRIC_ELIGIBILITY.map(item=>{
-    const checked = rubricState.eligibility[item.id] ? 'checked' : '';
-    return `<div class="rubric-check-row">
-      <input type="checkbox" id="relig-${item.id}" ${checked} onchange="rubricState.eligibility['${item.id}']=this.checked;updateRubricEligibilityAlert();saveRubric();"/>
-      <div>
-        <label for="relig-${item.id}" class="rubric-check-label">${item.label}</label>
-        <div class="rubric-check-note${item.autoFail?' rubric-autofail':''}">${item.note}</div>
-      </div>
-    </div>`;
-  }).join('');
-  updateRubricEligibilityAlert();
-}
-
-function updateRubricEligibilityAlert(){
-  const el = document.getElementById('rubric-eligibility-alert');
-  if(!el) return;
-  const unmet = RUBRIC_ELIGIBILITY.filter(i=>!rubricState.eligibility[i.id]);
-  if(!unmet.length){ el.innerHTML=''; return; }
-  const autoFailUnmet = unmet.filter(i=>i.autoFail);
-  if(autoFailUnmet.length){
-    el.innerHTML = `<div class="alert alert-amber" style="margin-top:10px;"><strong>Automatic-fail item${autoFailUnmet.length!==1?'s':''} unmet:</strong> ${autoFailUnmet.map(i=>i.label).join('; ')}. Worth confirming this was resolved before or during award — flag it if not.</div>`;
-  } else {
-    el.innerHTML = `<div class="alert alert-navy" style="margin-top:10px;">${unmet.length} eligibility item${unmet.length!==1?'s':''} unmet: ${unmet.map(i=>i.label).join('; ')}.</div>`;
-  }
-}
-
-function renderRubricCriteria(){
-  const el = document.getElementById('rubric-criteria');
-  if(!el) return;
-  el.innerHTML = RUBRIC_CRITERIA.map(c=>{
-    const sortedTiers = c.tiers.slice().sort((a,b)=>b.score-a.score);
-    const scaleHtml = sortedTiers.map(t=>{
-      const checked = rubricState.scores[c.id]===t.score ? 'checked' : '';
-      return `<label><input type="radio" name="rc-${c.id}" value="${t.score}" ${checked} onchange="setRubricScore('${c.id}',${t.score})"/> ${t.score} — ${t.name}</label>`;
-    }).join('');
-    const guideHtml = sortedTiers.map(t=>`<div class="rc-tier"><strong>${t.score} — ${t.name}:</strong> ${t.text}</div>`).join('');
-    const curScore = rubricState.scores[c.id];
-    return `<div class="rc-criterion${c.threshold?' threshold':''}" id="rc-crit-${c.id}">
-      <div class="rc-head">
-        <span class="rc-title">${c.num}. ${c.title}${c.threshold?' ⚠':''}</span>
-        <span class="rc-badge" id="rc-badge-${c.id}">${curScore?curScore:'—'} / 4</span>
-      </div>
-      <div class="rc-question">${c.question}</div>
-      <div class="rc-scale" role="radiogroup" aria-label="Score for ${c.title}">${scaleHtml}</div>
-      <div id="rc-flag-${c.id}"></div>
-      <details class="rc-guide"><summary>View scoring guide</summary>${guideHtml}</details>
-    </div>`;
-  }).join('');
-  RUBRIC_CRITERIA.forEach(c=>updateRubricThresholdFlag(c.id));
-}
-
-function setRubricScore(critId, score){
-  rubricState.scores[critId] = score;
-  const badge = document.getElementById('rc-badge-'+critId);
-  if(badge) badge.textContent = score+' / 4';
-  updateRubricThresholdFlag(critId);
-  updateRubricTotal();
-  saveRubric();
-}
-
-function updateRubricThresholdFlag(critId){
-  const crit = RUBRIC_CRITERIA.find(c=>c.id===critId);
-  const flagEl = document.getElementById('rc-flag-'+critId);
-  if(!crit || !flagEl) return;
-  if(crit.threshold && rubricState.scores[critId]===1){
-    flagEl.innerHTML = `<div class="alert alert-amber" style="margin:8px 0 0;">Score of 1 is disqualifying per the CFP — flag this project regardless of total score.</div>`;
-  } else {
-    flagEl.innerHTML = '';
-  }
-}
-
-function updateRubricTotal(){
-  const scores = RUBRIC_CRITERIA.map(c=>rubricState.scores[c.id]).filter(s=>typeof s==='number');
-  const total = scores.reduce((a,b)=>a+b,0);
-  const answered = scores.length;
-  const totalDisplay = document.getElementById('rubric-total-display');
-  if(totalDisplay) totalDisplay.textContent = (answered ? total : '—') + ' / 28';
-  const bandEl = document.getElementById('rubric-band-display');
-  if(!bandEl) return;
-  if(answered < RUBRIC_CRITERIA.length){
-    const remaining = RUBRIC_CRITERIA.length - answered;
-    bandEl.innerHTML = `<div class="hint">${remaining} criteri${remaining!==1?'a':'on'} not yet scored.</div>`;
-    return;
-  }
-  let band, cls;
-  if(total>=22){ band='Competitive'; cls='alert-green'; }
-  else if(total>=15){ band='Conditionally Competitive — HOLD'; cls='alert-amber'; }
-  else { band='Not Competitive'; cls='alert-amber'; }
-  bandEl.innerHTML = `<div class="alert ${cls}"><strong>${total} / 28 — ${band}</strong></div>`;
-}
-
-function renderRubricRedFlags(){
-  const el = document.getElementById('rubric-redflags');
-  if(!el) return;
-  el.innerHTML = RUBRIC_REDFLAGS.map((f,i)=>{
-    const checked = rubricState.redFlags[f.id] ? 'checked' : '';
-    return `<div class="rubric-check-row">
-      <input type="checkbox" id="rflag-${f.id}" ${checked} onchange="rubricState.redFlags['${f.id}']=this.checked;saveRubric();"/>
-      <div>
-        <label for="rflag-${f.id}" class="rubric-check-label">${i+1}. ${f.label}</label>
-        <div class="rubric-check-note">${f.desc}</div>
-      </div>
-    </div>`;
-  }).join('');
-}
-
-function saveRubric(){
-  rubricState.summary = {
-    applicant: document.getElementById('rub-applicant')?.value||'',
-    title: document.getElementById('rub-title')?.value||'',
-    reviewer: document.getElementById('rub-reviewer')?.value||'',
-    date: document.getElementById('rub-date')?.value||'',
-    grantType: document.querySelector('input[name="rub-granttype"]:checked')?.value||'',
-    fundingRec: document.querySelector('input[name="rub-fundingrec"]:checked')?.value||'',
-    strengths: document.getElementById('rub-strengths')?.value||'',
-    concerns: document.getElementById('rub-concerns')?.value||'',
-    outreach: document.getElementById('rub-outreach')?.value||'',
-    notes: document.getElementById('rub-notes')?.value||'',
-  };
-  const data = loadAll();
-  data.rubric = rubricState;
-  saveAll(data);
-}
-
-function loadRubric(){
-  const data = loadAll();
-  const r = data.rubric || {};
-  rubricState = {
-    eligibility: r.eligibility || {},
-    scores: r.scores || {},
-    redFlags: r.redFlags || {},
-    summary: r.summary || {},
-  };
-  renderRubricEligibility();
-  renderRubricCriteria();
-  renderRubricRedFlags();
-  updateRubricTotal();
-  const s = rubricState.summary;
-  const setup = data.setup || {};
-  const applicantEl = document.getElementById('rub-applicant');
-  if(applicantEl) applicantEl.value = s.applicant || setup.lead || '';
-  const titleEl = document.getElementById('rub-title');
-  if(titleEl) titleEl.value = s.title || setup.title || '';
-  const reviewerEl = document.getElementById('rub-reviewer');
-  if(reviewerEl) reviewerEl.value = s.reviewer || '';
-  const dateEl = document.getElementById('rub-date');
-  if(dateEl) dateEl.value = s.date || '';
-  if(s.grantType){ const r2=document.querySelector(`input[name="rub-granttype"][value="${s.grantType}"]`); if(r2) r2.checked=true; }
-  if(s.fundingRec){ const r3=document.querySelector(`input[name="rub-fundingrec"][value="${s.fundingRec}"]`); if(r3) r3.checked=true; }
-  const strengthsEl = document.getElementById('rub-strengths');
-  if(strengthsEl) strengthsEl.value = s.strengths || '';
-  const concernsEl = document.getElementById('rub-concerns');
-  if(concernsEl) concernsEl.value = s.concerns || '';
-  const outreachEl = document.getElementById('rub-outreach');
-  if(outreachEl) outreachEl.value = s.outreach || '';
-  const notesEl = document.getElementById('rub-notes');
-  if(notesEl) notesEl.value = s.notes || '';
-}
-
-// Builds a plain-text summary of the rubric for the AI prompt and exports.
-function buildRubricSummaryText(){
-  const lines = [];
-  const unmet = RUBRIC_ELIGIBILITY.filter(i=>!rubricState.eligibility[i.id]);
-  if(unmet.length){
-    lines.push(`Eligibility screen — unmet items: ${unmet.map(i=>i.label + (i.autoFail?' (AUTO-FAIL item)':'')).join('; ')}`);
-  } else {
-    lines.push('Eligibility screen: all items marked met.');
-  }
-  const scored = RUBRIC_CRITERIA.filter(c=>typeof rubricState.scores[c.id]==='number');
-  if(scored.length){
-    lines.push('Rubric scores: ' + scored.map(c=>`${c.title} ${rubricState.scores[c.id]}/4`).join('; '));
-    const total = scored.reduce((a,c)=>a+rubricState.scores[c.id],0);
-    if(scored.length===RUBRIC_CRITERIA.length){
-      let band = total>=22?'Competitive':total>=15?'Conditionally Competitive (HOLD)':'Not Competitive';
-      lines.push(`Total rubric score: ${total}/28 (${band})`);
-    }
-    if(rubricState.scores.c2===1) lines.push('Digital Innovation scored 1/4 — disqualifying per CFP, regardless of total score.');
-  }
-  const flagged = RUBRIC_REDFLAGS.filter(f=>rubricState.redFlags[f.id]);
-  if(flagged.length) lines.push('Red flags noted: ' + flagged.map(f=>f.label).join('; '));
-  const s = rubricState.summary || {};
-  if(s.strengths) lines.push(`Reviewer-noted strengths: ${s.strengths}`);
-  if(s.concerns) lines.push(`Reviewer-noted concerns: ${s.concerns}`);
-  if(s.notes) lines.push(`Reviewer notes: ${s.notes}`);
-  return lines.join('\n');
+// Serializes the rubric as reference text for the AI Guide to apply itself —
+// this is not shown in the UI; staff never fill out the rubric by hand.
+function buildRubricReferenceText(){
+  const eligText = RUBRIC_ELIGIBILITY.map(i=>`- ${i.label}${i.autoFail?' [AUTO-FAIL if unmet]':''} (${i.note})`).join('\n');
+  const critText = RUBRIC_CRITERIA.map(c=>{
+    const tiers = c.tiers.slice().sort((a,b)=>b.score-a.score)
+      .map(t=>`    ${t.score} (${t.name}): ${t.text}`).join('\n');
+    return `${c.num}. ${c.title}${c.threshold?' [THRESHOLD: a score of 1 here is disqualifying per the CFP, regardless of total score]':''}\n   Question: ${c.question}\n${tiers}`;
+  }).join('\n\n');
+  const flagsText = RUBRIC_REDFLAGS.map((f,i)=>`${i+1}. ${f.label} — ${f.desc}`).join('\n');
+  return `Eligibility screen items:\n${eligText}\n\nScoring bands: 22–28 Competitive (advance for funding consideration); 15–21 Conditionally Competitive (HOLD — flag for follow-up with the faculty team); 14 or below Not Competitive (would not have moved forward).\n\nScoring rubric — 7 criteria, 1–4 scale each, 28 points total:\n${critText}\n\nRed flag reference:\n${flagsText}`;
 }
 
 function togglePasteFallback(){
@@ -4151,7 +3851,6 @@ async function aiScopeReview(){
   setButtonLoading(btn, true);
   showThinking(out);
   saveSetup();
-  saveRubric();
   const data = loadAll();
   const s = data.setup || {};
   // Build context only from fields the staff member has actually filled in
@@ -4170,18 +3869,28 @@ async function aiScopeReview(){
   if(s.availability) filled.push(`Availability constraints: ${s.availability}`);
   if(s.priorities)   filled.push(`Priorities: ${s.priorities}`);
 
-  const rubricSummary = buildRubricSummaryText();
-  const rubricScored = RUBRIC_CRITERIA.some(c=>typeof rubricState.scores[c.id]==='number');
-  const rubricFlagged = RUBRIC_REDFLAGS.some(f=>rubricState.redFlags[f.id]) || RUBRIC_ELIGIBILITY.some(i=>!rubricState.eligibility[i.id]);
-  const hasRubricInput = rubricScored || rubricFlagged;
-
-  if(filled.length === 0 && !hasRubricInput){
+  if(filled.length === 0){
     out.innerHTML = `<div class="ai-response"><strong>Nothing to review yet</strong> — fill in some fields on this page first, then ask for feedback.</div>`;
     setButtonLoading(btn, false);
     return;
   }
 
-  const prompt = `You are a helpful guide for Institute for Excellence in Teaching & Learning staff supporting a faculty-led Shipley Academic Innovation Fund award (Health Education Innovation Grants, AY 2026–27) at Boston University. Review the project scoping information and RFP rubric assessment below, and give the staff member one combined set of feedback: identify potential challenges with the project as scoped, and make specific suggestions for strengthening the plan to mitigate the risks reflected in the rubric scores and flags. Only give feedback on what has actually been provided — do not reference or flag omissions for fields that weren't shared with you. Be collegial, specific, and direct. Do not reference the BU grants office or university policy. If something raises a concern that needs follow-up, flag it clearly for follow-up with the faculty lead.\n\nProject scoping information:\n${filled.length ? filled.join('\n') : '(none provided)'}\n\nRFP rubric assessment:\n${rubricSummary || '(not yet scored)'}`;
+  const prompt = `You are a helpful guide for Institute for Excellence in Teaching & Learning staff supporting a faculty-led Shipley Academic Innovation Fund award (Health Education Innovation Grants, AY 2026–27) at Boston University.
+
+Below is the Institute's RFP scoring rubric for this grant cycle, followed by the project scoping information entered so far. Using the rubric as your evaluative lens, give the staff member one combined set of feedback:
+- Score each of the 7 rubric criteria 1–4 based on the information provided. If there isn't enough information to judge a criterion, say so explicitly rather than guessing — do not invent a score.
+- Where you can score all 7 criteria, give the total (out of 28) and the resulting band. If you can't score all 7, skip the total and note what additional information would be needed to complete it.
+- Flag clearly if Digital Innovation would score 1 — that is disqualifying per the CFP, regardless of total score.
+- Note any red flags from the reference list that the information suggests, if any.
+- Identify potential challenges with the project as scoped, and make specific, practical suggestions for strengthening the plan to mitigate the risks the rubric surfaces.
+
+Only give feedback on what has actually been provided — do not reference or flag omissions for fields that weren't shared with you. Be collegial, specific, and direct. Do not reference the BU grants office or university policy. If something raises a concern that needs follow-up, flag it clearly for follow-up with the faculty lead.
+
+RFP rubric:
+${buildRubricReferenceText()}
+
+Project scoping information:
+${filled.join('\n')}`;
   try{
     const r = await callGuide(prompt);
     renderAIResponse(out, r);
@@ -4943,7 +4652,6 @@ window.addEventListener('DOMContentLoaded',()=>{
   renderPriorityEntries();
   renderTechToolEntries();
   loadSetup();
-  loadRubric();
   loadTechConsiderations();
   loadFramework();
   renderMeasuresTable();
