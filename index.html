@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Shipley Academic Innovation Project Guide</title>
 <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
-<script src="https://cdn.jsdelivr.net/npm/mammoth@1.8.0/mammoth.browser.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/exceljs@4.3.0/dist/exceljs.min.js"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -536,26 +535,6 @@ a:hover{color:var(--navy);}
   background:var(--navy);color:#fff;font-size:14px;padding:8px 16px;border-radius:4px;z-index:9999;
 }
 .skip-link:focus{left:8px;top:8px;width:auto;height:auto;}
-/* File upload drop zone */
-.upload-zone{
-  border:2px dashed var(--border2);border-radius:var(--radius-lg);
-  padding:2rem 1.5rem;text-align:center;cursor:pointer;
-  transition:all .15s;background:#fff;position:relative;
-}
-.upload-zone:hover,.upload-zone.drag-over{border-color:var(--orange);background:var(--orange-pale);}
-.upload-zone input[type="file"]{
-  position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;
-}
-.upload-zone .uz-icon{font-size:32px;margin-bottom:8px;}
-.upload-zone .uz-label{font-size:14px;font-weight:500;color:var(--navy);margin-bottom:4px;}
-.upload-zone .uz-sub{font-size:12px;color:var(--text3);}
-.upload-ready{
-  display:flex;align-items:center;gap:12px;
-  background:var(--green-bg);border:1px solid var(--green);
-  border-radius:var(--radius);padding:12px 16px;margin-top:12px;
-}
-.upload-ready .ur-name{font-size:13px;font-weight:600;color:var(--green-text);flex:1;}
-.upload-ready .ur-meta{font-size:12px;color:var(--green-text);opacity:0.8;}
 
 /* Support service learn-more links */
 .service-link{
@@ -734,10 +713,10 @@ a:hover{color:var(--navy);}
   <div class="modal-box">
     <div class="modal-title" id="modal-new-title">Start a new project</div>
     <div class="modal-warn">⚠ This will clear your current workspace. Any changes since this project was last saved will be lost.</div>
-    <div class="modal-body">Save your current project first if you want to be able to return to it.</div>
+    <div class="modal-body" id="modal-new-body">Save your current project first if you want to be able to return to it.</div>
     <div class="modal-actions">
       <button onclick="closeNewProjectModal()">Cancel</button>
-      <button onclick="saveAndStartNew()">Save first, then start new</button>
+      <button onclick="saveAndStartNew()" id="modal-new-savebtn">Save first, then start new</button>
       <button class="btn-primary" onclick="confirmStartNew()">Start new without saving</button>
     </div>
   </div>
@@ -798,53 +777,25 @@ a:hover{color:var(--navy);}
       <div class="card-icon" aria-hidden="true">📥</div>
       <div>
         <div class="card-title">Import from Proposal</div>
-        <div class="card-sub">Upload your proposal. The guide will pre-fill the tool with what it finds.</div>
+        <div class="card-sub">Paste the proposal text. The guide will pre-fill the tool with what it finds.</div>
       </div>
       <button onclick="toggleImportCard()" style="margin-left:auto;" aria-expanded="false" aria-controls="import-body" id="import-toggle">Expand ▼</button>
     </div>
     <div id="import-body" style="display:none;">
       <div class="alert alert-blue" style="margin-bottom:14px;">
-        The guide will extract project details from your uploaded proposal, filling in fields throughout the tool. Be sure to review every field for accuracy.
+        The guide will extract project details from the pasted proposal, filling in fields throughout the tool. Be sure to review every field for accuracy.
       </div>
 
-      <div class="upload-zone" id="upload-zone"
-        ondragover="event.preventDefault();this.classList.add('drag-over')"
-        ondragleave="this.classList.remove('drag-over')"
-        ondrop="handleFileDrop(event)">
-        <input type="file" id="import-file" accept=".docx,.txt,.text"
-          aria-label="Upload proposal document"
-          onchange="handleFileSelect(this.files[0])"/>
-        <div class="uz-icon" aria-hidden="true">📄</div>
-        <div class="uz-label">Click to upload or drag and drop</div>
-        <div class="uz-sub">Word document (.docx) or plain text (.txt)</div>
+      <div class="field">
+        <label for="import-text">Paste proposal text</label>
+        <textarea id="import-text" placeholder="Paste the full proposal text here…" style="width:100%;min-height:160px;"
+          oninput="const btn=document.getElementById('import-btn');const has=this.value.trim().length>0;btn.disabled=!has;btn.style.opacity=has?'1':'0.5';btn.style.cursor=has?'pointer':'not-allowed';"></textarea>
       </div>
 
-      <div id="upload-ready" class="upload-ready" style="display:none;" role="status">
-        <span aria-hidden="true">✓</span>
-        <span class="ur-name" id="ur-filename"></span>
-        <span class="ur-meta" id="ur-wordcount"></span>
-        <button onclick="clearImportFile()" class="btn-sm">Remove</button>
-      </div>
-
-      <div class="hint" style="margin-top:8px;">
-        For PDFs: open the file in Preview or your browser, select all text (⌘A), copy, then
-        <button onclick="togglePasteFallback()" class="btn-bare">paste it here instead</button>.
-      </div>
-
-      <div id="paste-fallback" style="display:none;margin-top:12px;">
-        <div class="field">
-          <label for="import-text">Paste proposal text</label>
-          <textarea id="import-text" placeholder="Paste your full proposal text here…" style="width:100%;min-height:100px;"
-            oninput="const btn=document.getElementById('import-btn');const has=this.value.trim().length>0;btn.disabled=!has;btn.style.opacity=has?'1':'0.5';btn.style.cursor=has?'pointer':'not-allowed';"></textarea>
-        </div>
-      </div>
-
-      <div id="import-actions" style="display:none;margin-top:14px;">
-        <div style="display:flex;gap:10px;flex-wrap:wrap;">
-          <button class="btn-primary" onclick="runProposalImport()" id="import-btn" disabled
-            style="opacity:0.5;cursor:not-allowed;">Import from proposal ↗</button>
-          <button onclick="clearImportFile()" class="btn-sm">Clear</button>
-        </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;">
+        <button class="btn-primary" onclick="runProposalImport()" id="import-btn" disabled
+          style="opacity:0.5;cursor:not-allowed;">Import from proposal ↗</button>
+        <button onclick="clearImportFile()" class="btn-sm">Clear</button>
       </div>
       <div id="import-output" style="margin-top:14px;" aria-live="polite"></div>
     </div>
@@ -1073,7 +1024,7 @@ a:hover{color:var(--navy);}
 
   <div style="display:flex;gap:10px;justify-content:flex-end;">
     <button onclick="saveSetup()" class="btn-primary">Save project setup</button>
-    <button onclick="aiScopeReview()" class="btn-gold" id="btn-scope-feedback">Get scoping &amp; rubric feedback ↗</button>
+    <button onclick="aiScopeReview()" class="btn-gold" id="btn-scope-feedback">Get proposal &amp; scoping feedback ↗</button>
   </div>
   <div id="scope-output" style="margin-top:16px;"></div>
 
@@ -1814,8 +1765,6 @@ function switchTab(name, btn){
 // ═══════════════════════════════════════════════════════
 // PROPOSAL IMPORT
 // ═══════════════════════════════════════════════════════
-let importedText = '';
-
 function toggleImportCard(){
   const body = document.getElementById('import-body');
   const btn = document.getElementById('import-toggle');
@@ -1867,13 +1816,13 @@ const RUBRIC_CRITERIA = [
      {score:1,name:'Insufficient',text:'Project is single-discipline. No meaningful collaboration across fields or programs. Does not align with CFP emphasis on convergent, interdisciplinary approaches.'},
    ]},
   {id:'c4', num:4, title:'Scalability & Transferability', threshold:false,
-   question:'Can this grow beyond the originating course and team? Will it produce reusable outputs others can adopt?',
-   note:"A 4 does not require a specific plan or a named dissemination venue (a particular journal, conference, etc.) — clear, valuable potential for the work to scale and transfer is sufficient on its own. A tool developed for health education that could also transfer to other disciplines should be credited highly here — that generalizability is a strength for this criterion, not a weakness for Criterion 1 (Health Education Focus).",
+   question:'Can this be sustained without continued Shipley funding, and can the framework or model transfer to disciplines beyond the one proposed?',
+   note:"Weight two things above all else, in this order: (1) sustainability without continued Shipley funding — most importantly, whether the faculty member's department would realistically commit to covering ongoing costs (e.g., software licenses) if the project succeeds, and (2) potential to transfer the framework or model to other disciplines beyond the proposed project's scope. Research dissemination (publications, presentations, conference talks) is a minor, secondary signal — do not weight it comparably to sustainability or cross-discipline transferability, and do not let a strong dissemination plan substitute for a weak answer on either of those two. A 4 does not require a specific formal plan for either — clear, credible potential is enough.",
    tiers:[
-     {score:4,name:'Exemplary',text:'Clear, specific plan for scaling beyond the original course or team. Project produces a named reusable artifact (toolkit, module, case study, framework) and articulates a dissemination pathway (publication, presentation, adoption by other programs).'},
-     {score:3,name:'Proficient',text:'Scaling potential is described and plausible. A reusable output is planned. Dissemination is mentioned but not yet fully detailed.'},
-     {score:2,name:'Developing',text:'Scaling is referenced as a goal but not planned. Outputs are unclear or confined to the originating context. Limited evidence that other programs could adopt the work.'},
-     {score:1,name:'Insufficient',text:"Project benefits only the applicant's course or team. No reusable products planned. No dissemination strategy. Impact ends when funding ends."},
+     {score:4,name:'Exemplary',text:"Credible case that the project continues without Shipley funding — e.g., the department would plausibly cover ongoing costs like licenses if it succeeds — combined with a credible case that the framework or model could transfer to other disciplines beyond the one proposed. Dissemination, if mentioned, is a bonus and not the basis for this score."},
+     {score:3,name:'Proficient',text:'A plausible (if not yet confirmed or committed) path to sustaining the work without Shipley funding, or a credible case for transfer to other disciplines — at least one of the two is clearly addressed, though not both as strongly as a 4.'},
+     {score:2,name:'Developing',text:"Sustainability without Shipley funding is vague or unaddressed — unclear whether the department would continue covering any ongoing costs — and transfer to other disciplines is only vaguely gestured at, if at all."},
+     {score:1,name:'Insufficient',text:'No indication the project continues without Shipley funding, and no case made for transfer beyond the proposed project. Leaning on a dissemination plan (publications, presentations) does not substitute for either — impact ends when funding ends.'},
    ]},
   {id:'c5', num:5, title:'Assessment & Evaluation', threshold:false,
    question:'Is there a clear, rigorous plan to measure and document impact on learners?',
@@ -1929,68 +1878,15 @@ function buildRubricReferenceText(){
   return `Eligibility screen items:\n${eligText}\n\nScoring bands: 22–28 Competitive (advance for funding consideration); 15–21 Conditionally Competitive (HOLD — flag for follow-up with the faculty team); 14 or below Not Competitive (would not have moved forward).\n\nScoring rubric — 7 criteria, 1–4 scale each, 28 points total:\n${critText}\n\nRed flag reference:\n${flagsText}`;
 }
 
-function togglePasteFallback(){
-  const el = document.getElementById('paste-fallback');
-  el.style.display = el.style.display==='none' ? 'block' : 'none';
-  if(el.style.display==='block') document.getElementById('import-actions').style.display='block';
-}
-
-function handleFileDrop(e){
-  e.preventDefault();
-  document.getElementById('upload-zone').classList.remove('drag-over');
-  const file = e.dataTransfer.files[0];
-  if(file) handleFileSelect(file);
-}
-
-function handleFileSelect(file){
-  if(!file) return;
-  const ext = file.name.split('.').pop().toLowerCase();
-  if(ext==='txt'||ext==='text'){
-    const reader = new FileReader();
-    reader.onload = e => setImportReady(e.target.result, file.name);
-    reader.readAsText(file);
-  } else if(ext==='docx'){
-    const reader = new FileReader();
-    reader.onload = e => {
-      mammoth.extractRawText({arrayBuffer: e.target.result})
-        .then(r => setImportReady(r.value, file.name))
-        .catch(() => {
-          document.getElementById('import-output').innerHTML =
-            `<div class="alert alert-amber">Could not read this Word document. Try saving it as a .txt file from Word and uploading again, or use the paste option below.</div>`;
-        });
-    };
-    reader.readAsArrayBuffer(file);
-  } else {
-    document.getElementById('import-output').innerHTML =
-      `<div class="alert alert-amber">Unsupported file type. Please upload a .docx or .txt file.</div>`;
-  }
-}
-
-function setImportReady(text, filename){
-  importedText = text;
-  const wordCount = text.trim().split(/\s+/).length;
-  document.getElementById('ur-filename').textContent = filename;
-  document.getElementById('ur-wordcount').textContent = wordCount.toLocaleString()+' words';
-  document.getElementById('upload-ready').style.display = 'flex';
-  document.getElementById('import-actions').style.display = 'block';
-  const btn = document.getElementById('import-btn');
-  btn.disabled = false; btn.style.opacity='1'; btn.style.cursor='pointer';
-}
-
 function clearImportFile(){
-  importedText = '';
-  document.getElementById('import-file').value = '';
   document.getElementById('import-text').value = '';
-  document.getElementById('upload-ready').style.display = 'none';
   document.getElementById('import-output').innerHTML = '';
-  document.getElementById('import-actions').style.display = 'none';
   const btn = document.getElementById('import-btn');
   btn.disabled = true; btn.style.opacity='0.5'; btn.style.cursor='not-allowed';
 }
 
 async function runProposalImport(){
-  // Use uploaded file text, or fall back to pasted text
-  const text = importedText || document.getElementById('import-text').value.trim();
+  const text = document.getElementById('import-text').value.trim();
   if(!text) return;
   const out = document.getElementById('import-output');
   showThinking(out);
@@ -4575,6 +4471,15 @@ function confirmSaveProject(){
 
 // ── New project modal ──
 function openNewProjectModal(){
+  const id = getActiveId();
+  const projects = loadProjects();
+  const alreadySaved = !!(id && projects[id]);
+  document.getElementById('modal-new-body').textContent = alreadySaved
+    ? "Save changes you've made to this project before starting a new project."
+    : 'Save your current project first if you want to be able to return to it.';
+  document.getElementById('modal-new-savebtn').textContent = alreadySaved
+    ? 'Save changes, then start new'
+    : 'Save first, then start new';
   document.getElementById('modal-new').classList.remove('hidden');
 }
 function closeNewProjectModal(){ document.getElementById('modal-new').classList.add('hidden'); }
