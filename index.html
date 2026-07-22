@@ -316,29 +316,6 @@ a:hover{color:var(--navy);}
 }
 .fw-table-remove:hover{color:var(--red);background:none;}
 
-/* ── FRAMEWORK TRANSCRIPT ── */
-.fw-transcript{
-  max-height:320px;overflow-y:auto;
-  border:0.5px solid var(--border);border-radius:var(--radius);
-  padding:12px;background:#fff;margin-bottom:10px;
-  display:flex;flex-direction:column;gap:10px;
-}
-.fw-transcript:empty::before{
-  content:'Your conversation will appear here as you talk through your framework.';
-  font-size:13px;color:var(--text3);font-style:italic;
-}
-.fw-msg-user{
-  align-self:flex-end;background:var(--navy);color:#fff;
-  border-radius:12px 12px 2px 12px;padding:8px 12px;
-  font-size:13px;max-width:85%;line-height:1.5;
-}
-.fw-msg-guide{
-  align-self:flex-start;background:var(--gold-pale);
-  border-left:3px solid var(--gold);
-  border-radius:0 12px 12px 12px;padding:8px 12px;
-  font-size:13px;max-width:90%;line-height:1.6;white-space:pre-wrap;
-}
-
 /* ── PER-SECTION GUIDE REVEAL ── */
 .fw-section-guide{
   border-top:0.5px solid var(--border);
@@ -723,7 +700,7 @@ a:hover{color:var(--navy);}
           <div class="proj-dd-header">Saved projects</div>
           <div id="proj-dd-list"></div>
           <div class="proj-dd-actions">
-            <button class="btn-sm btn-primary" onclick="openSaveModal();closeProjDropdown();">Save current</button>
+            <button class="btn-sm btn-primary" id="btn-save-current" onclick="openSaveModal();closeProjDropdown();">Save Open Project</button>
             <button class="btn-sm" onclick="openNewProjectModal();closeProjDropdown();">New project</button>
           </div>
         </div>
@@ -756,7 +733,7 @@ a:hover{color:var(--navy);}
 <div class="modal-overlay hidden" id="modal-new" role="dialog" aria-modal="true" aria-labelledby="modal-new-title">
   <div class="modal-box">
     <div class="modal-title" id="modal-new-title">Start a new project</div>
-    <div class="modal-warn">⚠ This will clear your current workspace. Any unsaved work will be lost.</div>
+    <div class="modal-warn">⚠ This will clear your current workspace. Any changes since this project was last saved will be lost.</div>
     <div class="modal-body">Save your current project first if you want to be able to return to it.</div>
     <div class="modal-actions">
       <button onclick="closeNewProjectModal()">Cancel</button>
@@ -770,7 +747,7 @@ a:hover{color:var(--navy);}
 <div class="modal-overlay hidden" id="modal-load" role="dialog" aria-modal="true" aria-labelledby="modal-load-title">
   <div class="modal-box">
     <div class="modal-title" id="modal-load-title">Switch project</div>
-    <div class="modal-warn">⚠ Any unsaved changes to your current workspace will be lost.</div>
+    <div class="modal-warn">⚠ Any changes since your current workspace was last saved will be lost.</div>
     <div class="modal-body">Load <strong id="modal-load-name"></strong>?</div>
     <div class="modal-actions">
       <button onclick="closeLoadModal()">Cancel</button>
@@ -1120,35 +1097,7 @@ a:hover{color:var(--navy);}
       This framework is the backbone of this project's impact measurement. Work through each section from top to bottom — each one builds on the last. Use the guided conversation below to think through responses before filling in the framework. You can return to this and refine it as the project evolves.
     </p>
     <div class="alert alert-blue">
-      <strong>How to use this:</strong> Start with the AI conversation below to talk through your thinking. Then work down each section — click "Answer questions to draft this section," answer the short prompts, and your guide will draft that section in a few concise bullets you can review and edit. Each section builds on what was drafted before it. Your entries are saved automatically and will inform your survey design, data collection plan, and final report.
-    </div>
-  </div>
-
-  <!-- Guided Framework Conversation -->
-  <div class="card">
-    <div class="card-header">
-      <div class="card-icon">💬</div>
-      <div>
-        <div class="card-title">Framework Conversation</div>
-        <div class="card-sub">Use these prompts to think through your whole framework before filling it in</div>
-      </div>
-    </div>
-    <div class="guide-chips">
-      <button class="chip" onclick="impactChip(this)">Help me think through what I want students to take away from this experience — at the end of the course and in 5 or 10 years?</button>
-      <button class="chip" onclick="impactChip(this)">Help me think through how I'll know students have achieved this goal.</button>
-      <button class="chip" onclick="impactChip(this)">Help me think through what learning experiences will help students get there.</button>
-      <button class="chip" onclick="impactChip(this)">Help me think through the challenge or problem this project addresses.</button>
-      <button class="chip" onclick="impactChip(this)">Help me think through what evidence of student success would look like.</button>
-      <button class="chip" onclick="impactChip(this)">Help me think through how I'll measure students' success.</button>
-    </div>
-    <div class="fw-transcript" id="fw-transcript"></div>
-    <div class="field" style="margin-bottom:8px;">
-      <textarea id="impact-input" placeholder="Type your thoughts or use a prompt above to get started…" style="width:100%;min-height:65px;"></textarea>
-    </div>
-    <div style="display:flex;gap:8px;flex-wrap:wrap;">
-      <button class="btn-gold" onclick="askImpact()">Ask your guide ↗</button>
-      <button onclick="clearFrameworkConversation()">Clear conversation</button>
-      <button onclick="printFrameworkTranscript()">⬇ Save / Print conversation</button>
+      <strong>How to use this:</strong> Work down each section — click "Answer questions to draft this section," answer the short prompts, and your guide will draft that section in a few concise bullets you can review and edit. Each section builds on what was drafted before it. Your entries are saved automatically and will inform your survey design, data collection plan, and final report.
     </div>
   </div>
 
@@ -2552,59 +2501,6 @@ function loadFramework(){
   if(fw.collection_rows && fw.collection_rows.length){ fwCollectionRows = fw.collection_rows; }
   else if(!fw.collection_rows){ fwCollectionRows = []; }
   renderCollectionTable();
-  loadFrameworkTranscript();
-}
-
-// ── Framework transcript ──────────────────────────────────
-let frameworkTranscript = [];
-
-function loadFrameworkTranscript(){
-  const data = loadAll();
-  frameworkTranscript = data.framework_transcript || [];
-  renderTranscript();
-}
-
-function renderTranscript(){
-  const el = document.getElementById('fw-transcript');
-  if(!el) return;
-  el.innerHTML = frameworkTranscript.map(msg=>
-    `<div class="${msg.role==='user'?'fw-msg-user':'fw-msg-guide'}">${msg.content}</div>`
-  ).join('');
-  el.scrollTop = el.scrollHeight;
-}
-
-function saveTranscript(){
-  const data = loadAll();
-  data.framework_transcript = frameworkTranscript;
-  saveAll(data);
-}
-
-function clearFrameworkConversation(){
-  frameworkTranscript = [];
-  saveTranscript();
-  renderTranscript();
-  document.getElementById('impact-input').value = '';
-}
-
-function printFrameworkTranscript(){
-  const data = loadAll();
-  const title = (data.setup&&data.setup.title)||'Shipley Project';
-  const date = new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});
-  let html = `<html><head><style>
-    body{font-family:Georgia,serif;max-width:680px;margin:40px auto;color:#222;font-size:14px;line-height:1.7;}
-    h1{font-size:18px;color:#1a2744;margin-bottom:4px;}.meta{font-size:12px;color:#888;margin-bottom:24px;}
-    .user{background:#1a2744;color:#fff;padding:8px 12px;border-radius:8px;margin:8px 0;}
-    .guide{background:#fff7ed;border-left:3px solid #ed974f;padding:8px 12px;margin:8px 0;white-space:pre-wrap;}
-    .label{font-size:11px;font-weight:600;color:#888;margin-bottom:2px;}
-  </style></head><body>
-  <h1>${title}</h1>
-  <div class="meta">Impact Framework Conversation · ${date}</div>`;
-  frameworkTranscript.forEach(msg=>{
-    if(msg.role==='user') html+=`<div class="label">You</div><div class="user">${msg.content}</div>`;
-    else html+=`<div class="label">Guide</div><div class="guide">${msg.content}</div>`;
-  });
-  html+='</body></html>';
-  const w=window.open('','_blank');w.document.write(html);w.document.close();w.print();
 }
 
 // ── Section guide: scaffolded sub-questions that draft each section ──────
@@ -4060,45 +3956,6 @@ WHAT IMPACT WILL THIS PROJECT HAVE IF SELECTED
   }finally{ setButtonLoading(btn, false); }
 }
 
-async function askImpact(){
-  const inputEl = document.getElementById('impact-input');
-  const input = inputEl.value.trim();
-  if(!input) return;
-  frameworkTranscript.push({role:'user', content:input});
-  inputEl.value = '';
-  renderTranscript();
-  const transcriptEl = document.getElementById('fw-transcript');
-  // Show thinking in transcript
-  const thinkingId = 'fw-thinking-'+Date.now();
-  const thinkDiv = document.createElement('div');
-  thinkDiv.id = thinkingId;
-  thinkDiv.className = 'fw-msg-guide';
-  thinkDiv.innerHTML = '<div class="dots"><span></span><span></span><span></span></div>';
-  transcriptEl.appendChild(thinkDiv);
-  transcriptEl.scrollTop = transcriptEl.scrollHeight;
-  const history = frameworkTranscript.slice(0,-1).map(m=>({role:m.role,content:m.content}));
-  const systemNote = 'You are a helpful guide for Institute for Excellence in Teaching & Learning staff supporting a faculty-led Shipley Academic Innovation Fund award at Boston University. The staff member is using a backwards design approach to help the faculty lead think through the Impact Evaluation Framework. Help them think through goals, evidence, and measurement approach. Be conversational, ask clarifying questions, and build on what has been said. Do not reference the BU grants office or university policy. If something raises a concern, flag it clearly for follow-up with the faculty lead.';
-  try{
-    const prompt = systemNote + '\n\nConversation so far:\n' + history.map(m=>`${m.role==='user'?'Staff':'Guide'}: ${m.content}`).join('\n') + '\n\nStaff: ' + input;
-    const r = await callGuide(prompt);
-    document.getElementById(thinkingId)?.remove();
-    frameworkTranscript.push({role:'assistant', content:r});
-    saveTranscript();
-    renderTranscript();
-  }catch(e){
-    document.getElementById(thinkingId)?.remove();
-    const errDiv = document.createElement('div');
-    errDiv.className = 'fw-msg-guide';
-    errDiv.textContent = 'Something went wrong — please try again.';
-    transcriptEl.appendChild(errDiv);
-  }
-}
-
-function impactChip(el){
-  document.getElementById('impact-input').value = el.textContent.trim();
-  document.getElementById('impact-input').focus();
-}
-
 async function reviewFramework(){
   const out = document.getElementById('framework-review');
   showThinking(out);
@@ -4631,6 +4488,8 @@ function updateHeaderLabel(){
   const projects = loadProjects();
   const label = id && projects[id] ? projects[id].name : 'No project loaded';
   document.getElementById('proj-switcher-label').textContent = label;
+  const saveBtn = document.getElementById('btn-save-current');
+  if(saveBtn) saveBtn.textContent = (id && projects[id]) ? 'Save changes to open project' : 'Save Open Project';
 }
 
 function renderProjDropdown(){
@@ -4818,7 +4677,6 @@ window.addEventListener('DOMContentLoaded',()=>{
   loadFrameworkAnswers();
   renderMeasuresTable();
   renderCollectionTable();
-  loadFrameworkTranscript();
   loadBudget();
   loadReport();
   renderMilestones();
