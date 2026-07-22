@@ -351,7 +351,6 @@ a:hover{color:var(--navy);}
   background:#fff;border:1px solid var(--border2);border-radius:6px;
   padding:8px 10px;
 }
-.fw-section-guide-output{margin-top:8px;}
 .fw-header-num{
   width:28px;height:28px;border-radius:50%;
   background:rgba(255,255,255,0.2);
@@ -1121,7 +1120,7 @@ a:hover{color:var(--navy);}
       This framework is the backbone of this project's impact measurement. Work through each section from top to bottom — each one builds on the last. Use the guided conversation below to think through responses before filling in the framework. You can return to this and refine it as the project evolves.
     </p>
     <div class="alert alert-blue">
-      <strong>How to use this:</strong> Start with the AI conversation below to talk through your thinking. Then fill in each section from top to bottom. Your entries are saved automatically and will inform your survey design, data collection plan, and final report.
+      <strong>How to use this:</strong> Start with the AI conversation below to talk through your thinking. Then work down each section — click "Answer questions to draft this section," answer the short prompts, and your guide will draft that section in a few concise bullets you can review and edit. Each section builds on what was drafted before it. Your entries are saved automatically and will inform your survey design, data collection plan, and final report.
     </div>
   </div>
 
@@ -1175,15 +1174,10 @@ a:hover{color:var(--navy);}
           <textarea id="fw-problems" placeholder="e.g. Students struggle to transfer conceptual understanding to novel problems; low engagement in large lecture format…" oninput="autoSaveFramework()"></textarea>
         </div>
         <div class="fw-section-guide" id="fsg-problems">
-          <div class="fw-question" style="margin-bottom:8px;">Ask your guide for help with this section</div>
-          <textarea id="fsg-input-problems" placeholder="What would you like help thinking through about your challenges?" style="width:100%;min-height:55px;font-size:13px;"></textarea>
-          <div style="display:flex;gap:8px;margin-top:6px;">
-            <button class="btn-sm btn-gold" onclick="askSectionGuide('problems')">Ask your guide ↗</button>
-          </div>
-          <div class="fw-section-guide-output" id="fsg-out-problems"></div>
+          <div id="fwd-problems"><!-- rendered by renderFwSubquestions() --></div>
         </div>
         <div style="padding:10px 16px;border-top:0.5px solid var(--border);">
-          <button class="btn-sm" onclick="toggleSectionGuide('problems')">Ask your guide for help with this section</button>
+          <button class="btn-sm" onclick="toggleSectionGuide('problems')">Answer questions to draft this section</button>
         </div>
       </div>
       <div class="fw-connector">↓</div>
@@ -1201,15 +1195,10 @@ a:hover{color:var(--navy);}
           <textarea id="fw-objectives" placeholder="e.g. Students will demonstrate improved ability to apply concepts to unfamiliar contexts; increase active participation by 40%…" oninput="autoSaveFramework()"></textarea>
         </div>
         <div class="fw-section-guide" id="fsg-objectives">
-          <div class="fw-question" style="margin-bottom:8px;">Ask your guide for help with this section</div>
-          <textarea id="fsg-input-objectives" placeholder="What would you like help thinking through about your objectives?" style="width:100%;min-height:55px;font-size:13px;"></textarea>
-          <div style="display:flex;gap:8px;margin-top:6px;">
-            <button class="btn-sm btn-gold" onclick="askSectionGuide('objectives')">Ask your guide ↗</button>
-          </div>
-          <div class="fw-section-guide-output" id="fsg-out-objectives"></div>
+          <div id="fwd-objectives"><!-- rendered by renderFwSubquestions() --></div>
         </div>
         <div style="padding:10px 16px;border-top:0.5px solid var(--border);">
-          <button class="btn-sm" onclick="toggleSectionGuide('objectives')">Ask your guide for help with this section</button>
+          <button class="btn-sm" onclick="toggleSectionGuide('objectives')">Answer questions to draft this section</button>
         </div>
       </div>
       <div class="fw-connector">↓</div>
@@ -1227,15 +1216,10 @@ a:hover{color:var(--navy);}
           <textarea id="fw-impacts" placeholder="e.g. Increased self-efficacy in problem-solving; improved critical thinking; greater sense of belonging in STEM…" oninput="autoSaveFramework()"></textarea>
         </div>
         <div class="fw-section-guide" id="fsg-impacts">
-          <div class="fw-question" style="margin-bottom:8px;">Ask your guide for help with this section</div>
-          <textarea id="fsg-input-impacts" placeholder="What would you like help thinking through about your impacts?" style="width:100%;min-height:55px;font-size:13px;"></textarea>
-          <div style="display:flex;gap:8px;margin-top:6px;">
-            <button class="btn-sm btn-gold" onclick="askSectionGuide('impacts')">Ask your guide ↗</button>
-          </div>
-          <div class="fw-section-guide-output" id="fsg-out-impacts"></div>
+          <div id="fwd-impacts"><!-- rendered by renderFwSubquestions() --></div>
         </div>
         <div style="padding:10px 16px;border-top:0.5px solid var(--border);">
-          <button class="btn-sm" onclick="toggleSectionGuide('impacts')">Ask your guide for help with this section</button>
+          <button class="btn-sm" onclick="toggleSectionGuide('impacts')">Answer questions to draft this section</button>
         </div>
       </div>
       <div class="fw-connector">↓</div>
@@ -1262,15 +1246,10 @@ a:hover{color:var(--navy);}
           <input type="hidden" id="fw-measures"/>
         </div>
         <div class="fw-section-guide" id="fsg-measures">
-          <div class="fw-question" style="margin-bottom:8px;">Ask your guide for help with this section</div>
-          <textarea id="fsg-input-measures" placeholder="What would you like help thinking through about your measures and targets?" style="width:100%;min-height:55px;font-size:13px;"></textarea>
-          <div style="display:flex;gap:8px;margin-top:6px;">
-            <button class="btn-sm btn-gold" onclick="askSectionGuide('measures')">Ask your guide ↗</button>
-          </div>
-          <div class="fw-section-guide-output" id="fsg-out-measures"></div>
+          <div id="fwd-measures"><!-- rendered by renderFwSubquestions() --></div>
         </div>
         <div style="padding:10px 16px;border-top:0.5px solid var(--border);">
-          <button class="btn-sm" onclick="toggleSectionGuide('measures')">Ask your guide for help with this section</button>
+          <button class="btn-sm" onclick="toggleSectionGuide('measures')">Answer questions to draft this section</button>
         </div>
       </div>
       <div class="fw-connector">↓</div>
@@ -1297,15 +1276,10 @@ a:hover{color:var(--navy);}
           <input type="hidden" id="fw-collection"/>
         </div>
         <div class="fw-section-guide" id="fsg-collection">
-          <div class="fw-question" style="margin-bottom:8px;">Ask your guide for help with this section</div>
-          <textarea id="fsg-input-collection" placeholder="What would you like help thinking through about your data collection?" style="width:100%;min-height:55px;font-size:13px;"></textarea>
-          <div style="display:flex;gap:8px;margin-top:6px;">
-            <button class="btn-sm btn-gold" onclick="askSectionGuide('collection')">Ask your guide ↗</button>
-          </div>
-          <div class="fw-section-guide-output" id="fsg-out-collection"></div>
+          <div id="fwd-collection"><!-- rendered by renderFwSubquestions() --></div>
         </div>
         <div style="padding:10px 16px;border-top:0.5px solid var(--border);">
-          <button class="btn-sm" onclick="toggleSectionGuide('collection')">Ask your guide for help with this section</button>
+          <button class="btn-sm" onclick="toggleSectionGuide('collection')">Answer questions to draft this section</button>
         </div>
       </div>
       <div class="fw-connector">↓</div>
@@ -1323,15 +1297,10 @@ a:hover{color:var(--navy);}
           <textarea id="fw-analysis" placeholder="e.g. Paired t-test on pre/post scores; thematic coding of open-ended responses; descriptive statistics on participation rates; graduate student will lead analysis with faculty oversight…" oninput="autoSaveFramework()"></textarea>
         </div>
         <div class="fw-section-guide" id="fsg-analysis">
-          <div class="fw-question" style="margin-bottom:8px;">Ask your guide for help with this section</div>
-          <textarea id="fsg-input-analysis" placeholder="What would you like help thinking through about your data analysis?" style="width:100%;min-height:55px;font-size:13px;"></textarea>
-          <div style="display:flex;gap:8px;margin-top:6px;">
-            <button class="btn-sm btn-gold" onclick="askSectionGuide('analysis')">Ask your guide ↗</button>
-          </div>
-          <div class="fw-section-guide-output" id="fsg-out-analysis"></div>
+          <div id="fwd-analysis"><!-- rendered by renderFwSubquestions() --></div>
         </div>
         <div style="padding:10px 16px;border-top:0.5px solid var(--border);">
-          <button class="btn-sm" onclick="toggleSectionGuide('analysis')">Ask your guide for help with this section</button>
+          <button class="btn-sm" onclick="toggleSectionGuide('analysis')">Answer questions to draft this section</button>
         </div>
       </div>
 
@@ -2638,39 +2607,167 @@ function printFrameworkTranscript(){
   const w=window.open('','_blank');w.document.write(html);w.document.close();w.print();
 }
 
-// ── Section guide ─────────────────────────────────────────
+// ── Section guide: scaffolded sub-questions that draft each section ──────
+const FW_SECTION_ORDER = ['problems','objectives','impacts','measures','collection','analysis'];
+
+const FW_SUBQUESTIONS = {
+  problems: {title:'Problems', type:'bullets', questions:[
+    {id:'q1', label:"What isn't working today in the teaching or in students' learning?"},
+    {id:'q2', label:'Who is affected, and what have you observed that shows this is a problem?'},
+  ]},
+  objectives: {title:'Objectives', type:'bullets', questions:[
+    {id:'q1', label:'Given that problem, what should be different by the end of this project?'},
+    {id:'q2', label:"What will students be able to do that they can't do now?"},
+  ]},
+  impacts: {title:'Impacts', type:'bullets', questions:[
+    {id:'q1', label:'If the objectives are met, what will change for students?'},
+    {id:'q2', label:'What would count as evidence that this change actually happened?'},
+  ]},
+  measures: {title:'Measures & Targets', type:'table', tableCols:['measure','target'], questions:[
+    {id:'q1', label:'What specific data points would show that impact (e.g. survey score, grade, participation rate)?'},
+    {id:'q2', label:'What number or threshold would count as success for each?'},
+  ]},
+  collection: {title:'Data Collection', type:'table', tableCols:['source','freq'], questions:[
+    {id:'q1', label:'Where will this data come from (surveys, LMS, grades, interviews)?'},
+    {id:'q2', label:'How often will each be collected?'},
+  ]},
+  analysis: {title:'Data Analysis', type:'bullets', questions:[
+    {id:'q1', label:'Who will analyze this data?'},
+    {id:'q2', label:'What method will they use (e.g. compare pre/post scores, look for themes, count occurrences)?'},
+  ]},
+};
+
+let fwAnswers = {};
+
 function toggleSectionGuide(section){
   const el = document.getElementById('fsg-'+section);
   if(!el) return;
   el.classList.toggle('open');
-  if(el.classList.contains('open')) document.getElementById('fsg-input-'+section)?.focus();
+  if(el.classList.contains('open')) document.getElementById('fwq-'+section+'-q1')?.focus();
 }
 
-async function askSectionGuide(section){
-  const inputEl = document.getElementById('fsg-input-'+section);
-  const out = document.getElementById('fsg-out-'+section);
-  if(!inputEl||!out) return;
-  const question = inputEl.value.trim();
-  if(!question) return;
-  showThinking(out);
+function renderFwSubquestions(){
+  FW_SECTION_ORDER.forEach(key=>{
+    const container = document.getElementById('fwd-'+key);
+    if(!container) return;
+    const def = FW_SUBQUESTIONS[key];
+    const ans = fwAnswers[key] || {};
+    container.innerHTML = `
+      <div class="fw-question" style="margin-bottom:8px;">Answer these to have your guide draft this section — short answers are fine</div>
+      ${def.questions.map(q=>`
+        <div class="field" style="margin-bottom:8px;">
+          <label style="font-size:12px;color:var(--text2);display:block;margin-bottom:4px;">${q.label}</label>
+          <textarea id="fwq-${key}-${q.id}" oninput="saveFrameworkAnswers()"></textarea>
+        </div>`).join('')}
+      <button class="btn-sm btn-gold" onclick="draftFrameworkSection('${key}')" id="fwd-btn-${key}">Draft this section ↗</button>
+      <div class="prefill-note hidden" id="fwd-note-${key}"></div>
+    `;
+    def.questions.forEach(q=>{
+      const el = document.getElementById(`fwq-${key}-${q.id}`);
+      if(el) el.value = ans[q.id] || '';
+    });
+  });
+}
+
+function saveFrameworkAnswers(){
+  FW_SECTION_ORDER.forEach(key=>{
+    const def = FW_SUBQUESTIONS[key];
+    fwAnswers[key] = fwAnswers[key] || {};
+    def.questions.forEach(q=>{
+      const el = document.getElementById(`fwq-${key}-${q.id}`);
+      if(el) fwAnswers[key][q.id] = el.value;
+    });
+  });
   const data = loadAll();
-  const fw = data.framework||{};
-  const s = data.setup||{};
-  const sectionLabels = {problems:'Problems',objectives:'Objectives',impacts:'Impacts',measures:'Measures & Targets',collection:'Data Collection',analysis:'Data Analysis'};
-  // Build context from sections above
-  const ctx = [];
-  if(s.title) ctx.push(`Project: ${s.title}`);
-  if(fw.problems && section!=='problems') ctx.push(`Problems: ${fw.problems}`);
-  if(fw.objectives && !['problems','objectives'].includes(section)) ctx.push(`Objectives: ${fw.objectives}`);
-  if(fw.impacts && !['problems','objectives','impacts'].includes(section)) ctx.push(`Impacts: ${fw.impacts}`);
-  if(fw.measures && !['problems','objectives','impacts','measures'].includes(section)) ctx.push(`Measures & Targets: ${fw.measures}`);
-  const prompt = `You are a helpful guide for Institute for Excellence in Teaching & Learning staff supporting a faculty-led Shipley Academic Innovation Fund award at Boston University. The staff member is working with the faculty lead on the "${sectionLabels[section]}" section of the Impact Evaluation Framework and needs help thinking it through.\n\n${ctx.length?'Context from earlier sections:\n'+ctx.join('\n')+'\n\n':''}Focus your response specifically on helping with the "${sectionLabels[section]}" section. Do not reference the BU grants office or university policy. If something raises a concern, flag it clearly for follow-up with the faculty lead.\n\nStaff question: ${question}`;
-  try{
-    const r = await callGuide(prompt);
-    renderAIResponse(out, r);
-  }catch(e){
-    out.innerHTML=`<div class="ai-response" style="border-left-color:var(--red);">Something went wrong.</div>`;
+  data.framework_answers = fwAnswers;
+  saveAll(data);
+}
+
+function loadFrameworkAnswers(){
+  const data = loadAll();
+  fwAnswers = data.framework_answers || {};
+  renderFwSubquestions();
+}
+
+function getFrameworkSectionText(key){
+  if(key==='measures') return getMeasuresText();
+  if(key==='collection') return getCollectionText();
+  const el = document.getElementById('fw-'+key);
+  return el ? el.value.trim() : '';
+}
+
+async function draftFrameworkSection(key){
+  const btn = document.getElementById('fwd-btn-'+key);
+  const noteEl = document.getElementById('fwd-note-'+key);
+  const def = FW_SUBQUESTIONS[key];
+  if(!btn || !noteEl || !def) return;
+  saveFrameworkAnswers();
+  const ans = fwAnswers[key] || {};
+  const answeredQs = def.questions.filter(q => ans[q.id] && ans[q.id].trim());
+  if(!answeredQs.length){
+    noteEl.classList.remove('hidden');
+    noteEl.textContent = 'Answer at least one question above before drafting this section.';
+    return;
   }
+
+  setButtonLoading(btn, true);
+  noteEl.classList.remove('hidden');
+  noteEl.textContent = 'Your guide is drafting this section…';
+
+  const priorContext = [];
+  for(const priorKey of FW_SECTION_ORDER){
+    if(priorKey === key) break;
+    const val = getFrameworkSectionText(priorKey);
+    if(val) priorContext.push(`${FW_SUBQUESTIONS[priorKey].title}: ${val}`);
+  }
+
+  const qaText = answeredQs.map(q => `${q.label}\n${ans[q.id]}`).join('\n\n');
+
+  const formatSpec = def.type === 'table'
+    ? `Return ONLY a valid JSON object with no other text, explanation, or markdown: {"rows":[{"${def.tableCols[0]}":"...", "${def.tableCols[1]}":"..."}]}. Include 2–4 rows. Each value should be a short phrase (a few words) — succinct, not a full sentence. Base this only on the answers below; do not invent specifics the answers didn't provide.`
+    : `Return ONLY a valid JSON object with no other text, explanation, or markdown: {"bullets":["...", "..."]}. Include 2–4 bullets, each ONE short sentence or phrase — succinct, just enough for a staff or faculty reviewer to get the gist. Do not write polished narrative paragraphs. Base this only on the answers below; do not invent specifics the answers didn't provide.`;
+
+  const prompt = `You are helping an Institute for Excellence in Teaching & Learning staff member draft the "${def.title}" section of a Shipley project's Impact Evaluation Framework, using backward design (each section should follow logically from the ones before it).
+
+${priorContext.length ? 'Sections already drafted, for context and continuity:\n' + priorContext.join('\n') + '\n\n' : ''}The staff member answered the following about this section:
+
+${qaText}
+
+${formatSpec}`;
+
+  try{
+    const raw = await callGuide(prompt, {skipCtx:true, maxTokens:600});
+    const jsonMatch = raw.match(/\{[\s\S]*\}/);
+    if(!jsonMatch) throw new Error('No JSON');
+    const parsed = JSON.parse(jsonMatch[0]);
+    applyFrameworkDraft(key, parsed);
+    noteEl.textContent = "Drafted by your guide from the answers above — review and edit freely.";
+  }catch(e){
+    noteEl.textContent = 'Something went wrong drafting this section — please try again.';
+  }finally{
+    setButtonLoading(btn, false);
+  }
+}
+
+function applyFrameworkDraft(key, parsed){
+  const def = FW_SUBQUESTIONS[key];
+  if(def.type === 'table'){
+    const rows = Array.isArray(parsed.rows) ? parsed.rows : [];
+    if(key === 'measures'){
+      const newRows = rows.map(r => ({measure: r.measure || '', target: r.target || ''})).filter(r => r.measure);
+      fwMeasureRows = newRows.length ? newRows : [{measure:'',target:''}];
+      renderMeasuresTable();
+    } else if(key === 'collection'){
+      const newRows = rows.map(r => ({source: r.source || '', freq: r.freq || ''})).filter(r => r.source);
+      fwCollectionRows = newRows.length ? newRows : [{source:'',freq:''}];
+      renderCollectionTable();
+    }
+  } else {
+    const bullets = Array.isArray(parsed.bullets) ? parsed.bullets : [];
+    const el = document.getElementById('fw-'+key);
+    if(el) el.value = bullets.map(b => '- '+b).join('\n');
+  }
+  autoSaveFramework();
 }
 
 // ═══════════════════════════════════════════════════════
@@ -3330,7 +3427,7 @@ function onGrantAmountChange(radio){
   if(g===5000) selectBudgetTemplate('5k');
   else if(g===10000) selectBudgetTemplate('10k');
   else if(g===25000) selectBudgetTemplate('25k');
-  saveData();
+  saveSetup();
 }
 
 function updateBudgetTotal(){
@@ -3921,7 +4018,7 @@ ${buildRubricReferenceText()}
 Project scoping information:
 ${filled.join('\n')}
 
-This feedback is for internal staff use and must be fast to scan, not narrative. Reply using EXACTLY this structure, with nothing added before, after, or between sections, and no narrative outside of it. Fill in every bracketed placeholder. Each criterion bullet is capped at ONE sentence of rationale — do not exceed it. Each of the three closing sections is capped at exactly 3 sentences of plain prose — not bullets, not more than 3 sentences:
+This feedback is for internal staff use and must be fast to scan, not narrative. Reply using EXACTLY this structure, with nothing added before, after, or between sections, and no narrative outside of it. Fill in every bracketed placeholder. Each criterion bullet is capped at ONE sentence of rationale — do not exceed it. Each of the three closing sections is capped at 3 short bullets, not prose paragraphs — one point per bullet, no more than one sentence per bullet:
 
 RUBRIC SCORES
 - Health Education Focus: [1-4]/4 — [one-sentence rationale]
@@ -3942,13 +4039,19 @@ CHALLENGES & SUGGESTIONS
 - [one bullet per challenge, each pairing the challenge with a specific, practical suggestion to address it]
 
 WHAT'S EXCITING ABOUT THIS PROPOSAL
-[Exactly 3 sentences of plain prose.]
+- [short bullet]
+- [short bullet]
+- [short bullet, if there's a third distinct point — otherwise omit]
 
 WHAT CONCERNS DOES THIS PROPOSAL RAISE
-[Exactly 3 sentences of plain prose.]
+- [short bullet]
+- [short bullet]
+- [short bullet, if there's a third distinct point — otherwise omit]
 
 WHAT IMPACT WILL THIS PROJECT HAVE IF SELECTED
-[Exactly 3 sentences of plain prose.]`;
+- [short bullet]
+- [short bullet]
+- [short bullet, if there's a third distinct point — otherwise omit]`;
   try{
     const r = await callGuide(prompt, {skipCtx:true, maxTokens:3000});
     renderAIResponse(out, r);
@@ -4712,6 +4815,7 @@ window.addEventListener('DOMContentLoaded',()=>{
   loadSetup();
   loadTechConsiderations();
   loadFramework();
+  loadFrameworkAnswers();
   renderMeasuresTable();
   renderCollectionTable();
   loadFrameworkTranscript();
