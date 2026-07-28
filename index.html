@@ -405,6 +405,21 @@ a:hover{color:var(--navy);}
   padding:3px 8px;border-radius:4px;margin-top:4px;display:inline-block;
 }
 
+/* ── MILESTONE TAILORING ── */
+.investigate-card{
+  background:var(--amber-bg);border-left:3px solid var(--amber);
+  border-radius:var(--radius);padding:12px 14px;margin-bottom:10px;
+}
+.investigate-question{font-size:13px;font-weight:600;color:var(--amber-text);margin-bottom:8px;line-height:1.5;}
+.investigate-note{font-size:12px;color:var(--amber-text);opacity:0.85;margin-bottom:8px;line-height:1.5;}
+.hidden-tasks-toggle{
+  font-size:12px;color:var(--text3);background:none;border:none;
+  padding:6px 2px;cursor:pointer;text-decoration:underline;border-radius:0;
+}
+.hidden-tasks-toggle:hover{background:none;color:var(--navy);}
+.hidden-task-row{opacity:0.65;}
+.hidden-task-row .task-name{color:var(--text3);}
+
 /* ── BUDGET BUILDER ── */
 .budget-tpl-selector{display:flex;gap:14px;margin-bottom:6px;}
 .budget-tpl-card{
@@ -1229,6 +1244,26 @@ a:hover{color:var(--navy);}
     <p style="font-size:14px;color:var(--text2);line-height:1.7;">
       Shipley projects typically follow four milestones. Check off tasks as you complete them, add notes, and flag blockers. Use the guide to think through sequencing or troubleshoot delays.
     </p>
+  </div>
+
+  <!-- Tailor Milestones to Proposal -->
+  <div class="card" id="milestone-tailor-card">
+    <div class="card-header">
+      <div class="card-icon" aria-hidden="true">🧭</div>
+      <div>
+        <div class="card-title">Tailor Milestones to This Proposal</div>
+        <div class="card-sub">Customize the default checklist below to what this specific project actually involves</div>
+      </div>
+    </div>
+    <div class="alert alert-blue" style="margin-bottom:14px;">
+      The guide reads the imported proposal against the full default checklist below: tasks clearly supported by the proposal stay visible, tasks clearly not applicable are hidden (but never deleted — you can always bring them back), and anything ambiguous — commonly needed for Shipley projects but not clearly addressed in this proposal — surfaces as a question for you to answer below.
+    </div>
+    <div id="milestone-tailor-guard"></div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;">
+      <button class="btn-gold" onclick="tailorMilestonesToProposal()" id="btn-tailor-milestones">Tailor milestones to this proposal ↗</button>
+      <button class="btn-sm" onclick="resetMilestoneTailoring()" id="btn-reset-tailoring" style="display:none;">Reset — show all default tasks</button>
+    </div>
+    <div id="milestone-investigate" style="margin-top:14px;"></div>
   </div>
 
   <!-- Milestone 1 -->
@@ -2632,10 +2667,158 @@ const MILESTONE_TASKS = {
 let taskStates = {};
 let customTasks = [];
 
+// ── Tailor Milestones to Proposal ─────────────────────────────────────
+const MILESTONE_LABELS = {m1:'Prepare', m2:'Conduct & Gather Data', m3:'Analyze & Share Findings', m4:'Reflect, Iterate & Scale', m5:'Report & Close'};
+
+function getAllDefaultTasksFlat(){
+  const flat = [];
+  ['m1','m2','m3','m4','m5'].forEach(m=>{
+    MILESTONE_TASKS[m].forEach((t,i)=>{
+      flat.push({id:m+'_'+i, milestone:m, group:t.group||null, name:t.name});
+    });
+  });
+  return flat;
+}
+
+function updateMilestoneTailorGuard(){
+  const data = loadAll();
+  const guard = document.getElementById('milestone-tailor-guard');
+  const btn = document.getElementById('btn-tailor-milestones');
+  if(!guard || !btn) return;
+  if(!data.proposalText){
+    guard.innerHTML = `<div class="alert alert-navy" style="margin-bottom:10px;">Import a proposal on the Project Setup tab first — tailoring needs the full proposal text to work from.</div>`;
+    btn.disabled = true; btn.style.opacity = '0.5'; btn.style.cursor = 'not-allowed';
+  } else {
+    guard.innerHTML = '';
+    btn.disabled = false; btn.style.opacity = '1'; btn.style.cursor = 'pointer';
+  }
+  const resetBtn = document.getElementById('btn-reset-tailoring');
+  if(resetBtn) resetBtn.style.display = (data.task_relevance || data.investigate_questions) ? 'inline-flex' : 'none';
+}
+
+async function tailorMilestonesToProposal(){
+  const btn = document.getElementById('btn-tailor-milestones');
+  const data = loadAll();
+  if(!data.proposalText || !btn) return;
+  setButtonLoading(btn, true);
+  const guard = document.getElementById('milestone-tailor-guard');
+  guard.innerHTML = `<div class="alert alert-blue" style="margin-bottom:10px;">Your guide is reading the proposal against the full milestone checklist…</div>`;
+
+  const flat = getAllDefaultTasksFlat();
+  const taskListText = flat.map(t=>`${t.id} [${MILESTONE_LABELS[t.milestone]}${t.group?' / '+t.group:''}]: ${t.name}`).join('\n');
+
+  const prompt = `You are helping an Institute for Excellence in Teaching & Learning staff member tailor a default Shipley project milestone checklist to one specific project, using its full proposal text.
+
+Full proposal text:
+${data.proposalText}
+
+Default milestone checklist (every task below has a stable ID — classify every single one, with no exceptions):
+${taskListText}
+
+For each task ID, decide one of three things:
+1. "confirmed" — the proposal clearly supports or implies this task applies to this project.
+2. "not_relevant" — the proposal makes clear this task does not apply to this project (e.g., no mention of student workers at all, no digital tools involved, no plans for a second pilot).
+3. Ambiguous — the proposal doesn't clearly address whether this applies, but it's a common and important task for Shipley projects generally, so a human should be asked rather than the task being silently dropped or kept. Group related ambiguous task IDs together into ONE question wherever they belong together (e.g., all the Hiring-group tasks under one "will this project need to hire student workers?" question) — do not ask a separate question per task when several tasks share the same underlying yes/no decision. Word each question so a "yes" means "add these tasks to the plan" and a "no" means "these tasks don't apply."
+
+Return ONLY a valid JSON object with no other text, explanation, or markdown, in exactly this shape:
+{"confirmed": ["m1_0", "m2_3", ...], "not_relevant": ["m1_5", ...], "investigate": [{"question": "...", "relatedTaskIds": ["m1_11","m1_12","m1_13","m1_14"]}, ...]}
+
+Every task ID from the checklist above must appear in exactly one place: either in "confirmed", in "not_relevant", or inside exactly one "investigate" entry's "relatedTaskIds". Do not leave any task ID out.`;
+
+  try{
+    const raw = await callGuide(prompt, {skipCtx:true, maxTokens:3000});
+    const jsonMatch = raw.match(/\{[\s\S]*\}/);
+    if(!jsonMatch) throw new Error('No JSON');
+    const parsed = JSON.parse(jsonMatch[0]);
+    applyMilestoneTailoring(parsed);
+    guard.innerHTML = `<div class="alert alert-green" style="margin-bottom:10px;">Milestones tailored to this proposal. Answer any questions below, and use "Reset" any time to go back to the full default checklist.</div>`;
+  }catch(e){
+    guard.innerHTML = `<div class="alert alert-amber" style="margin-bottom:10px;">Something went wrong tailoring the milestones — please try again.</div>`;
+  }finally{
+    setButtonLoading(btn, false);
+    updateMilestoneTailorGuard();
+  }
+}
+
+function applyMilestoneTailoring(parsed){
+  const data = loadAll();
+  const relevance = {};
+  (parsed.confirmed||[]).forEach(id=>{ relevance[id] = 'confirmed'; });
+  (parsed.not_relevant||[]).forEach(id=>{ relevance[id] = 'not_relevant'; });
+  const questions = (parsed.investigate||[]).filter(q=>q.question && Array.isArray(q.relatedTaskIds) && q.relatedTaskIds.length)
+    .map((q,i)=>({id:'inv_'+Date.now()+'_'+i, question:q.question, relatedTaskIds:q.relatedTaskIds, resolved:null}));
+  data.task_relevance = relevance;
+  data.investigate_questions = questions;
+  saveAll(data);
+  renderMilestones();
+}
+
+function resolveInvestigateQuestion(qid, answer){
+  const data = loadAll();
+  const questions = data.investigate_questions || [];
+  const q = questions.find(x=>x.id===qid);
+  if(!q) return;
+  const relevance = data.task_relevance || {};
+  q.relatedTaskIds.forEach(id=>{ relevance[id] = answer==='yes' ? 'confirmed' : 'not_relevant'; });
+  q.resolved = answer;
+  data.task_relevance = relevance;
+  data.investigate_questions = questions;
+  saveAll(data);
+  renderMilestones();
+}
+
+function resetMilestoneTailoring(){
+  const data = loadAll();
+  delete data.task_relevance;
+  delete data.investigate_questions;
+  saveAll(data);
+  renderMilestones();
+}
+
+function restoreHiddenTask(taskId){
+  const data = loadAll();
+  const relevance = data.task_relevance || {};
+  relevance[taskId] = 'confirmed';
+  data.task_relevance = relevance;
+  saveAll(data);
+  renderMilestones();
+}
+
+function toggleHiddenTasksPanel(milestone){
+  const el = document.getElementById('hidden-tasks-'+milestone);
+  if(!el) return;
+  el.style.display = el.style.display==='none' ? 'block' : 'none';
+}
+
+function renderInvestigatePanel(){
+  const el = document.getElementById('milestone-investigate');
+  if(!el) return;
+  const data = loadAll();
+  const questions = (data.investigate_questions||[]).filter(q=>!q.resolved);
+  if(!questions.length){ el.innerHTML = ''; return; }
+  el.innerHTML = `<div class="section-label" style="margin-bottom:8px;">Questions to investigate</div>` +
+    questions.map(q=>`
+      <div class="investigate-card">
+        <div class="investigate-question">${q.question}</div>
+        <div style="display:flex;gap:8px;">
+          <button class="btn-sm btn-primary" onclick="resolveInvestigateQuestion('${q.id}','yes')">Yes — add to plan</button>
+          <button class="btn-sm" onclick="resolveInvestigateQuestion('${q.id}','no')">No — not needed</button>
+        </div>
+      </div>`).join('');
+}
+
 function renderMilestones(){
   const data = loadAll();
   taskStates = data.task_states || {};
   customTasks = data.custom_tasks || [];
+  const taskRelevance = data.task_relevance || {};
+  const pendingTaskIds = new Set();
+  (data.investigate_questions||[]).forEach(q=>{ if(!q.resolved) q.relatedTaskIds.forEach(id=>pendingTaskIds.add(id)); });
+  // Tailoring only affects the default checklist — custom/auto-generated tasks are always shown.
+  function isHiddenByTailoring(t){
+    if(t.custom) return false;
+    return taskRelevance[t.id]==='not_relevant' || pendingTaskIds.has(t.id);
+  }
 
   const M1_GROUPS = ['General','IRB','Content Development','Hiring','Technology','Learning Analytics'];
 
@@ -2643,7 +2826,7 @@ function renderMilestones(){
     const container = document.getElementById(m+'-tasks');
     const tasks = MILESTONE_TASKS[m];
     const custom = customTasks.filter(t=>t.milestone===m);
-    let allTasks = [...tasks.map((t,i)=>({...t,id:m+'_'+i,custom:false})), ...custom.map(t=>({
+    let allTasksRaw = [...tasks.map((t,i)=>({...t,id:m+'_'+i,custom:false})), ...custom.map(t=>({
       ...t,
       // Ensure auto-generated tasks land in the correct group regardless of stored value
       group: (t.id && t.id.startsWith('tech_')) ? 'Technology'
@@ -2652,13 +2835,15 @@ function renderMilestones(){
       custom:true
     }))];
     if(m==='m1'){
-      allTasks.sort((a,b)=>{
+      allTasksRaw.sort((a,b)=>{
         const ga = M1_GROUPS.indexOf(a.group||'');
         const gb = M1_GROUPS.indexOf(b.group||'');
         if(ga!==gb) return (ga===-1?999:ga)-(gb===-1?999:gb);
         return 0;
       });
     }
+    const allTasks = allTasksRaw.filter(t=>!isHiddenByTailoring(t));
+    const hiddenTasks = allTasksRaw.filter(isHiddenByTailoring);
 
     const taskMeta = data.task_meta || {};
     const tools = (typeof techTools !== 'undefined') ? techTools.filter(t=>t.name.trim()) : [];
@@ -2778,6 +2963,16 @@ function renderMilestones(){
         if(anyDone) html += buildReflectionPrompt(m, milestoneLabels[m]);
       }
     }
+    if(hiddenTasks.length){
+      const hiddenHtml = hiddenTasks.map(t=>`
+        <div class="task-row hidden-task-row">
+          <div style="width:24px;min-width:24px;"></div>
+          <div class="task-body"><div class="task-name">${t.name}</div></div>
+          <button class="btn-sm" onclick="restoreHiddenTask('${t.id}')">Restore</button>
+        </div>`).join('');
+      html += `<button class="hidden-tasks-toggle" onclick="toggleHiddenTasksPanel('${m}')">${hiddenTasks.length} task${hiddenTasks.length!==1?'s':''} hidden as not relevant to this project — show ▾</button>
+        <div id="hidden-tasks-${m}" style="display:none;margin-top:6px;">${hiddenHtml}</div>`;
+    }
     container.innerHTML = html;
 
     const total = allTasks.length;
@@ -2794,6 +2989,8 @@ function renderMilestones(){
       if(el && data.milestone_notes[m]) el.value = data.milestone_notes[m];
     });
   }
+  renderInvestigatePanel();
+  updateMilestoneTailorGuard();
 }
 
 function saveTaskMeta(id, field, value){
