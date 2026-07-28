@@ -419,6 +419,13 @@ a:hover{color:var(--navy);}
 .hidden-tasks-toggle:hover{background:none;color:var(--navy);}
 .hidden-task-row{opacity:0.65;}
 .hidden-task-row .task-name{color:var(--text3);}
+.budget-flag-card{
+  background:var(--amber-bg);border-left:3px solid var(--amber);
+  border-radius:var(--radius);padding:12px 14px;margin-bottom:10px;
+}
+.budget-flag-row{font-size:13px;font-weight:600;color:var(--amber-text);margin-bottom:2px;}
+.budget-flag-type{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;background:#fff;border-radius:20px;padding:2px 8px;margin-right:6px;color:var(--amber-text);border:1px solid var(--amber);}
+.budget-flag-message{font-size:13px;color:var(--amber-text);margin-bottom:8px;line-height:1.5;}
 
 /* ── BUDGET BUILDER ── */
 .budget-tpl-selector{display:flex;gap:14px;margin-bottom:6px;}
@@ -603,7 +610,7 @@ a:hover{color:var(--navy);}
 .proj-dd-empty{padding:14px;font-size:13px;color:var(--text3);text-align:center;font-style:italic;}
 .proj-dd-actions{
   padding:10px 14px;display:flex;gap:8px;flex-wrap:wrap;
-  border-top:1px solid var(--border);background:var(--bg);
+  border-bottom:1px solid var(--border);background:var(--bg);
 }
 
 /* ── MODAL OVERLAY ── */
@@ -691,12 +698,12 @@ a:hover{color:var(--navy);}
           <span class="ps-caret">▾</span>
         </button>
         <div class="proj-dropdown" id="proj-dropdown" role="listbox">
-          <div class="proj-dd-header">Saved projects</div>
-          <div id="proj-dd-list"></div>
           <div class="proj-dd-actions">
             <button class="btn-sm btn-primary" id="btn-save-current" onclick="openSaveModal();closeProjDropdown();">Save Open Project</button>
             <button class="btn-sm" onclick="openNewProjectModal();closeProjDropdown();">New project</button>
           </div>
+          <div class="proj-dd-header">Saved projects</div>
+          <div id="proj-dd-list"></div>
         </div>
       </div>
     </div>
@@ -769,8 +776,8 @@ a:hover{color:var(--navy);}
   <button class="tab" role="tab" aria-selected="false" aria-controls="tab-impact" id="tab-btn-impact" onclick="switchTab('impact',this)">Impact Framework <span class="tab-check" aria-hidden="true">✓</span></button>
   <button class="tab" role="tab" aria-selected="false" aria-controls="tab-milestones" id="tab-btn-milestones" onclick="switchTab('milestones',this)">Milestones <span class="tab-check" aria-hidden="true">✓</span></button>
   <button class="tab" role="tab" aria-selected="false" aria-controls="tab-budget" id="tab-btn-budget" onclick="switchTab('budget',this)">Budget <span class="tab-check" aria-hidden="true">✓</span></button>
-  <button class="tab" role="tab" aria-selected="false" aria-controls="tab-report" id="tab-btn-report" onclick="switchTab('report',this)">Project Report <span class="tab-check" aria-hidden="true">✓</span></button>
   <button class="tab" role="tab" aria-selected="false" aria-controls="tab-guide" id="tab-btn-guide" onclick="switchTab('guide',this)">Ask Your Guide</button>
+  <button class="tab" role="tab" aria-selected="false" aria-controls="tab-report" id="tab-btn-report" onclick="switchTab('report',this)">Project Report <span class="tab-check" aria-hidden="true">✓</span></button>
 </nav>
 
 <div class="main" id="main-content">
@@ -860,6 +867,22 @@ a:hover{color:var(--navy);}
       </div>
       <div class="hint">This selects the project's budget template. (No $5,000 tier this funding round.)</div>
     </div>
+  </div>
+
+  <!-- Proposed Budget Line Items -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-icon">🧾</div>
+      <div>
+        <div class="card-title">Proposed Budget Line Items</div>
+        <div class="card-sub">List what the proposal itself asked for — this feeds the Budget tab's tailoring</div>
+      </div>
+    </div>
+    <div class="hint" style="margin-bottom:10px;">Enter each budget line item as the proposal states it. On the Budget tab, the guide will compare this list against the official template and flag anything that looks missing or under-budgeted.</div>
+    <div id="budget-line-guard"></div>
+    <button class="btn-sm btn-gold" onclick="extractBudgetLinesFromProposal()" id="btn-extract-budget-lines" style="margin-bottom:10px;">Extract from proposal ↗</button>
+    <div id="budget-line-entries"></div>
+    <button class="btn-sm" onclick="addBudgetLineEntry()" style="margin-top:4px;">+ Add line item</button>
   </div>
 
   <!-- Vision & Goals -->
@@ -1450,6 +1473,25 @@ a:hover{color:var(--navy);}
   </div>
 
   <div id="budget-builder" style="display:none;">
+    <div class="card" id="budget-tailor-card">
+      <div class="card-header">
+        <div class="card-icon" aria-hidden="true">🧭</div>
+        <div>
+          <div class="card-title">Tailor Budget to This Proposal</div>
+          <div class="card-sub">Compare the proposal's budget line items against the official template</div>
+        </div>
+      </div>
+      <div class="alert alert-blue" style="margin-bottom:14px;">
+        The guide compares the budget line items entered on Project Setup — plus the full proposal text — against this template's official rows. Amounts it can confidently match get filled in below; anything commonly needed but not addressed, or that looks under-budgeted, is flagged here to raise with the faculty lead.
+      </div>
+      <div id="budget-tailor-guard"></div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;">
+        <button class="btn-gold" onclick="tailorBudgetToProposal()" id="btn-tailor-budget">Tailor budget to this proposal ↗</button>
+        <button class="btn-sm" onclick="resetBudgetTailoring()" id="btn-reset-budget-tailoring" style="display:none;">Reset — clear flags</button>
+      </div>
+      <div id="budget-flags" style="margin-top:14px;"></div>
+    </div>
+
     <div class="card">
       <div class="card-header">
         <div class="card-icon">📅</div>
@@ -2011,6 +2053,7 @@ function applyProposalImport(data, out){
 
   updateProjectName();
   saveSetup();
+  updateBudgetLineGuard();
   const count=filled.length;
   out.innerHTML=`<div class="alert alert-green">
     <strong>Import complete —</strong> ${count} field${count!==1?'s':''} pre-filled from the proposal.
@@ -2257,6 +2300,88 @@ function removePriorityEntry(i){
 
 function getPriorityEntries(){ return priorityEntries; }
 
+// ── Proposed budget line items ────────────────────────────────────────
+let budgetLineEntries = [];
+
+function renderBudgetLineEntries(){
+  const container = document.getElementById('budget-line-entries');
+  if(!container) return;
+  if(budgetLineEntries.length===0) budgetLineEntries.push({description:'',amount:'',category:''});
+  container.innerHTML = budgetLineEntries.map((e,i)=>`
+    <div class="entry-row">
+      <input type="text" placeholder="Line item description" value="${(e.description||'').replace(/"/g,'&quot;')}"
+        oninput="budgetLineEntries[${i}].description=this.value;saveSetup();" style="flex:2;"/>
+      <input type="number" min="0" step="50" placeholder="$ amount" value="${e.amount!==''&&e.amount!=null?e.amount:''}"
+        oninput="budgetLineEntries[${i}].amount=this.value;saveSetup();" style="flex:1;min-width:110px;"/>
+      <select onchange="budgetLineEntries[${i}].category=this.value;saveSetup();" style="flex:1;min-width:150px;">
+        <option value="" ${!e.category?'selected':''}>Category…</option>
+        <option value="salary" ${e.category==='salary'?'selected':''}>Salary / Personnel</option>
+        <option value="operating" ${e.category==='operating'?'selected':''}>Operating</option>
+      </select>
+      <button class="remove-btn" onclick="removeBudgetLineEntry(${i})" aria-label="Remove">✕</button>
+    </div>`).join('');
+}
+
+function addBudgetLineEntry(){
+  budgetLineEntries.push({description:'',amount:'',category:''});
+  renderBudgetLineEntries();
+}
+
+function removeBudgetLineEntry(i){
+  budgetLineEntries.splice(i,1);
+  if(budgetLineEntries.length===0) budgetLineEntries.push({description:'',amount:'',category:''});
+  renderBudgetLineEntries();
+  saveSetup();
+}
+
+function getBudgetLineEntries(){ return budgetLineEntries; }
+
+function updateBudgetLineGuard(){
+  const data = loadAll();
+  const guard = document.getElementById('budget-line-guard');
+  if(!guard) return;
+  guard.innerHTML = data.proposalText ? '' : `<div class="alert alert-navy" style="margin-bottom:10px;">Import a proposal above to enable "Extract from proposal" — or add line items manually below.</div>`;
+}
+
+async function extractBudgetLinesFromProposal(){
+  const btn = document.getElementById('btn-extract-budget-lines');
+  const guard = document.getElementById('budget-line-guard');
+  const data = loadAll();
+  if(!data.proposalText){
+    updateBudgetLineGuard();
+    return;
+  }
+  setButtonLoading(btn, true);
+  guard.innerHTML = `<div class="alert alert-blue" style="margin-bottom:10px;">Your guide is reading the proposal for budget line items…</div>`;
+
+  const prompt = `An Institute staff member needs every budget line item mentioned in the proposal text below, exactly as the proposal describes them.
+
+Proposal text:
+${data.proposalText}
+
+Return ONLY a valid JSON object with no other text, explanation, or markdown: {"lines": [{"description": "...", "amount": number_or_null, "category": "salary"|"operating"|null}]}. Include every distinct budget line item you can find — do not invent line items that aren't in the text. Use "salary" for personnel/stipend/compensation items, "operating" for everything else (software, supplies, travel, services), and null for category if you can't tell. Use null for amount if no dollar figure is given for that specific item.`;
+
+  try{
+    const raw = await callGuide(prompt, {skipCtx:true, maxTokens:1500});
+    const jsonMatch = raw.match(/\{[\s\S]*\}/);
+    if(!jsonMatch) throw new Error('No JSON');
+    const parsed = JSON.parse(jsonMatch[0]);
+    const lines = Array.isArray(parsed.lines) ? parsed.lines : [];
+    if(lines.length){
+      budgetLineEntries = lines.map(l=>({description:l.description||'', amount:(l.amount!=null?l.amount:''), category:l.category||''}));
+      renderBudgetLineEntries();
+      saveSetup();
+      guard.innerHTML = `<div class="alert alert-green" style="margin-bottom:10px;">${lines.length} line item${lines.length!==1?'s':''} extracted — review each one below, then add or edit as needed.</div>`;
+    } else {
+      guard.innerHTML = `<div class="alert alert-amber" style="margin-bottom:10px;">No budget line items found in the proposal text — add them manually below.</div>`;
+    }
+  }catch(e){
+    guard.innerHTML = `<div class="alert alert-amber" style="margin-bottom:10px;">Something went wrong extracting line items — please try again or add them manually.</div>`;
+  }finally{
+    setButtonLoading(btn, false);
+  }
+}
+
 function saveSetup(){
   const data = loadAll();
   data.touched = data.touched||{};
@@ -2279,6 +2404,7 @@ function saveSetup(){
     workers: document.getElementById('s-workers').value,
     availability: getAvailabilityEntries(),
     priorities: getPriorityEntries(),
+    budget_lines: getBudgetLineEntries(),
     irb_notes: document.getElementById('s-irb-notes').value,
   };
   saveAll(data);
@@ -2317,6 +2443,10 @@ function loadSetup(){
   if(Array.isArray(s.priorities) && s.priorities.length) priorityEntries = s.priorities;
   else priorityEntries = [{text:'',type:''}];
   renderPriorityEntries();
+  if(Array.isArray(s.budget_lines) && s.budget_lines.length) budgetLineEntries = s.budget_lines;
+  else budgetLineEntries = [{description:'',amount:'',category:''}];
+  renderBudgetLineEntries();
+  updateBudgetLineGuard();
   updateProjectName();
 }
 
@@ -3252,6 +3382,139 @@ function fmt$(n){
   return '$'+v.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g,',');
 }
 
+// ── Tailor Budget to Proposal ──────────────────────────────────────────
+function updateBudgetTailorGuard(){
+  const data = loadAll();
+  const guard = document.getElementById('budget-tailor-guard');
+  const btn = document.getElementById('btn-tailor-budget');
+  if(!guard || !btn) return;
+  if(!data.proposalText){
+    guard.innerHTML = `<div class="alert alert-navy" style="margin-bottom:10px;">Import a proposal on the Project Setup tab first — tailoring needs the full proposal text to work from.</div>`;
+    btn.disabled = true; btn.style.opacity = '0.5'; btn.style.cursor = 'not-allowed';
+  } else {
+    guard.innerHTML = '';
+    btn.disabled = false; btn.style.opacity = '1'; btn.style.cursor = 'pointer';
+  }
+  const resetBtn = document.getElementById('btn-reset-budget-tailoring');
+  if(resetBtn) resetBtn.style.display = (data.budget_flags && data.budget_flags.length) ? 'inline-flex' : 'none';
+}
+
+async function tailorBudgetToProposal(){
+  const btn = document.getElementById('btn-tailor-budget');
+  const data = loadAll();
+  if(!data.proposalText || !budgetState.template || !btn) return;
+  const def = BUDGET_DEFS[budgetState.template];
+  setButtonLoading(btn, true);
+  const guard = document.getElementById('budget-tailor-guard');
+  guard.innerHTML = `<div class="alert alert-blue" style="margin-bottom:10px;">Your guide is comparing the proposal's budget against the official template…</div>`;
+
+  const lines = (data.setup && data.setup.budget_lines) || [];
+  const linesText = lines.filter(l=>l.description && l.description.trim())
+    .map(l=>`- ${l.description}${l.amount?` — $${l.amount}`:' (no amount given)'}${l.category?` [${l.category}]`:''}`).join('\n') || '(none entered by staff — rely on the full proposal text below)';
+  const rowsText = [
+    ...def.salaryRows.map(r=>`SALARY: ${r.name}`),
+    ...def.opRows.map(r=>`OPERATING: ${r.name}`),
+  ].join('\n');
+
+  const prompt = `You are helping an Institute for Excellence in Teaching & Learning staff member reconcile a faculty proposal's budget with the official Shipley budget template (${budgetState.template} tier, $${def.max.toLocaleString()} maximum, ${budgetState.periods.length} terms over the project period).
+
+Full proposal text:
+${data.proposalText}
+
+Budget line items the staff member confirmed from the proposal:
+${linesText}
+
+Official template rows (every row must be addressed):
+${rowsText}
+
+For each official template row:
+1. If a proposal line item clearly maps to it, include a mapping with your best estimate of the TOTAL amount for that row across the whole project period (a single number covering all terms combined, not per-term).
+2. If nothing in the proposal addresses this row, but it is a commonly needed cost for a Shipley project of this scope, add a flag with type "missing" and a short question the staff member should raise with the faculty lead.
+3. If a proposal line item does map to this row but the dollar amount looks too low for what is actually needed to accomplish what the proposal describes, add a flag with type "under_budgeted" (in addition to the mapping) explaining briefly why it looks low.
+Rows that are genuinely not applicable given the proposal (e.g., a generic "Other, please describe" row with nothing described) need no flag — skip them silently, do not force a flag on every row.
+
+Return ONLY a valid JSON object with no other text, explanation, or markdown, in exactly this shape:
+{"mappings": [{"rowName": "...", "amount": number}], "flags": [{"rowName": "...", "type": "missing", "message": "..."}]}`;
+
+  try{
+    const raw = await callGuide(prompt, {skipCtx:true, maxTokens:2500});
+    const jsonMatch = raw.match(/\{[\s\S]*\}/);
+    if(!jsonMatch) throw new Error('No JSON');
+    const parsed = JSON.parse(jsonMatch[0]);
+    applyBudgetTailoring(parsed);
+    guard.innerHTML = `<div class="alert alert-green" style="margin-bottom:10px;">Budget tailored to this proposal. Review the flags below and adjust amounts as needed.</div>`;
+  }catch(e){
+    guard.innerHTML = `<div class="alert alert-amber" style="margin-bottom:10px;">Something went wrong tailoring the budget — please try again.</div>`;
+  }finally{
+    setButtonLoading(btn, false);
+    updateBudgetTailorGuard();
+  }
+}
+
+function applyBudgetTailoring(parsed){
+  const def = BUDGET_DEFS[budgetState.template];
+  if(!def) return;
+  (parsed.mappings||[]).forEach(m=>{
+    if(!m.rowName || m.amount==null) return;
+    const amount = parseFloat(m.amount)||0;
+    const sIdx = def.salaryRows.findIndex(r=>r.name===m.rowName);
+    if(sIdx>-1 && budgetState.salary[sIdx]){
+      const per = Math.round((amount/(budgetState.periods.length||1))*100)/100;
+      budgetState.salary[sIdx].amounts = budgetState.periods.map(()=>per);
+      return;
+    }
+    const oIdx = def.opRows.findIndex(r=>r.name===m.rowName);
+    if(oIdx>-1 && budgetState.op[oIdx]){
+      budgetState.op[oIdx].amount = amount;
+    }
+  });
+  const data = loadAll();
+  const flags = (parsed.flags||[]).filter(f=>f.rowName && f.message).map((f,i)=>({
+    id:'bf_'+Date.now()+'_'+i,
+    rowName:f.rowName,
+    type: f.type==='under_budgeted' ? 'under_budgeted' : 'missing',
+    message:f.message,
+    dismissed:false,
+  }));
+  data.budget_flags = flags;
+  saveAll(data);
+  renderBudgetBuilder();
+  saveBudget();
+}
+
+function dismissBudgetFlag(flagId){
+  const data = loadAll();
+  const flags = data.budget_flags || [];
+  const f = flags.find(x=>x.id===flagId);
+  if(f) f.dismissed = true;
+  data.budget_flags = flags;
+  saveAll(data);
+  renderBudgetFlags();
+  updateBudgetTailorGuard();
+}
+
+function resetBudgetTailoring(){
+  const data = loadAll();
+  delete data.budget_flags;
+  saveAll(data);
+  renderBudgetFlags();
+  updateBudgetTailorGuard();
+}
+
+function renderBudgetFlags(){
+  const el = document.getElementById('budget-flags');
+  if(!el) return;
+  const data = loadAll();
+  const flags = (data.budget_flags||[]).filter(f=>!f.dismissed);
+  if(!flags.length){ el.innerHTML = ''; return; }
+  el.innerHTML = flags.map(f=>`
+    <div class="budget-flag-card">
+      <div class="budget-flag-row"><span class="budget-flag-type">${f.type==='under_budgeted'?'Under-budgeted':'Missing'}</span>${f.rowName}</div>
+      <div class="budget-flag-message">${f.message}</div>
+      <button class="btn-sm" onclick="dismissBudgetFlag('${f.id}')">Dismiss</button>
+    </div>`).join('');
+}
+
 function renderBudgetBuilder(){
   const def = BUDGET_DEFS[budgetState.template];
   if(!def) return;
@@ -3404,6 +3667,8 @@ function renderBudgetBuilder(){
       </tbody>
     </table>
     <div class="budget-status-bar ${statusCls}">${statusIcon} ${statusMsg}</div>`;
+  renderBudgetFlags();
+  updateBudgetTailorGuard();
 }
 
 function getGrantAmount(){
@@ -4772,6 +5037,7 @@ window.addEventListener('DOMContentLoaded',()=>{
   updateHeaderLabel();
   renderAvailabilityEntries();
   renderPriorityEntries();
+  renderBudgetLineEntries();
   renderTechToolEntries();
   loadSetup();
   loadTechConsiderations();
