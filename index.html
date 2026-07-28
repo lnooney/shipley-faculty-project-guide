@@ -2414,6 +2414,7 @@ function saveSetup(){
 
 function loadSetup(){
   const data = loadAll();
+  if(data.irb_status) selectIRB(data.irb_status);
   const s = data.setup;
   if(!s) return;
   const fields = ['title','lead','dept','team','start','end','challenge','vision','audience','prior'];
@@ -2430,7 +2431,6 @@ function loadSetup(){
     if(el && s[f]) el.value = s[f];
   });
   if(s.irb_notes) document.getElementById('s-irb-notes').value = s.irb_notes;
-  if(s.irb_status) selectIRB(s.irb_status);
   // Restore worker details
   const wd = data.worker_details || {};
   if(wd.cost) document.getElementById('s-worker-cost').value = wd.cost;
