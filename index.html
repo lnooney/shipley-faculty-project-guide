@@ -1743,6 +1743,15 @@ a:hover{color:var(--navy);}
   </div>
 
   <div class="card">
+    <div class="section-label" style="margin-bottom:8px;">Ask about the proposal</div>
+    <div class="guide-chips" style="margin-bottom:14px;">
+      <button class="chip" onclick="guideChip(this)">Does the proposal mention IRB or human subjects data? What does it say?</button>
+      <button class="chip" onclick="guideChip(this)">What does the proposal say about how the team will measure impact?</button>
+      <button class="chip" onclick="guideChip(this)">Who are the named collaborators and what are their roles, per the proposal?</button>
+      <button class="chip" onclick="guideChip(this)">Summarize the proposal's implementation timeline</button>
+      <button class="chip" onclick="guideChip(this)">Does the proposal mention hiring student workers? What does it say?</button>
+    </div>
+    <div class="section-label" style="margin-bottom:8px;">Ask for guidance</div>
     <div class="guide-chips">
       <button class="chip" onclick="guideChip(this)">How do I help the faculty lead write a good survey?</button>
       <button class="chip" onclick="guideChip(this)">This project is behind on its timeline — help me think through options</button>
@@ -2458,6 +2467,10 @@ function autoSaveFramework(){
   clearTimeout(fwSaveTimer);
   fwSaveTimer = setTimeout(saveFramework, 1500);
 }
+function flushFrameworkSave(){
+  clearTimeout(fwSaveTimer);
+  saveFramework();
+}
 
 const FW_COLLECTION_EXAMPLES = [
   {source:'Qualtrics survey', freq:'Pre/Post only'},
@@ -2826,6 +2839,29 @@ function updateMilestoneTailorGuard(){
   if(resetBtn) resetBtn.style.display = (data.task_relevance || data.investigate_questions) ? 'inline-flex' : 'none';
 }
 
+const IRB_STATUS_TEXT = {yes:'Yes — this project will collect data from human subjects', maybe:'Unsure whether this project will collect data from human subjects', no:'No — this project will not collect data from human subjects'};
+function buildSetupContextText(data){
+  const s = (data||loadAll()).setup || {};
+  const irbStatus = (data||loadAll()).irb_status;
+  const filled = [];
+  if(s.title)      filled.push(`Project title: ${s.title}`);
+  if(s.lead)       filled.push(`Faculty lead: ${s.lead}`);
+  if(s.dept)       filled.push(`Department: ${s.dept}`);
+  if(s.start || s.end) filled.push(`Project period: ${s.start||'?'} to ${s.end||'?'}`);
+  if(s.grant)      filled.push(`Grant amount: $${Number(s.grant).toLocaleString()}`);
+  if(s.challenge)  filled.push(`Teaching/learning challenge: ${s.challenge}`);
+  if(s.vision)     filled.push(`Vision: ${s.vision}`);
+  if(s.audience)   filled.push(`Target audience: ${s.audience}`);
+  if(s.prior)      filled.push(`Prior work: ${s.prior}`);
+  if(s.media)      filled.push(`Media & content needs: ${s.media}`);
+  if(s.data_needs) filled.push(`Data & analytics needs: ${s.data_needs}`);
+  if(s.tech)       filled.push(`Technology: ${s.tech}`);
+  if(s.workers)    filled.push(`Student workers: ${s.workers}`);
+  if(irbStatus && IRB_STATUS_TEXT[irbStatus]) filled.push(`IRB / human subjects data: ${IRB_STATUS_TEXT[irbStatus]}`);
+  if(s.irb_notes)  filled.push(`IRB notes: ${s.irb_notes}`);
+  return filled.join('\n');
+}
+
 async function tailorMilestonesToProposal(){
   const btn = document.getElementById('btn-tailor-milestones');
   const data = loadAll();
@@ -2836,19 +2872,23 @@ async function tailorMilestonesToProposal(){
 
   const flat = getAllDefaultTasksFlat();
   const taskListText = flat.map(t=>`${t.id} [${MILESTONE_LABELS[t.milestone]}${t.group?' / '+t.group:''}]: ${t.name}`).join('\n');
+  const setupText = buildSetupContextText(data);
+  const setupSection = setupText
+    ? `Project scoping information the staff member has already manually entered — treat anything answered here as settled and do NOT generate an investigate question asking about it again:\n${setupText}\n\n`
+    : '';
 
-  const prompt = `You are helping an Institute for Excellence in Teaching & Learning staff member tailor a default Shipley project milestone checklist to one specific project, using its full proposal text.
+  const prompt = `You are helping an Institute for Excellence in Teaching & Learning staff member tailor a default Shipley project milestone checklist to one specific project, using its full proposal text and any project scoping information already entered.
 
 Full proposal text:
 ${data.proposalText}
 
-Default milestone checklist (every task below has a stable ID — classify every single one, with no exceptions):
+${setupSection}Default milestone checklist (every task below has a stable ID — classify every single one, with no exceptions):
 ${taskListText}
 
 For each task ID, decide one of three things:
-1. "confirmed" — the proposal clearly supports or implies this task applies to this project.
-2. "not_relevant" — the proposal makes clear this task does not apply to this project (e.g., no mention of student workers at all, no digital tools involved, no plans for a second pilot).
-3. Ambiguous — the proposal doesn't clearly address whether this applies, but it's a common and important task for Shipley projects generally, so a human should be asked rather than the task being silently dropped or kept. Group related ambiguous task IDs together into ONE question wherever they belong together (e.g., all the Hiring-group tasks under one "will this project need to hire student workers?" question) — do not ask a separate question per task when several tasks share the same underlying yes/no decision. Word each question so a "yes" means "add these tasks to the plan" and a "no" means "these tasks don't apply."
+1. "confirmed" — the proposal or the scoping information above clearly supports or implies this task applies to this project.
+2. "not_relevant" — the proposal or the scoping information above makes clear this task does not apply to this project (e.g., no mention of student workers at all, no digital tools involved, no plans for a second pilot).
+3. Ambiguous — neither the proposal nor the scoping information above clearly addresses whether this applies, but it's a common and important task for Shipley projects generally, so a human should be asked rather than the task being silently dropped or kept. Group related ambiguous task IDs together into ONE question wherever they belong together (e.g., all the Hiring-group tasks under one "will this project need to hire student workers?" question) — do not ask a separate question per task when several tasks share the same underlying yes/no decision. Word each question so a "yes" means "add these tasks to the plan" and a "no" means "these tasks don't apply." Never ask about something already answered in the scoping information above — resolve it into "confirmed" or "not_relevant" instead.
 
 Return ONLY a valid JSON object with no other text, explanation, or markdown, in exactly this shape:
 {"confirmed": ["m1_0", "m2_3", ...], "not_relevant": ["m1_5", ...], "investigate": [{"question": "...", "relatedTaskIds": ["m1_11","m1_12","m1_13","m1_14"]}, ...]}
@@ -4779,7 +4819,7 @@ async function askGuide(){
   const out = document.getElementById('guide-output');
   showThinking(out);
   try{
-    const guidePrompt = `You are a helpful guide for Institute for Excellence in Teaching & Learning staff supporting a faculty-led Shipley Academic Innovation Fund award at Boston University. Answer the staff member's question below. Do not reference the BU grants office or university policy. If the question raises something that needs follow-up, flag it clearly for follow-up with the faculty lead.\n\n${input}`;
+    const guidePrompt = `You are a helpful guide for Institute for Excellence in Teaching & Learning staff supporting a faculty-led Shipley Academic Innovation Fund award at Boston University. Answer the staff member's question below. If the question asks whether something was included in the proposal, or how the team proposes to approach something, answer directly from the full proposal text provided in the project context below — quote or closely paraphrase what it actually says rather than giving generic advice, and say plainly if the proposal doesn't address it. Do not reference the BU grants office or university policy. If the question raises something that needs follow-up, flag it clearly for follow-up with the faculty lead.\n\n${input}`;
     const r = await callGuide(guidePrompt);
     renderAIResponse(out, r);
   }catch(e){
@@ -4916,6 +4956,8 @@ function closeSaveModal(){ document.getElementById('modal-save').classList.add('
 function confirmSaveProject(){
   const name = document.getElementById('modal-save-name').value.trim();
   if(!name){ document.getElementById('modal-save-name').focus(); return; }
+  saveSetup();
+  flushFrameworkSave();
   const projects = loadProjects();
   let id = getActiveId();
   if(!id || !projects[id]){
