@@ -3338,11 +3338,23 @@ For type "under_budgeted" flags, "message" can be omitted — it is filled in au
   }
 }
 
+// A nonzero amount already in a row — whether typed in directly or left over from an
+// earlier tailoring pass — is treated as a staff correction to the AI's estimate and is
+// never silently overwritten by a later tailoring run.
+function getBudgetRowAmount(def, rowName){
+  const sIdx = def.salaryRows.findIndex(r=>r.name===rowName);
+  if(sIdx>-1 && budgetState.salary[sIdx]) return parseFloat(budgetState.salary[sIdx].amount)||0;
+  const oIdx = def.opRows.findIndex(r=>r.name===rowName);
+  if(oIdx>-1 && budgetState.op[oIdx]) return parseFloat(budgetState.op[oIdx].amount)||0;
+  return 0;
+}
+
 function applyBudgetTailoring(parsed){
   const def = BUDGET_DEFS[budgetState.template];
   if(!def) return;
   (parsed.mappings||[]).forEach(m=>{
     if(!m.rowName || m.amount==null) return;
+    if(getBudgetRowAmount(def, m.rowName) > 0) return;
     const amount = parseFloat(m.amount)||0;
     const sIdx = def.salaryRows.findIndex(r=>r.name===m.rowName);
     if(sIdx>-1 && budgetState.salary[sIdx]){
@@ -3356,7 +3368,7 @@ function applyBudgetTailoring(parsed){
   });
   const data = loadAll();
   const UNDER_BUDGETED_MESSAGE = 'This amount looks like it may be under estimated. Please ask your faculty project lead to confirm.';
-  const flags = (parsed.flags||[]).filter(f=>f.rowName && (f.type==='under_budgeted' || f.message)).map((f,i)=>({
+  const flags = (parsed.flags||[]).filter(f=>f.rowName && getBudgetRowAmount(def, f.rowName)===0 && (f.type==='under_budgeted' || f.message)).map((f,i)=>({
     id:'bf_'+Date.now()+'_'+i,
     rowName:f.rowName,
     type: f.type==='under_budgeted' ? 'under_budgeted' : 'missing',
