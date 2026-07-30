@@ -791,6 +791,18 @@ a:hover{color:var(--navy);}
     <p>This guide will walk you through every stage of a Shipley Academic Innovation project — from initial scoping through impact reporting — as you support the faculty lead running it. Each section builds on the last. Start by telling us about the project, and your guide will personalize everything to the work you're supporting.</p>
   </div>
 
+  <!-- Follow-ups With Faculty Team -->
+  <div class="card" id="followups-card" style="display:none;">
+    <div class="card-header">
+      <div class="card-icon" aria-hidden="true">📌</div>
+      <div>
+        <div class="card-title">Follow-ups With Your Faculty Team</div>
+        <div class="card-sub">Open items to raise with the faculty team before you can finish planning</div>
+      </div>
+    </div>
+    <div id="followups-list"></div>
+  </div>
+
   <!-- Proposal Import -->
   <div class="card" id="import-card">
     <div class="card-header">
@@ -1251,7 +1263,7 @@ a:hover{color:var(--navy);}
       <div><div class="card-title">Project Milestones & Timeline</div><div class="card-sub">Based on the Shipley project timeline structure</div></div>
     </div>
     <p style="font-size:14px;color:var(--text2);line-height:1.7;">
-      Shipley projects typically follow four milestones. Check off tasks as you complete them, add notes, and flag blockers. Use the guide to think through sequencing or troubleshoot delays.
+      Shipley projects typically follow four milestones. Check off tasks as they are completed, add notes, and flag blockers. Use the guide to think through sequencing or troubleshoot delays.
     </p>
   </div>
 
@@ -2146,27 +2158,41 @@ function showWorkerNote(){
   document.getElementById('worker-details').style.display = hiring ? 'block' : 'none';
 }
 
+function addDaysToDate(dateStr, days){
+  if(!dateStr) return '';
+  const d = new Date(dateStr+'T00:00:00');
+  d.setDate(d.getDate()+days);
+  return d.toISOString().slice(0,10);
+}
+
 function syncWorkersToProjectPlan(){
   const v = document.getElementById('s-workers').value;
   const hiring = v && v !== 'no';
   const date = document.getElementById('s-worker-date')?.value || '';
+  const startDate = date ? addDaysToDate(date, -42) : '';
 
   // ── Milestones: inject/remove hiring task in M1 ──
   customTasks = customTasks.filter(t=>t.id!=='worker_hire');
   if(hiring){
     customTasks.push({
       id: 'worker_hire',
-      name: 'Post and hire student worker position(s)',
+      name: 'Begin student hiring process',
       lead: 'Faculty lead',
       milestone: 'm1',
-      date: date,
-      blocker: 'HR onboarding takes 4–6 weeks minimum. Begin before the semester starts.',
+      blocker: date
+        ? `Target hire date is ${fmtDate(date)} — HR onboarding takes 4–6 weeks minimum, so start posting the position by ${fmtDate(startDate)}.`
+        : 'HR onboarding takes 4–6 weeks minimum. Begin before the semester starts.',
       custom: true
     });
   }
   const data = loadAll();
   data.custom_tasks = customTasks;
   data.worker_details = { date };
+  if(hiring && date){
+    const meta = data.task_meta || {};
+    meta.worker_hire = { ...(meta.worker_hire||{}), due: date, start: startDate };
+    data.task_meta = meta;
+  }
   saveAll(data);
   renderMilestones();
 }
@@ -2772,6 +2798,10 @@ async function tailorMilestonesToProposal(){
   const setupSection = setupText
     ? `Project scoping information the staff member has already manually entered — treat anything answered here as settled and do NOT generate an investigate question asking about it again:\n${setupText}\n\n`
     : '';
+  const s = data.setup || {};
+  const windowStart = s.start || '2026-09-01';
+  const windowEnd = s.end || '2027-08-31';
+  const hasHireDate = !!(data.worker_details && data.worker_details.date);
 
   const prompt = `You are helping an Institute for Excellence in Teaching & Learning staff member tailor a default Shipley project milestone checklist to one specific project, using its full proposal text and any project scoping information already entered.
 
@@ -2786,13 +2816,17 @@ For each task ID, decide one of three things:
 2. "not_relevant" — the proposal or the scoping information above makes clear this task does not apply to this project (e.g., no mention of student workers at all, no digital tools involved, no plans for a second pilot).
 3. Ambiguous — neither the proposal nor the scoping information above clearly addresses whether this applies, but it's a common and important task for Shipley projects generally, so a human should be asked rather than the task being silently dropped or kept. Group related ambiguous task IDs together into ONE question wherever they belong together (e.g., all the Hiring-group tasks under one "will this project need to hire student workers?" question) — do not ask a separate question per task when several tasks share the same underlying yes/no decision. Word each question so a "yes" means "add these tasks to the plan" and a "no" means "these tasks don't apply." Never ask about something already answered in the scoping information above — resolve it into "confirmed" or "not_relevant" instead.
 
-Return ONLY a valid JSON object with no other text, explanation, or markdown, in exactly this shape:
-{"confirmed": ["m1_0", "m2_3", ...], "not_relevant": ["m1_5", ...], "investigate": [{"question": "...", "relatedTaskIds": ["m1_11","m1_12","m1_13","m1_14"]}, ...]}
+Additionally, for every task ID you mark "confirmed", estimate a realistic due date and include it in "dates". Use your expertise as an experienced project manager: read the proposal's own timeline narrative for explicit signals, and where the proposal is silent, reason from normal project sequencing (e.g., hiring and IRB submission happen early; data collection follows setup; analysis and dissemination come later) and reasonable estimates of how long each kind of task actually takes. Every date must fall between ${windowStart} and ${windowEnd} (this award's full duration — the project cannot run longer than this). Use YYYY-MM-DD format. It is fine and expected to estimate confidently — the staff member reviews and can adjust every date, so a reasonable estimate is far more useful than leaving it blank. Only omit a date for a confirmed task if there is truly no reasonable basis to place it anywhere in the window.
 
-Every task ID from the checklist above must appear in exactly one place: either in "confirmed", in "not_relevant", or inside exactly one "investigate" entry's "relatedTaskIds". Do not leave any task ID out.`;
+${!hasHireDate ? `The Setup tab does not yet have a target student-worker hire date. If the proposal states one directly, or states when the student worker's described work begins (from which the hire date is the same as that work-start date), include it as "worker_target_date" in YYYY-MM-DD format. Omit this field entirely if the proposal gives no basis to infer it, or if this project has no student workers.` : `The Setup tab already has a target student-worker hire date — do not include "worker_target_date" in your response.`}
+
+Return ONLY a valid JSON object with no other text, explanation, or markdown, in exactly this shape:
+{"confirmed": ["m1_0", "m2_3", ...], "not_relevant": ["m1_5", ...], "investigate": [{"question": "...", "relatedTaskIds": ["m1_11","m1_12","m1_13","m1_14"]}, ...], "dates": {"m1_0": "2026-09-15", ...}, "worker_target_date": "2026-10-01"}
+
+Every task ID from the checklist above must appear in exactly one place: either in "confirmed", in "not_relevant", or inside exactly one "investigate" entry's "relatedTaskIds". Do not leave any task ID out. Omit "worker_target_date" per the instructions above when it doesn't apply.`;
 
   try{
-    const raw = await callGuide(prompt, {skipCtx:true, maxTokens:3000});
+    const raw = await callGuide(prompt, {skipCtx:true, maxTokens:3800});
     const jsonMatch = raw.match(/\{[\s\S]*\}/);
     if(!jsonMatch) throw new Error('No JSON');
     const parsed = JSON.parse(jsonMatch[0]);
@@ -2815,7 +2849,30 @@ function applyMilestoneTailoring(parsed){
     .map((q,i)=>({id:'inv_'+Date.now()+'_'+i, question:q.question, relatedTaskIds:q.relatedTaskIds, resolved:null}));
   data.task_relevance = relevance;
   data.investigate_questions = questions;
+
+  // Estimated due dates for confirmed tasks — never overwrite a date the PM already entered.
+  const meta = data.task_meta || {};
+  Object.entries(parsed.dates||{}).forEach(([id, date])=>{
+    if(!date || relevance[id]!=='confirmed') return;
+    if(meta[id] && meta[id].due) return;
+    meta[id] = { ...(meta[id]||{}), due: date };
+  });
+  data.task_meta = meta;
   saveAll(data);
+
+  // If the proposal reveals a target hire date and the PM has already indicated this
+  // project needs student workers but hasn't set a date yet, fill it in.
+  if(parsed.worker_target_date){
+    const workersSel = document.getElementById('s-workers');
+    const dateInput = document.getElementById('s-worker-date');
+    const currentlyHiring = workersSel && workersSel.value && workersSel.value !== 'no';
+    const dateAlreadySet = !!(data.worker_details && data.worker_details.date);
+    if(currentlyHiring && !dateAlreadySet && dateInput){
+      dateInput.value = parsed.worker_target_date;
+      syncWorkersToProjectPlan();
+    }
+  }
+
   renderMilestones();
 }
 
@@ -2825,7 +2882,9 @@ function resolveInvestigateQuestion(qid, answer){
   const q = questions.find(x=>x.id===qid);
   if(!q) return;
   const relevance = data.task_relevance || {};
-  q.relatedTaskIds.forEach(id=>{ relevance[id] = answer==='yes' ? 'confirmed' : 'not_relevant'; });
+  q.relatedTaskIds.forEach(id=>{
+    relevance[id] = answer==='yes' ? 'confirmed' : answer==='ask_faculty' ? 'pending_faculty' : 'not_relevant';
+  });
   q.resolved = answer;
   data.task_relevance = relevance;
   data.investigate_questions = questions;
@@ -2866,9 +2925,10 @@ function renderInvestigatePanel(){
     questions.map(q=>`
       <div class="investigate-card">
         <div class="investigate-question">${q.question}</div>
-        <div style="display:flex;gap:8px;">
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
           <button class="btn-sm btn-primary" onclick="resolveInvestigateQuestion('${q.id}','yes')">Yes — add to plan</button>
           <button class="btn-sm" onclick="resolveInvestigateQuestion('${q.id}','no')">No — not needed</button>
+          <button class="btn-sm" onclick="resolveInvestigateQuestion('${q.id}','ask_faculty')">Ask faculty team</button>
         </div>
       </div>`).join('');
 }
@@ -2893,7 +2953,7 @@ function renderMilestones(){
   // Tailoring only affects the default checklist — custom/auto-generated tasks are always shown.
   function isHiddenByTailoring(t){
     if(t.custom) return false;
-    return taskRelevance[t.id]==='not_relevant' || pendingTaskIds.has(t.id);
+    return taskRelevance[t.id]==='not_relevant' || taskRelevance[t.id]==='pending_faculty' || pendingTaskIds.has(t.id);
   }
 
   const M1_GROUPS = ['General','IRB','Content Development','Hiring','Technology','Learning Analytics'];
@@ -3050,7 +3110,7 @@ function renderMilestones(){
           <div class="task-body"><div class="task-name">${t.name}</div></div>
           <button class="btn-sm" onclick="restoreHiddenTask('${t.id}')">Restore</button>
         </div>`).join('');
-      html += `<button class="hidden-tasks-toggle" onclick="toggleHiddenTasksPanel('${m}')">${hiddenTasks.length} task${hiddenTasks.length!==1?'s':''} hidden as not relevant to this project — show ▾</button>
+      html += `<button class="hidden-tasks-toggle" onclick="toggleHiddenTasksPanel('${m}')">${hiddenTasks.length} task${hiddenTasks.length!==1?'s':''} currently hidden (not relevant, or still awaiting confirmation) — show ▾</button>
         <div id="hidden-tasks-${m}" style="display:none;margin-top:6px;">${hiddenHtml}</div>`;
     }
     container.innerHTML = html;
@@ -3071,6 +3131,7 @@ function renderMilestones(){
   }
   renderInvestigatePanel();
   updateMilestoneTailorGuard();
+  renderFollowUpsCard();
 }
 
 function saveTaskMeta(id, field, value){
@@ -3405,13 +3466,63 @@ function renderBudgetFlags(){
   if(!el) return;
   const data = loadAll();
   const flags = (data.budget_flags||[]).filter(f=>!f.dismissed);
-  if(!flags.length){ el.innerHTML = ''; return; }
+  if(!flags.length){ el.innerHTML = ''; renderFollowUpsCard(); return; }
   el.innerHTML = flags.map(f=>`
     <div class="budget-flag-card">
       <div class="budget-flag-row"><span class="budget-flag-type">${f.type==='under_budgeted'?'Under-budgeted':'Missing'}</span>${f.rowName}</div>
       <div class="budget-flag-message">${f.message}</div>
       <button class="btn-sm" onclick="dismissBudgetFlag('${f.id}')">Dismiss</button>
     </div>`).join('');
+  renderFollowUpsCard();
+}
+
+function goToTab(name){
+  const btn = document.getElementById('tab-btn-'+name);
+  if(btn) switchTab(name, btn);
+}
+
+// Consolidated PM to-do list: gathers open "ask faculty team" investigate questions
+// (Milestones) and undismissed flags (Budget) into one place, surfaced on Project Setup
+// so a PM sees outstanding follow-ups as soon as they load a project.
+function renderFollowUpsCard(){
+  const card = document.getElementById('followups-card');
+  const list = document.getElementById('followups-list');
+  if(!card || !list) return;
+  const data = loadAll();
+  const askFacultyQuestions = (data.investigate_questions||[]).filter(q=>q.resolved==='ask_faculty');
+  const budgetFlags = (data.budget_flags||[]).filter(f=>!f.dismissed);
+  if(!askFacultyQuestions.length && !budgetFlags.length){
+    card.style.display = 'none';
+    list.innerHTML = '';
+    return;
+  }
+  card.style.display = 'block';
+  let html = '';
+  if(askFacultyQuestions.length){
+    html += `<div class="section-label" style="margin-bottom:8px;">From Milestones</div>`;
+    html += askFacultyQuestions.map(q=>`
+      <div class="investigate-card">
+        <div class="investigate-question">${q.question}</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <button class="btn-sm btn-primary" onclick="resolveInvestigateQuestion('${q.id}','yes')">Yes — add to plan</button>
+          <button class="btn-sm" onclick="resolveInvestigateQuestion('${q.id}','no')">No — not needed</button>
+          <button class="btn-sm" onclick="goToTab('milestones')">Go to Milestones</button>
+        </div>
+      </div>`).join('');
+  }
+  if(budgetFlags.length){
+    html += `<div class="section-label" style="margin-bottom:8px;${askFacultyQuestions.length?'margin-top:14px;':''}">From Budget</div>`;
+    html += budgetFlags.map(f=>`
+      <div class="budget-flag-card">
+        <div class="budget-flag-row"><span class="budget-flag-type">${f.type==='under_budgeted'?'Under-budgeted':'Missing'}</span>${f.rowName}</div>
+        <div class="budget-flag-message">${f.message}</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <button class="btn-sm" onclick="dismissBudgetFlag('${f.id}')">Dismiss</button>
+          <button class="btn-sm" onclick="goToTab('budget')">Go to Budget</button>
+        </div>
+      </div>`).join('');
+  }
+  list.innerHTML = html;
 }
 
 function renderBudgetBuilder(){
