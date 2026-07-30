@@ -445,7 +445,7 @@ a:hover{color:var(--navy);}
 .bgt-main-table{width:100%;border-collapse:collapse;font-size:13px;}
 .bgt-main-table th{background:var(--navy);color:#fff;padding:9px 12px;text-align:left;font-size:12px;font-weight:500;white-space:nowrap;}
 .bgt-main-table td{padding:7px 12px;border-bottom:0.5px solid var(--border);vertical-align:middle;}
-.bgt-period-header,.bgt-total-header{text-align:right;min-width:90px;}
+.bgt-total-header{text-align:right;min-width:90px;}
 .bgt-fringe-header{text-align:center;min-width:70px;}
 .bgt-label-header{min-width:200px;}
 .bgt-section-header td{background:var(--navy2);color:#fff;font-size:11px;font-weight:600;padding:7px 12px;text-transform:uppercase;letter-spacing:0.07em;}
@@ -458,7 +458,6 @@ a:hover{color:var(--navy);}
   border:1px dashed var(--gold);border-radius:4px;padding:4px 7px;font-size:13px;
 }
 .bgt-input-cell input:focus{background:#fff;border-color:var(--navy);box-shadow:0 0 0 2px rgba(26,39,68,.1);}
-.bgt-calc-cell{text-align:right;color:var(--text2);font-weight:500;white-space:nowrap;}
 .bgt-na-cell{text-align:center;color:var(--text3);font-size:12px;}
 .bgt-fringe-cell{text-align:center;}
 .fringe-badge{font-size:11px;background:rgba(26,39,68,0.1);color:var(--navy);padding:2px 7px;border-radius:4px;font-weight:600;}
@@ -470,16 +469,13 @@ a:hover{color:var(--navy);}
 .bgt-grand-total-row td{background:var(--navy);color:#fff;}
 .bgt-grand-label{font-weight:600;font-size:14px;}
 .bgt-grand-total-cell{text-align:right;font-weight:700;font-size:15px;white-space:nowrap;}
-.bgt-total-cell{text-align:right;font-weight:600;white-space:nowrap;}
 .budget-status-bar{padding:12px 16px;font-size:13px;font-weight:600;border-radius:0 0 var(--radius) var(--radius);}
 .bgt-status-ok{background:var(--green-bg);color:var(--green-text);}
 .bgt-status-warn{background:var(--amber-bg);color:var(--amber-text);}
 .bgt-status-over{background:var(--red-light);color:#9b2d23;}
 .bgt-desc-input{margin-top:4px;}
 .bgt-desc-input input{background:rgba(255,235,150,0.3);border:1px dashed var(--gold);border-radius:4px;padding:3px 8px;font-size:12px;width:100%;}
-.bgt-period-config{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px;}
-.bgt-period-config .field{flex:1;min-width:140px;}
-.budget-fringe-ref{font-size:12px;color:var(--text3);margin-top:10px;padding:10px 14px;background:rgba(26,39,68,0.04);border-radius:var(--radius);}
+.budget-fringe-ref{font-size:12px;color:var(--text3);margin-bottom:14px;padding:10px 14px;background:rgba(26,39,68,0.04);border-radius:var(--radius);}
 .budget-fringe-ref strong{color:var(--text2);}
 @media(max-width:700px){.budget-tpl-selector{flex-direction:column;}.bgt-main-table{font-size:12px;}}
 
@@ -860,14 +856,14 @@ a:hover{color:var(--navy);}
         <input type="date" id="s-end" value="2027-08-31" style="width:100%;"/>
       </div>
     </div>
-    <div class="hint" style="margin-top:-8px;margin-bottom:14px;">This grant cycle runs one calendar year, Fall 2026 – Summer 2027. Adjust these dates only if this project's actual timeline differs.</div>
+    <div class="hint" style="margin-top:-8px;margin-bottom:14px;">This award cycle runs one calendar year, Fall 2026 – Summer 2027. Adjust these dates only if this project's actual timeline differs.</div>
     <div class="field">
-      <label id="grant-amount-label">Grant award amount</label>
+      <label id="grant-amount-label">Award amount</label>
       <div class="radio-pill-group" role="radiogroup" aria-labelledby="grant-amount-label">
         <label class="radio-pill"><input type="radio" name="s-grant" value="10000" onchange="onGrantAmountChange(this)"/> $10,000</label>
         <label class="radio-pill"><input type="radio" name="s-grant" value="25000" onchange="onGrantAmountChange(this)"/> $25,000</label>
       </div>
-      <div class="hint">This selects the project's budget template. (No $5,000 tier this funding round.)</div>
+      <div class="hint">This selects the project's budget template.</div>
     </div>
   </div>
 
@@ -891,7 +887,7 @@ a:hover{color:var(--navy);}
   <div class="card">
     <div class="card-header">
       <div class="card-icon">🎯</div>
-      <div><div class="card-title">Vision & Goals</div><div class="card-sub">This is your opportunity to think big.</div></div>
+      <div><div class="card-title">Vision & Goals</div><div class="card-sub">Capture the faculty lead's vision for this project</div></div>
     </div>
 
     <div class="field">
@@ -1019,7 +1015,8 @@ a:hover{color:var(--navy);}
     <div id="tech-considerations">
       <!-- rendered by renderTechConsiderations() -->
     </div>
-    <div class="alert alert-amber" style="margin-top:8px;"><strong>Do not assume a tool is approved for use simply because it is popular.</strong></div>
+    <div class="alert alert-amber" style="margin-top:8px;"><strong>New technology clearance:</strong> Any technology that isn't already approved by BU IS&amp;T for use will need to be cleared by Shipley and IS&amp;T leadership before use — loop in the ATI team early to support this process.</div>
+    <div class="alert alert-amber" style="margin-top:8px;"><strong>Please remind your faculty team not to assume a tool is approved for use simply because it is popular</strong> — confirm it clears the considerations above.</div>
 
     <div class="section-label" style="margin-top:14px;">Student Workers</div>
     <div class="field">
@@ -1031,7 +1028,7 @@ a:hover{color:var(--navy);}
         <option value="yes-both">Yes — both graduate and undergraduate</option>
         <option value="no">No student workers planned</option>
       </select>
-      <div id="worker-note" class="conditional-note hint" style="display:none;color:var(--amber-text);">Hiring student workers involves administrative steps that take longer than most faculty teams expect. Someone will need to post positions, conduct interviews, complete HR onboarding paperwork, and set up payroll — plan for 4–6 weeks minimum before a student worker can begin paid work. If this project depends on student worker contributions early in the semester, begin this process before the semester starts. Also confirm with the department whether a stipend or hourly employment is more appropriate for this project.</div>
+      <div id="worker-note" class="conditional-note hint" style="display:none;color:var(--amber-text);">Please remind your faculty team that hiring student workers involves administrative steps that take longer than most teams expect — someone will need to post positions, conduct interviews, complete HR onboarding paperwork, and set up payroll. Plan for 4–6 weeks minimum before a student worker can begin paid work, and if this project depends on student worker contributions early in the semester, begin this process before the semester starts. They should also confirm with the department whether a stipend or hourly employment is more appropriate for this project.</div>
     </div>
 
     <div id="worker-details" style="display:none;">
@@ -1044,7 +1041,7 @@ a:hover{color:var(--navy);}
     </div>
 
     <div class="section-label" style="margin-top:14px;">Time & Availability</div>
-    <div class="hint" style="margin-bottom:10px;">Be specific. A realistic picture of availability is essential for building a workable timeline. If team members are on 9-month contracts and the grant does not include summer stipends, project work may need to pause or slow significantly during summer months.</div>
+    <div class="hint" style="margin-bottom:10px;">Be specific. A realistic picture of availability is essential for building a workable timeline. If team members are on 9-month contracts and the award does not include summer stipends, project work may need to pause or slow significantly during summer months.</div>
     <div id="availability-entries"></div>
     <button class="btn-sm" onclick="addAvailabilityEntry()" style="margin-top:4px;">+ Add constraint</button>
   </div>
@@ -1441,22 +1438,22 @@ a:hover{color:var(--navy);}
       <div class="card-icon">💰</div>
       <div><div class="card-title">Budget Builder</div><div class="card-sub">Based on official Shipley Award budget templates</div></div>
     </div>
-    <div class="alert alert-navy" style="margin-bottom:14px;">Select the grant award amount to load the appropriate budget template. Yellow cells are input fields — fringe benefits calculate automatically. Adjust the timeline labels to match the project's start year.</div>
+    <div class="alert alert-navy" style="margin-bottom:14px;">Select the award amount to load the appropriate budget template. Yellow cells are input fields — fringe benefits calculate automatically. These awards are paid up front as a single lump sum, not disbursed by term.</div>
     <div class="alert alert-amber" style="margin-bottom:14px;">
-      <strong>Before spending:</strong> Contact the department grants administrator before making large purchases or hiring decisions. Keep receipts for all expenditures. Unspent funds at project close may need to be returned.
+      <strong>Before spending:</strong> Please remind your faculty team that they should contact the department grants administrator before making large purchases or hiring decisions, keep receipts for all expenditures, and know that unspent funds at project close may need to be returned.
     </div>
 
-    <div class="section-label">My Shipley award is:</div>
+    <div class="section-label">Shipley Award amount</div>
     <div class="budget-tpl-selector">
       <div class="budget-tpl-card" id="btpl-10k" onclick="selectBudgetTemplate('10k')">
         <div class="tpl-amount">$10,000</div>
-        <div class="tpl-label">Standard award</div>
-        <div class="tpl-periods">4 terms · 18 months</div>
+        <div class="tpl-label">Seed Funding</div>
+        <div class="tpl-periods">12 months</div>
       </div>
       <div class="budget-tpl-card" id="btpl-25k" onclick="selectBudgetTemplate('25k')">
         <div class="tpl-amount">$25,000</div>
-        <div class="tpl-label">Expanded award</div>
-        <div class="tpl-periods">5 terms · 2 academic years</div>
+        <div class="tpl-label">Innovation Funding</div>
+        <div class="tpl-periods">12 months</div>
       </div>
     </div>
   </div>
@@ -1471,7 +1468,7 @@ a:hover{color:var(--navy);}
         </div>
       </div>
       <div class="alert alert-blue" style="margin-bottom:14px;">
-        The guide compares the budget line items entered on Project Setup — plus the full proposal text — against this template's official rows. Amounts it can confidently match get filled in below; anything commonly needed but not addressed, or that looks under-budgeted, is flagged here to raise with the faculty lead.
+        The guide compares the budget line items entered on Project Setup — plus the full proposal text, when available — against this template's official rows. Amounts it can confidently match get filled in below; anything commonly needed but not addressed, or that looks under-budgeted, is flagged here to raise with the faculty lead.
       </div>
       <div id="budget-tailor-guard"></div>
       <div style="display:flex;gap:10px;flex-wrap:wrap;">
@@ -1483,34 +1480,15 @@ a:hover{color:var(--navy);}
 
     <div class="card">
       <div class="card-header">
-        <div class="card-icon">📅</div>
-        <div><div class="card-title">Timeline Labels</div><div class="card-sub">Select your start year — labels update automatically</div></div>
-        <div style="margin-left:auto;display:flex;align-items:center;gap:8px;">
-          <label style="font-size:13px;font-weight:600;color:var(--navy);">Start year:</label>
-          <select id="budget-start-year" style="font-size:13px;padding:4px 8px;border-radius:6px;border:1px solid var(--border);"
-            onchange="updateBudgetYear(this.value)">
-            <option value="2025">2025</option>
-            <option value="2026" selected>2026</option>
-            <option value="2027">2027</option>
-            <option value="2028">2028</option>
-            <option value="2029">2029</option>
-          </select>
-        </div>
+        <div class="card-icon">📊</div>
+        <div><div class="card-title">Budget Summary</div><div class="card-sub">Enter amounts in yellow cells — totals calculate automatically</div></div>
       </div>
-      <div class="bgt-period-config" id="budget-period-inputs"></div>
       <div class="budget-fringe-ref">
         <strong>Fringe Rate Reference:</strong>&ensp;
         Faculty / PostDoc / Temp Exempt: <strong>31.0%</strong> &nbsp;·&nbsp;
         PhD Student: <strong>12.5%</strong> &nbsp;·&nbsp;
         Undergrad / Grad Student (Hourly): <strong>0%</strong> &nbsp;·&nbsp;
         Temporary Employee, Non-Exempt: <strong>31.4%</strong>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <div class="card-icon">📊</div>
-        <div><div class="card-title">Budget Summary</div><div class="card-sub">Enter amounts in yellow cells — totals calculate automatically</div></div>
       </div>
       <div id="budget-table-container" style="overflow-x:auto;"></div>
       <div style="margin-top:16px;">
@@ -1521,7 +1499,7 @@ a:hover{color:var(--navy);}
             onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();aiBudgetChat();}"></textarea>
           <button class="btn-gold" onclick="aiBudgetChat()" style="white-space:nowrap;">Send ↗</button>
         </div>
-        <button class="btn-gold" onclick="aibudgethelp()" style="margin-top:8px;">Ask guide about my budget ↗</button>
+        <button class="btn-gold" onclick="aibudgethelp()" style="margin-top:8px;">Ask guide about this project's budget ↗</button>
       </div>
     </div>
   </div>
@@ -1837,6 +1815,9 @@ function switchTab(name, btn){
     else prefillReport();
     updateReportTitlePreview();
   }
+  if(name==='budget'){
+    updateBudgetTailorGuard();
+  }
 }
 
 // ═══════════════════════════════════════════════════════
@@ -1999,7 +1980,7 @@ Return ONLY the JSON object with no other text, explanation, or markdown.
 For budget_template: "10k" if grant ≤ $10,000; "25k" if grant ≤ $25,000; null if not found.
 For salary keys ($10K): "Summer Stipend (shared between PIs)", "Course Release / Adjunct", "Other Faculty (describe)", "Research Assistant (Hourly)"
 For salary keys ($25K): "Course Release / Adjunct", "Summer Salary", "Overbase", "Other Faculty (describe)", "PostDoc", "PhD Student", "Undergrad/Grad Student (Hourly)", "Temporary Employee, Exempt", "Temporary Employee, Non-Exempt"
-Salary values: {"0": amount_period1, "1": amount_period2, ...} — distribute total evenly if periods not specified.
+Salary values: total amount for the whole award as a number (these projects are funded as a single lump sum, not by term).
 For op keys ($10K): "AI Tools & Software Licenses (e.g., ChatGPT Pro, Jutly)", "Supplies, Equipment, & Materials", "Meeting / Workshop Expense", "Other, please describe"
 For op keys ($25K): "AI Tools & Software Licenses", "Supplies, Equipment, & Materials", "Contracted Services", "Meeting / Workshop Expense", "Travel & Conference Registration", "Participant Incentives", "Other, please describe"
 Op values: total amount as a number.
@@ -2033,12 +2014,8 @@ function applyProposalImport(data, out){
     const def=BUDGET_DEFS[data.budget_template];
     if(data.salary && Object.keys(data.salary).length){
       def.salaryRows.forEach((row,ri)=>{
-        const amounts=data.salary[row.name];
-        if(amounts){
-          Object.keys(amounts).forEach(pi=>{
-            if(budgetState.salary[ri]) budgetState.salary[ri].amounts[parseInt(pi)]=parseFloat(amounts[pi])||0;
-          });
-        }
+        const amount=data.salary[row.name];
+        if(amount!=null && budgetState.salary[ri]) budgetState.salary[ri].amount=parseFloat(amount)||0;
       });
     }
     if(data.op && Object.keys(data.op).length){
@@ -2087,9 +2064,9 @@ function selectIRB(val){
   const g = document.getElementById('irb-guidance');
   g.style.display='block';
   const msgs = {
-    yes:`<div class="alert alert-amber"><strong>Action required before data collection:</strong> The faculty lead should submit an IRB application before collecting any data from students. Visit the BU IRB office website to determine whether the study qualifies for exempt, expedited, or full board review. Exempt review (the most common for teaching and learning research) is still a formal process — do not assume exemption without official confirmation. Plan for 4–8 weeks for the review process. Contact the BU IRB office: <a href="https://www.bu.edu/research/ethics-compliance/human-subjects/" target="_blank" style="color:var(--blue-text);">bu.edu/research/ethics-compliance/human-subjects</a></div>`,
-    maybe:`<div class="alert alert-amber"><strong>Seek clarification before proceeding:</strong> When in doubt, consult the BU IRB office. They can help determine whether this project requires review. It is always safer to ask than to assume approval isn't needed — collecting data without proper approval can invalidate the findings and create serious compliance issues. Contact: <a href="https://www.bu.edu/research/ethics-compliance/human-subjects/" target="_blank" style="color:var(--blue-text);">bu.edu/research/ethics-compliance/human-subjects</a></div>`,
-    no:`<div class="alert alert-amber"><strong>Be prepared.</strong> If this project later evolves to include data collection for research or publication, the faculty lead will need IRB approval. It is best to seek this in advance of any data collection to avoid jeopardizing the project or creating compliance issues. Contact: <a href="https://www.bu.edu/research/ethics-compliance/human-subjects/" target="_blank" style="color:var(--blue-text);">bu.edu/research/ethics-compliance/human-subjects</a></div>`
+    yes:`<div class="alert alert-amber"><strong>Action required before data collection:</strong> Please remind your faculty team that they should submit an IRB application before collecting any data from students, and visit the BU IRB office website to determine whether the study qualifies for exempt, expedited, or full board review. Exempt review (the most common for teaching and learning research) is still a formal process — they should not assume exemption without official confirmation. Plan for 4–8 weeks for the review process. Contact the BU IRB office: <a href="https://www.bu.edu/research/ethics-compliance/human-subjects/" target="_blank" style="color:var(--blue-text);">bu.edu/research/ethics-compliance/human-subjects</a></div>`,
+    maybe:`<div class="alert alert-amber"><strong>Seek clarification before proceeding:</strong> Please remind your faculty team that when in doubt, they should consult the BU IRB office — the office can help determine whether this project requires review. It is always safer to ask than to assume approval isn't needed, since collecting data without proper approval can invalidate the findings and create serious compliance issues. Contact: <a href="https://www.bu.edu/research/ethics-compliance/human-subjects/" target="_blank" style="color:var(--blue-text);">bu.edu/research/ethics-compliance/human-subjects</a></div>`,
+    no:`<div class="alert alert-amber"><strong>Be prepared.</strong> Please remind your faculty team that if this project later evolves to include data collection for research or publication, they will need IRB approval — it is best to seek this in advance of any data collection to avoid jeopardizing the project or creating compliance issues. Contact: <a href="https://www.bu.edu/research/ethics-compliance/human-subjects/" target="_blank" style="color:var(--blue-text);">bu.edu/research/ethics-compliance/human-subjects</a></div>`
   };
   g.innerHTML = msgs[val]||'';
   const data = loadAll();
@@ -3207,10 +3184,6 @@ function toggleMilestone(id){
 const BUDGET_DEFS = {
   '5k': {
     max: 5000,
-    defaultPeriods: [
-      {label:'Fall 2026 (Sept–Dec)'},
-      {label:'Spring 2027 (Jan–Jun)'},
-    ],
     salaryRows: [
       {name:'Summer Stipend', fringeRate:0.31},
       {name:'Course Release', fringeRate:0.31},
@@ -3226,12 +3199,6 @@ const BUDGET_DEFS = {
   },
   '10k': {
     max: 10000,
-    defaultPeriods: [
-      {label:'Fall 2026 (Sept–Dec)'},
-      {label:'Spring 2027 (Jan–Jun)'},
-      {label:'Summer 2027 (Jul–Aug)'},
-      {label:'Fall 2027 (Sept–Dec)'},
-    ],
     salaryRows: [
       {name:'Summer Stipend (shared between PIs)', fringeRate:0.31},
       {name:'Course Release', fringeRate:0.31},
@@ -3247,13 +3214,6 @@ const BUDGET_DEFS = {
   },
   '25k': {
     max: 25000,
-    defaultPeriods: [
-      {label:'Fall 2026 (Sept–Dec)'},
-      {label:'Spring 2027 (Jan–Jun)'},
-      {label:'Summer 2027 (Jul–Aug)'},
-      {label:'Fall 2027 (Sept–Dec)'},
-      {label:'Spring 2028 (Jan–Jun)'},
-    ],
     salaryRows: [
       {name:'Course Release', fringeRate:0.31},
       {name:'Summer Salary', fringeRate:0.31},
@@ -3277,69 +3237,16 @@ const BUDGET_DEFS = {
   }
 };
 
-let budgetState = {template:null, periods:[], salary:[], op:[]};
+let budgetState = {template:null, salary:[], op:[]};
 
 // Term label patterns per template
-const TERM_PATTERNS = {
-  '5k': (yr) => [
-    `Fall ${yr} (Sept–Dec)`,
-    `Spring ${yr+1} (Jan–Jun)`,
-  ],
-  '10k': (yr) => [
-    `Fall ${yr} (Sept–Dec)`,
-    `Spring ${yr+1} (Jan–Jun)`,
-    `Summer ${yr+1} (Jul–Aug)`,
-    `Fall ${yr+1} (Sept–Dec)`,
-  ],
-  '25k': (yr) => [
-    `Fall ${yr} (Sept–Dec)`,
-    `Spring ${yr+1} (Jan–Jun)`,
-    `Summer ${yr+1} (Jul–Aug)`,
-    `Fall ${yr+1} (Sept–Dec)`,
-    `Spring ${yr+2} (Jan–Jun)`,
-  ],
-};
-
-// Generate the next term label in sequence after the last existing period
-function nextTermLabel(periods){
-  if(!periods.length) return 'Fall (Sept–Dec)';
-  const last = periods[periods.length-1].label || '';
-  // Extract year from label e.g. "Fall 2027 (Sept–Dec)" → 2027
-  const yrMatch = last.match(/\d{4}/);
-  const yr = yrMatch ? parseInt(yrMatch[0]) : new Date().getFullYear();
-  if(/^Fall/.test(last))   return `Spring ${yr+1} (Jan–Jun)`;
-  if(/^Spring/.test(last)) return `Summer ${yr} (Jul–Aug)`;
-  if(/^Summer/.test(last)) return `Fall ${yr} (Sept–Dec)`;
-  return `Fall ${yr+1} (Sept–Dec)`;
-}
-
-function addBudgetTerm(){
-  const label = nextTermLabel(budgetState.periods);
-  budgetState.periods.push({label});
-  budgetState.salary.forEach(s=>{ s.amounts.push(0); });
-  renderBudgetBuilder();
-  saveBudget();
-}
-
-function updateBudgetYear(yr){
-  yr = parseInt(yr);
-  if(!budgetState.template || !TERM_PATTERNS[budgetState.template]) return;
-  const labels = TERM_PATTERNS[budgetState.template](yr);
-  labels.forEach((lbl,i)=>{ if(budgetState.periods[i]) budgetState.periods[i].label = lbl; });
-  renderBudgetBuilder();
-  saveBudget();
-}
-
 function selectBudgetTemplate(tpl){
   const def = BUDGET_DEFS[tpl];
   if(!def) return;
   const prev = budgetState.template;
   budgetState.template = tpl;
   if(prev !== tpl){
-    const startYr = parseInt(document.getElementById('budget-start-year')?.value || 2026);
-    const labels = TERM_PATTERNS[tpl] ? TERM_PATTERNS[tpl](startYr) : def.defaultPeriods.map(p=>p.label);
-    budgetState.periods = def.defaultPeriods.map((p,i)=>({...p, label: labels[i]||p.label}));
-    budgetState.salary = def.salaryRows.map(()=>({amounts:def.defaultPeriods.map(()=>0), desc:''}));
+    budgetState.salary = def.salaryRows.map(()=>({amount:0, desc:'', fringeMode:null}));
     budgetState.op = def.opRows.map(()=>({amount:0, desc:''}));
   }
   document.querySelectorAll('.budget-tpl-card').forEach(c=>c.classList.remove('selected'));
@@ -3362,8 +3269,10 @@ function updateBudgetTailorGuard(){
   const guard = document.getElementById('budget-tailor-guard');
   const btn = document.getElementById('btn-tailor-budget');
   if(!guard || !btn) return;
-  if(!data.proposalText){
-    guard.innerHTML = `<div class="alert alert-navy" style="margin-bottom:10px;">Import a proposal on the Project Setup tab first — tailoring needs the full proposal text to work from.</div>`;
+  const lines = (data.setup && data.setup.budget_lines) || [];
+  const hasLines = lines.some(l=>l.description && l.description.trim());
+  if(!data.proposalText && !hasLines){
+    guard.innerHTML = `<div class="alert alert-navy" style="margin-bottom:10px;">Import a proposal or add budget line items on the Project Setup tab first — tailoring needs at least one of these to work from.</div>`;
     btn.disabled = true; btn.style.opacity = '0.5'; btn.style.cursor = 'not-allowed';
   } else {
     guard.innerHTML = '';
@@ -3376,39 +3285,43 @@ function updateBudgetTailorGuard(){
 async function tailorBudgetToProposal(){
   const btn = document.getElementById('btn-tailor-budget');
   const data = loadAll();
-  if(!data.proposalText || !budgetState.template || !btn) return;
+  const lines = (data.setup && data.setup.budget_lines) || [];
+  const hasLines = lines.some(l=>l.description && l.description.trim());
+  if((!data.proposalText && !hasLines) || !budgetState.template || !btn) return;
   const def = BUDGET_DEFS[budgetState.template];
   setButtonLoading(btn, true);
   const guard = document.getElementById('budget-tailor-guard');
-  guard.innerHTML = `<div class="alert alert-blue" style="margin-bottom:10px;">Your guide is comparing the proposal's budget against the official template…</div>`;
+  guard.innerHTML = `<div class="alert alert-blue" style="margin-bottom:10px;">Your guide is comparing the entered budget against the official template…</div>`;
 
-  const lines = (data.setup && data.setup.budget_lines) || [];
-  const linesText = lines.filter(l=>l.description && l.description.trim())
-    .map(l=>`- ${l.description}${l.amount?` — $${l.amount}`:' (no amount given)'}${l.category?` [${l.category}]`:''}`).join('\n') || '(none entered by staff — rely on the full proposal text below)';
+  const linesText = hasLines
+    ? lines.filter(l=>l.description && l.description.trim())
+        .map(l=>`- ${l.description}${l.amount?` — $${l.amount}`:' (no amount given)'}${l.category?` [${l.category}]`:''}`).join('\n')
+    : '(none entered by staff — rely on the full proposal text below)';
+  const proposalSection = data.proposalText
+    ? `Full proposal text:\n${data.proposalText}\n\n`
+    : '(No full proposal text was provided — rely on the budget line items below.)\n\n';
   const rowsText = [
     ...def.salaryRows.map(r=>`SALARY: ${r.name}`),
     ...def.opRows.map(r=>`OPERATING: ${r.name}`),
   ].join('\n');
 
-  const prompt = `You are helping an Institute for Excellence in Teaching & Learning staff member reconcile a faculty proposal's budget with the official Shipley budget template (${budgetState.template} tier, $${def.max.toLocaleString()} maximum, ${budgetState.periods.length} terms over the project period).
+  const prompt = `You are helping an Institute for Excellence in Teaching & Learning staff member reconcile a faculty proposal's budget with the official Shipley budget template (${budgetState.template} tier, $${def.max.toLocaleString()} maximum, awarded as a single lump sum up front — not disbursed by term).
 
-Full proposal text:
-${data.proposalText}
-
-Budget line items the staff member confirmed from the proposal:
+${proposalSection}Budget line items the staff member confirmed:
 ${linesText}
 
 Official template rows (every row must be addressed):
 ${rowsText}
 
 For each official template row:
-1. If a proposal line item clearly maps to it, include a mapping with your best estimate of the TOTAL amount for that row across the whole project period (a single number covering all terms combined, not per-term).
-2. If nothing in the proposal addresses this row, but it is a commonly needed cost for a Shipley project of this scope, add a flag with type "missing" and a short question the staff member should raise with the faculty lead.
-3. If a proposal line item does map to this row but the dollar amount looks too low for what is actually needed to accomplish what the proposal describes, add a flag with type "under_budgeted" (in addition to the mapping) explaining briefly why it looks low.
-Rows that are genuinely not applicable given the proposal (e.g., a generic "Other, please describe" row with nothing described) need no flag — skip them silently, do not force a flag on every row.
+1. If a line item clearly maps to it, include a mapping with your best estimate of the TOTAL amount for that row across the whole award.
+2. If nothing addresses this row, but it is a commonly needed cost for a Shipley project of this scope, add a flag with type "missing" and a short question the staff member should raise with the faculty lead.
+3. If a line item does map to this row but the dollar amount looks too low for what is actually needed to accomplish what's described, add a flag with type "under_budgeted" (in addition to the mapping) — no explanation needed, just the rowName and type; the message is standardized and added automatically.
+Rows that are genuinely not applicable (e.g., a generic "Other, please describe" row with nothing described) need no flag — skip them silently, do not force a flag on every row.
 
 Return ONLY a valid JSON object with no other text, explanation, or markdown, in exactly this shape:
-{"mappings": [{"rowName": "...", "amount": number}], "flags": [{"rowName": "...", "type": "missing", "message": "..."}]}`;
+{"mappings": [{"rowName": "...", "amount": number}], "flags": [{"rowName": "...", "type": "missing", "message": "..."}]}
+For type "under_budgeted" flags, "message" can be omitted — it is filled in automatically.`;
 
   try{
     const raw = await callGuide(prompt, {skipCtx:true, maxTokens:2500});
@@ -3433,8 +3346,7 @@ function applyBudgetTailoring(parsed){
     const amount = parseFloat(m.amount)||0;
     const sIdx = def.salaryRows.findIndex(r=>r.name===m.rowName);
     if(sIdx>-1 && budgetState.salary[sIdx]){
-      const per = Math.round((amount/(budgetState.periods.length||1))*100)/100;
-      budgetState.salary[sIdx].amounts = budgetState.periods.map(()=>per);
+      budgetState.salary[sIdx].amount = amount;
       return;
     }
     const oIdx = def.opRows.findIndex(r=>r.name===m.rowName);
@@ -3443,11 +3355,12 @@ function applyBudgetTailoring(parsed){
     }
   });
   const data = loadAll();
-  const flags = (parsed.flags||[]).filter(f=>f.rowName && f.message).map((f,i)=>({
+  const UNDER_BUDGETED_MESSAGE = 'This amount looks like it may be under estimated. Please ask your faculty project lead to confirm.';
+  const flags = (parsed.flags||[]).filter(f=>f.rowName && (f.type==='under_budgeted' || f.message)).map((f,i)=>({
     id:'bf_'+Date.now()+'_'+i,
     rowName:f.rowName,
     type: f.type==='under_budgeted' ? 'under_budgeted' : 'missing',
-    message:f.message,
+    message: f.type==='under_budgeted' ? UNDER_BUDGETED_MESSAGE : f.message,
     dismissed:false,
   }));
   data.budget_flags = flags;
@@ -3492,45 +3405,19 @@ function renderBudgetFlags(){
 function renderBudgetBuilder(){
   const def = BUDGET_DEFS[budgetState.template];
   if(!def) return;
-  const periods = budgetState.periods;
-  const nP = periods.length;
 
-  // Period label inputs
-  let pInputs = '';
-  for(let p=0;p<nP;p++){
-    pInputs += `<div class="field" style="flex:1;min-width:130px;">
-      <label>Term ${p+1}</label>
-      <input type="text" value="${periods[p].label||''}" oninput="budgetState.periods[${p}].label=this.value;renderBudgetBuilder();saveBudget();" style="width:100%;font-size:13px;"/>
-    </div>`;
-  }
-  pInputs += `<div class="field" style="display:flex;align-items:flex-end;padding-bottom:2px;">
-    <button class="btn-sm" onclick="addBudgetTerm()" style="white-space:nowrap;">+ Add term</button>
-  </div>`;
-  document.getElementById('budget-period-inputs').innerHTML = pInputs;
-
-  // Calculate salary subtotals
-  const salByP = Array(nP).fill(0);
-  const fringeByP = Array(nP).fill(0);
-  let salaryRowsHtml = '';
-
+  // Salary rows — each a single lump-sum amount (projects are funded up front, not by term)
+  let salTotal=0, fringeTotal=0, salaryRowsHtml='';
   def.salaryRows.forEach((row,ri)=>{
-    const s = budgetState.salary[ri]||{amounts:Array(nP).fill(0),desc:'',fringeMode:null};
+    const s = budgetState.salary[ri]||{amount:0,desc:'',fringeMode:null};
     budgetState.salary[ri]=s;
-    if(s.amounts.length<nP) s.amounts = [...s.amounts,...Array(nP-s.amounts.length).fill(0)];
     if(s.fringeMode===undefined) s.fringeMode=null;
-    let rowTotal=0;
-    let cells='';
-    for(let p=0;p<nP;p++){
-      const amt=parseFloat(s.amounts[p])||0;
-      rowTotal+=amt;
-      // If fringe included: base = amt/(1+rate), fringe = amt - base; else add on top
-      const base = (s.fringeMode==='included' && row.fringeRate>0) ? amt/(1+row.fringeRate) : amt;
-      const fringe = (s.fringeMode==='included' && row.fringeRate>0) ? amt-base : amt*row.fringeRate;
-      salByP[p]+=base; fringeByP[p]+=fringe;
-      cells+=`<td class="bgt-input-cell"><input type="number" min="0" step="100" value="${amt||''}" placeholder="0"
-        onchange="budgetState.salary[${ri}].amounts[${p}]=parseFloat(this.value)||0;checkFringeMode(${ri});renderBudgetBuilder();saveBudget();"
-        onblur="checkFringePrompt(${ri},this)"/></td>`;
-    }
+    const amt = parseFloat(s.amount)||0;
+    // If fringe included: base = amt/(1+rate), fringe = amt - base; else add on top
+    const base = (s.fringeMode==='included' && row.fringeRate>0) ? amt/(1+row.fringeRate) : amt;
+    const fringe = (s.fringeMode==='included' && row.fringeRate>0) ? amt-base : amt*row.fringeRate;
+    salTotal+=base; fringeTotal+=fringe;
+
     const frLabel = row.fringeRate===0 ? '0%' : (row.fringeRate*100).toFixed(1)+'%';
     const descHtml = row.hasDesc ? `<div class="bgt-desc-input"><input type="text" placeholder="Describe activity…" value="${s.desc||''}" oninput="budgetState.salary[${ri}].desc=this.value;" onblur="saveBudget();" /></div>` : '';
     // Fringe toggle
@@ -3538,35 +3425,25 @@ function renderBudgetBuilder(){
     if(row.fringeRate>0){
       const modeAdd = s.fringeMode==='add' ? 'style="background:var(--navy);color:#fff;border-color:var(--navy);"' : '';
       const modeInc = s.fringeMode==='included' ? 'style="background:var(--navy);color:#fff;border-color:var(--navy);"' : '';
-      fringeToggle = `<div id="fringe-toggle-${ri}" style="display:${rowTotal>0?'flex':'none'};gap:4px;margin-top:5px;align-items:center;flex-wrap:wrap;">
+      fringeToggle = `<div id="fringe-toggle-${ri}" style="display:${amt>0?'flex':'none'};gap:4px;margin-top:5px;align-items:center;flex-wrap:wrap;">
         <span style="font-size:11px;color:var(--text3);">Fringe:</span>
         <button class="btn-sm" ${modeAdd} onclick="setFringeMode(${ri},'add')" style="font-size:11px;padding:2px 8px;">+ Calculate fringe</button>
         <button class="btn-sm" ${modeInc} onclick="setFringeMode(${ri},'included')" style="font-size:11px;padding:2px 8px;">Included in amount</button>
       </div>`;
-      const fringePrompt = s.fringeMode===null && rowTotal>0 ? `<div id="fringe-prompt-${ri}" class="alert alert-amber" style="font-size:12px;margin-top:5px;padding:7px 10px;">Does this amount include fringe benefits? <button class="btn-sm" onclick="setFringeMode(${ri},'included')" style="margin-left:6px;">Yes, included</button> <button class="btn-sm" onclick="setFringeMode(${ri},'add')" style="margin-left:4px;">No, calculate for me</button></div>` : '';
+      const fringePrompt = s.fringeMode===null && amt>0 ? `<div id="fringe-prompt-${ri}" class="alert alert-amber" style="font-size:12px;margin-top:5px;padding:7px 10px;">Does this amount include fringe benefits? <button class="btn-sm" onclick="setFringeMode(${ri},'included')" style="margin-left:6px;">Yes, included</button> <button class="btn-sm" onclick="setFringeMode(${ri},'add')" style="margin-left:4px;">No, calculate for me</button></div>` : '';
       fringeToggle += fringePrompt;
     }
-    const fringeNote = s.fringeMode==='included' && row.fringeRate>0 && rowTotal>0
-      ? `<span style="font-size:11px;color:var(--text3);font-style:italic;"> (fringe included)</span>` : '';
     salaryRowsHtml+=`<tr class="bgt-data-row">
       <td class="bgt-label-cell">${row.name}${descHtml}${fringeToggle}</td>
-      ${cells}
-      <td class="bgt-calc-cell">${rowTotal?fmt$(rowTotal):'—'}${fringeNote}</td>
+      <td class="bgt-input-cell"><input type="number" min="0" step="100" value="${amt||''}" placeholder="0"
+        onchange="budgetState.salary[${ri}].amount=parseFloat(this.value)||0;renderBudgetBuilder();saveBudget();"/></td>
       <td class="bgt-fringe-cell"><span class="fringe-badge">${frLabel}</span></td>
     </tr>`;
   });
 
-  const salTotal=salByP.reduce((a,b)=>a+b,0);
-  const fringeTotal=fringeByP.reduce((a,b)=>a+b,0);
-  const sfByP=salByP.map((s,i)=>s+fringeByP[i]);
   const sfTotal=salTotal+fringeTotal;
 
-  const salSubCells=salByP.map(v=>`<td class="bgt-subtotal-cell">${fmt$(v)}</td>`).join('');
-  const fringeSubCells=fringeByP.map(v=>`<td class="bgt-subtotal-cell">${fmt$(v)}</td>`).join('');
-  const sfSubCells=sfByP.map(v=>`<td class="bgt-subtotal-cell">${fmt$(v)}</td>`).join('');
-  const emptyP=Array(nP).fill('<td class="bgt-na-cell">—</td>').join('');
-
-  // Operating rows
+  // Operating rows — already a single lump-sum amount
   let opRowsHtml=''; let opTotal=0;
   def.opRows.forEach((row,ri)=>{
     const o=budgetState.op[ri]||{amount:0,desc:''};
@@ -3575,18 +3452,16 @@ function renderBudgetBuilder(){
     const descHtml=row.hasDesc?`<div class="bgt-desc-input"><input type="text" placeholder="Describe…" value="${o.desc||''}" oninput="budgetState.op[${ri}].desc=this.value;" onblur="saveBudget();" /></div>`:'';
     opRowsHtml+=`<tr class="bgt-data-row">
       <td class="bgt-label-cell">${row.name}${descHtml}</td>
-      ${emptyP}
       <td class="bgt-input-cell"><input type="number" min="0" step="100" value="${amt||''}" placeholder="0" onchange="budgetState.op[${ri}].amount=parseFloat(this.value)||0;renderBudgetBuilder();saveBudget();"/></td>
       <td class="bgt-na-cell">—</td>
     </tr>`;
   });
-  // Dynamic rows from tech tools, media, data
+  // Dynamic rows from media, data & analytics
   Object.entries(dynamicOpRows).forEach(([key,row])=>{
     if(!row.label||!row.amount) return;
     opTotal+=row.amount;
     opRowsHtml+=`<tr class="bgt-data-row" style="background:var(--orange-pale);">
       <td class="bgt-label-cell" style="font-style:italic;">${row.label}</td>
-      ${emptyP}
       <td class="bgt-input-cell">${fmt$(row.amount)}</td>
       <td class="bgt-na-cell" style="font-size:11px;color:var(--text3);">auto</td>
     </tr>`;
@@ -3600,42 +3475,37 @@ function renderBudgetBuilder(){
     ?`Over budget by $${Math.abs(remaining).toLocaleString('en-US',{minimumFractionDigits:2})} — exceeds $${def.max.toLocaleString()} maximum`
     :`Within budget — $${remaining.toLocaleString('en-US',{minimumFractionDigits:2})} remaining of $${def.max.toLocaleString()} maximum`;
 
-  const colHeaders=periods.map(p=>`<th class="bgt-period-header">${p.label||'Term'}</th>`).join('');
-  const gtByP=sfByP.map(v=>v);
-  const gtCells=gtByP.map(v=>`<td class="bgt-total-cell">${fmt$(v)}</td>`).join('');
-
   document.getElementById('budget-table-container').innerHTML=`
     <table class="bgt-main-table">
       <thead><tr>
         <th class="bgt-label-header">Line Item</th>
-        ${colHeaders}
-        <th class="bgt-total-header">Total</th>
+        <th class="bgt-total-header">Amount</th>
         <th class="bgt-fringe-header">Fringe</th>
       </tr></thead>
       <tbody>
-        <tr class="bgt-section-header"><td colspan="${nP+3}">Salaries &amp; Fringe Benefits</td></tr>
-        <tr class="bgt-section-note"><td colspan="${nP+3}">Faculty — describe activity in the field below each applicable row</td></tr>
+        <tr class="bgt-section-header"><td colspan="3">Salaries &amp; Fringe Benefits</td></tr>
+        <tr class="bgt-section-note"><td colspan="3">Faculty — describe activity in the field below each applicable row</td></tr>
         ${salaryRowsHtml}
         <tr class="bgt-subtotal-row">
-          <td class="bgt-subtotal-label">Subtotal Salaries</td>${salSubCells}
+          <td class="bgt-subtotal-label">Subtotal Salaries</td>
           <td class="bgt-subtotal-cell">${fmt$(salTotal)}</td><td></td>
         </tr>
         <tr class="bgt-fringe-row">
-          <td class="bgt-subtotal-label">Fringe Benefits <span style="font-weight:400;font-size:11px;">(auto-calculated)</span></td>${fringeSubCells}
+          <td class="bgt-subtotal-label">Fringe Benefits <span style="font-weight:400;font-size:11px;">(auto-calculated)</span></td>
           <td class="bgt-subtotal-cell">${fmt$(fringeTotal)}</td><td></td>
         </tr>
         <tr class="bgt-subtotal-row bgt-bold-subtotal">
-          <td class="bgt-subtotal-label">Subtotal Salaries &amp; Fringe Benefits</td>${sfSubCells}
+          <td class="bgt-subtotal-label">Subtotal Salaries &amp; Fringe Benefits</td>
           <td class="bgt-subtotal-cell">${fmt$(sfTotal)}</td><td></td>
         </tr>
-        <tr class="bgt-section-header"><td colspan="${nP+3}">Operating Expense</td></tr>
+        <tr class="bgt-section-header"><td colspan="3">Operating Expense</td></tr>
         ${opRowsHtml}
         <tr class="bgt-subtotal-row">
-          <td class="bgt-subtotal-label">Subtotal Operating Expense</td>${emptyP}
+          <td class="bgt-subtotal-label">Subtotal Operating Expense</td>
           <td class="bgt-subtotal-cell">${fmt$(opTotal)}</td><td></td>
         </tr>
         <tr class="bgt-grand-total-row">
-          <td class="bgt-grand-label">TOTAL</td>${gtCells}
+          <td class="bgt-grand-label">TOTAL</td>
           <td class="bgt-grand-total-cell">${fmt$(grandTotal)}</td><td></td>
         </tr>
       </tbody>
@@ -3826,10 +3696,24 @@ function checkFringePrompt(ri, input){
   saveBudget();
 }
 
+// Migrate budgets saved before terms were removed: sum any old per-period
+// salary.amounts[] arrays into a single flat amount.
+function migrateBudgetPeriods(state){
+  if(!state) return state;
+  delete state.periods;
+  (state.salary||[]).forEach(s=>{
+    if(s && Array.isArray(s.amounts)){
+      s.amount = s.amounts.reduce((a,b)=>a+(parseFloat(b)||0),0);
+      delete s.amounts;
+    }
+  });
+  return state;
+}
+
 function loadBudget(){
   const data=loadAll();
   if(data.budget_v2&&data.budget_v2.template){
-    budgetState=data.budget_v2;
+    budgetState=migrateBudgetPeriods(data.budget_v2);
     selectBudgetTemplate(budgetState.template);
   } else {
     const g=getGrantAmount();
@@ -4610,11 +4494,11 @@ async function aibudgethelp(){
   if(s.challenge) projectContext += `Teaching challenge: ${s.challenge}\n`;
   if(s.workers)  projectContext += `Student workers: ${s.workers}\n`;
 
-  let summary = `Grant award: $${def.max.toLocaleString()}\nTerms: ${budgetState.periods.map(p=>p.label).join(', ')}\n\nSalary line items (fringe rates are fixed institutional rates applied by this tool — do not flag them as errors):\n`;
+  let summary = `Award: $${def.max.toLocaleString()} (paid up front as a single lump sum)\n\nSalary line items (fringe rates are fixed institutional rates applied by this tool — do not flag them as errors):\n`;
   let salTotal=0, fringeTotal=0;
   def.salaryRows.forEach((row,ri)=>{
-    const s=budgetState.salary[ri]||{amounts:[],fringeMode:null};
-    const rowTotal=s.amounts.reduce((a,b)=>a+(parseFloat(b)||0),0);
+    const s=budgetState.salary[ri]||{amount:0,fringeMode:null};
+    const rowTotal=parseFloat(s.amount)||0;
     if(rowTotal>0){
       const base = (s.fringeMode==='included' && row.fringeRate>0) ? rowTotal/(1+row.fringeRate) : rowTotal;
       const fringe = (s.fringeMode==='included' && row.fringeRate>0) ? rowTotal-base : rowTotal*row.fringeRate;
