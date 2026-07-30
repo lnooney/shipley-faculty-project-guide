@@ -212,17 +212,12 @@ a:hover{color:var(--navy);}
 .tc-header{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
 .tc-label{font-size:13px;font-weight:600;color:var(--navy);flex:1;min-width:160px;line-height:1.4;}
 .tc-label .tc-desc{font-size:12px;font-weight:400;color:var(--text3);margin-top:2px;line-height:1.5;}
-/* Repeating entry rows (availability, priorities) */
+/* Repeating entry rows (availability, budget line items) */
 .entry-row{display:flex;gap:8px;align-items:flex-start;margin-bottom:8px;flex-wrap:wrap;}
 .entry-row input[type="text"]{flex:2;min-width:140px;}
 .entry-row input[type="date"]{flex:1;min-width:130px;}
 .entry-row .remove-btn{background:none;border:none;color:var(--text3);font-size:16px;padding:6px 4px;cursor:pointer;line-height:1;border-radius:0;}
 .entry-row .remove-btn:hover{color:var(--red);background:none;}
-.priority-toggle{display:flex;border-radius:20px;overflow:hidden;border:1.5px solid var(--border);flex-shrink:0;}
-.priority-toggle button{border:none;border-radius:0;padding:5px 12px;font-size:12px;font-weight:600;background:#fff;color:var(--text3);cursor:pointer;}
-.priority-toggle button:hover{background:var(--bg2);}
-.priority-toggle button.must{background:var(--navy);color:#fff;}
-.priority-toggle button.nice{background:var(--orange-pale);color:var(--navy);}
 .tc-pills{display:flex;gap:6px;}
 .tc-pill{font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;border:1.5px solid var(--border);background:#fff;cursor:pointer;color:var(--text3);transition:all .12s;}
 .tc-pill.addressed{border-color:var(--green);background:var(--green-bg);color:var(--green-text);}
@@ -1015,7 +1010,7 @@ a:hover{color:var(--navy);}
 
     <div class="section-label" style="margin-top:14px;">Technology <a href="#" class="service-link" aria-label="Learn more about technology support (link coming soon)" onclick="return false;" title="Link coming soon">Learn more ↗</a></div>
 
-    <div class="alert alert-navy" style="margin-bottom:8px;">Each tool will appear as its own line item in the budget and its own set of considerations below.</div>
+    <div class="alert alert-navy" style="margin-bottom:8px;">Each tool will appear as its own set of considerations below. If the proposal includes a cost for it, add that as a line item in Proposed Budget Line Items above.</div>
     <div id="tech-tool-entries"></div>
     <button class="btn-sm" onclick="addTechToolEntry()" style="margin-bottom:12px;">+ Add tool</button>
 
@@ -1040,19 +1035,11 @@ a:hover{color:var(--navy);}
     </div>
 
     <div id="worker-details" style="display:none;">
-      <div class="grid2">
-        <div class="field">
-          <label>Estimated total compensation ($)</label>
-          <input type="number" id="s-worker-cost" min="0" step="100" placeholder="0" style="width:100%;"
-            oninput="syncWorkersToProjectPlan()"/>
-          <div class="hint">Added to the budget as a salary line item.</div>
-        </div>
-        <div class="field">
-          <label>Target hire date</label>
-          <input type="date" id="s-worker-date" style="width:100%;"
-            onchange="syncWorkersToProjectPlan()"/>
-          <div class="hint">Adds a hiring task to Milestone 1 with this deadline.</div>
-        </div>
+      <div class="field">
+        <label>Target hire date</label>
+        <input type="date" id="s-worker-date" style="width:100%;"
+          onchange="syncWorkersToProjectPlan()"/>
+        <div class="hint">Adds a hiring task to Milestone 1 with this deadline. If the proposal includes a cost for this position, add it as a line item in Proposed Budget Line Items above.</div>
       </div>
     </div>
 
@@ -1060,11 +1047,6 @@ a:hover{color:var(--navy);}
     <div class="hint" style="margin-bottom:10px;">Be specific. A realistic picture of availability is essential for building a workable timeline. If team members are on 9-month contracts and the grant does not include summer stipends, project work may need to pause or slow significantly during summer months.</div>
     <div id="availability-entries"></div>
     <button class="btn-sm" onclick="addAvailabilityEntry()" style="margin-top:4px;">+ Add constraint</button>
-
-    <div class="section-label" style="margin-top:20px;">Prioritization</div>
-    <div class="hint" style="margin-bottom:10px;">What elements of this project are must-have vs. nice-to-have?</div>
-    <div id="priority-entries"></div>
-    <button class="btn-sm" onclick="addPriorityEntry()" style="margin-top:4px;">+ Add item</button>
   </div>
 
   <div style="display:flex;gap:10px;justify-content:flex-end;">
@@ -2190,34 +2172,7 @@ function showWorkerNote(){
 function syncWorkersToProjectPlan(){
   const v = document.getElementById('s-workers').value;
   const hiring = v && v !== 'no';
-  const cost = parseFloat(document.getElementById('s-worker-cost')?.value) || 0;
   const date = document.getElementById('s-worker-date')?.value || '';
-
-  // ── Budget: populate the appropriate salary row(s) ──
-  if(budgetState.template){
-    const def = BUDGET_DEFS[budgetState.template];
-    // Map worker type to salary row name(s)
-    const rowNames = [];
-    if(v==='yes-grad'||v==='yes-both'){
-      // $25k has PhD Student; $5k/$10k use Research Assistant
-      const gradRow = def.salaryRows.find(r=>r.name.toLowerCase().includes('phd')||r.name.toLowerCase().includes('research assistant'));
-      if(gradRow) rowNames.push(gradRow.name);
-    }
-    if(v==='yes-undergrad'||v==='yes-both'){
-      const undergradRow = def.salaryRows.find(r=>r.name.toLowerCase().includes('hourly')||r.name.toLowerCase().includes('undergrad'));
-      if(undergradRow && !rowNames.includes(undergradRow.name)) rowNames.push(undergradRow.name);
-    }
-    // Distribute cost evenly across matched rows × period 0
-    def.salaryRows.forEach((row, ri)=>{
-      if(!budgetState.salary[ri]) budgetState.salary[ri]={amounts:def.defaultPeriods.map(()=>0),desc:''};
-      if(hiring && rowNames.includes(row.name)){
-        const share = rowNames.length > 1 ? Math.round(cost/2) : cost;
-        budgetState.salary[ri].amounts[0] = share;
-      }
-    });
-    renderBudgetBuilder();
-    saveBudget();
-  }
 
   // ── Milestones: inject/remove hiring task in M1 ──
   customTasks = customTasks.filter(t=>t.id!=='worker_hire');
@@ -2234,7 +2189,7 @@ function syncWorkersToProjectPlan(){
   }
   const data = loadAll();
   data.custom_tasks = customTasks;
-  data.worker_details = { cost, date };
+  data.worker_details = { date };
   saveAll(data);
   renderMilestones();
 }
@@ -2276,47 +2231,6 @@ function removeAvailabilityEntry(i){
 }
 
 function getAvailabilityEntries(){ return availabilityEntries; }
-
-// ═══════════════════════════════════════════════════════
-// PRIORITY ENTRIES
-// ═══════════════════════════════════════════════════════
-let priorityEntries = [];
-
-function renderPriorityEntries(){
-  const container = document.getElementById('priority-entries');
-  if(!container) return;
-  if(priorityEntries.length===0) priorityEntries.push({text:'',type:''});
-  container.innerHTML = priorityEntries.map((e,i)=>`
-    <div class="entry-row">
-      <input type="text" placeholder="Describe this project element" value="${(e.text||'').replace(/"/g,'&quot;')}"
-        oninput="priorityEntries[${i}].text=this.value;saveSetup();" style="flex:2;"/>
-      <div class="priority-toggle">
-        <button class="${e.type==='must'?'must':''}" onclick="setPriorityType(${i},'must')">Must-have</button>
-        <button class="${e.type==='nice'?'nice':''}" onclick="setPriorityType(${i},'nice')">Nice-to-have</button>
-      </div>
-      <button class="remove-btn" onclick="removePriorityEntry(${i})" aria-label="Remove">✕</button>
-    </div>`).join('');
-}
-
-function setPriorityType(i, type){
-  priorityEntries[i].type = priorityEntries[i].type===type ? '' : type;
-  renderPriorityEntries();
-  saveSetup();
-}
-
-function addPriorityEntry(){
-  priorityEntries.push({text:'',type:''});
-  renderPriorityEntries();
-}
-
-function removePriorityEntry(i){
-  priorityEntries.splice(i,1);
-  if(priorityEntries.length===0) priorityEntries.push({text:'',type:''});
-  renderPriorityEntries();
-  saveSetup();
-}
-
-function getPriorityEntries(){ return priorityEntries; }
 
 // ── Proposed budget line items ────────────────────────────────────────
 let budgetLineEntries = [];
@@ -2421,7 +2335,6 @@ function saveSetup(){
     tech: document.getElementById('s-tech')?.value || '',
     workers: document.getElementById('s-workers').value,
     availability: getAvailabilityEntries(),
-    priorities: getPriorityEntries(),
     budget_lines: getBudgetLineEntries(),
     irb_notes: document.getElementById('s-irb-notes').value,
   };
@@ -2433,8 +2346,12 @@ function saveSetup(){
 function loadSetup(){
   const data = loadAll();
   if(data.irb_status) selectIRB(data.irb_status);
+  // Worker details (hire date) live outside data.setup, so restore them regardless of
+  // whether the rest of Setup has been saved yet.
+  const wd = data.worker_details || {};
+  if(wd.date) document.getElementById('s-worker-date').value = wd.date;
   const s = data.setup;
-  if(!s) return;
+  if(!s){ showWorkerNote(); return; }
   const fields = ['title','lead','dept','team','start','end','challenge','vision','audience','prior'];
   fields.forEach(f=>{
     const el = document.getElementById('s-'+f);
@@ -2449,18 +2366,11 @@ function loadSetup(){
     if(el && s[f]) el.value = s[f];
   });
   if(s.irb_notes) document.getElementById('s-irb-notes').value = s.irb_notes;
-  // Restore worker details
-  const wd = data.worker_details || {};
-  if(wd.cost) document.getElementById('s-worker-cost').value = wd.cost;
-  if(wd.date) document.getElementById('s-worker-date').value = wd.date;
   showWorkerNote();
   // Restore repeating entries
   if(Array.isArray(s.availability) && s.availability.length) availabilityEntries = s.availability;
   else availabilityEntries = [{name:'',start:'',end:''}];
   renderAvailabilityEntries();
-  if(Array.isArray(s.priorities) && s.priorities.length) priorityEntries = s.priorities;
-  else priorityEntries = [{text:'',type:''}];
-  renderPriorityEntries();
   if(Array.isArray(s.budget_lines) && s.budget_lines.length) budgetLineEntries = s.budget_lines;
   else budgetLineEntries = [{description:'',amount:'',category:''}];
   renderBudgetLineEntries();
@@ -3763,35 +3673,32 @@ const TECH_ITEMS = [
   {key:'vendor',        label:'Vendor contracts', desc:'Some tools require a Statement of Work reviewed by BU\'s legal team, which takes time.'},
 ];
 
-// techTools: [{name, cost}]  techState: {itemKey: {toolKey: status, notes}}
+// techTools: [{name}]  techState: {itemKey: {toolKey: status, notes}}
 let techTools = [];
 let techState = {};
 
 function renderTechToolEntries(){
   const container = document.getElementById('tech-tool-entries');
   if(!container) return;
-  if(techTools.length===0) techTools.push({name:'',cost:0});
+  if(techTools.length===0) techTools.push({name:''});
   container.innerHTML = techTools.map((t,i)=>`
     <div class="entry-row">
       <input type="text" placeholder="Tool name (e.g. ChatGPT Pro)" value="${(t.name||'').replace(/"/g,'&quot;')}"
-        style="flex:2;" oninput="techTools[${i}].name=this.value;saveTechConsiderations();syncTechToBudget();renderTechConsiderations();"/>
-      <input type="number" min="0" step="100" placeholder="Cost $" value="${t.cost||''}"
-        style="flex:1;min-width:100px;" oninput="techTools[${i}].cost=parseFloat(this.value)||0;saveTechConsiderations();syncTechToBudget();"/>
+        style="flex:1;" oninput="techTools[${i}].name=this.value;saveTechConsiderations();renderTechConsiderations();"/>
       <button class="remove-btn" onclick="removeTechTool(${i})" aria-label="Remove">✕</button>
     </div>`).join('');
 }
 
 function addTechToolEntry(){
-  techTools.push({name:'',cost:0});
+  techTools.push({name:''});
   renderTechToolEntries();
 }
 
 function removeTechTool(i){
   techTools.splice(i,1);
-  if(techTools.length===0) techTools.push({name:'',cost:0});
+  if(techTools.length===0) techTools.push({name:''});
   renderTechToolEntries();
   saveTechConsiderations();
-  syncTechToBudget();
   syncTechToMilestones();
   renderTechConsiderations();
 }
@@ -3856,22 +3763,10 @@ function saveTechConsiderations(){
 function loadTechConsiderations(){
   const data = loadAll();
   const tc = data.tech_considerations || {};
-  techTools = Array.isArray(tc.tools) ? tc.tools : (tc.tools ? [{name:tc.tools,cost:tc.cost||0}] : []);
+  techTools = Array.isArray(tc.tools) ? tc.tools : (tc.tools ? [{name:tc.tools}] : []);
   techState = tc.items || {};
   renderTechToolEntries();
   renderTechConsiderations();
-}
-
-function syncTechToBudget(){
-  if(!budgetState.template) return;
-  // Each named tool gets its own dynamic op row
-  const existingKeys = Object.keys(dynamicOpRows).filter(k=>k.startsWith('tool_'));
-  existingKeys.forEach(k=>delete dynamicOpRows[k]);
-  techTools.filter(t=>t.name.trim()).forEach((t,i)=>{
-    dynamicOpRows['tool_'+i] = {label: t.name.trim(), amount: t.cost||0};
-  });
-  renderBudgetBuilder();
-  saveBudget();
 }
 
 function syncTechToMilestones(){
@@ -4302,7 +4197,6 @@ async function aiScopeReview(){
   if(s.tech)         filled.push(`Technology: ${s.tech}`);
   if(s.workers)      filled.push(`Student workers: ${s.workers}`);
   if(s.availability) filled.push(`Availability constraints: ${s.availability}`);
-  if(s.priorities)   filled.push(`Priorities: ${s.priorities}`);
 
   if(filled.length === 0){
     out.innerHTML = `<div class="ai-response"><strong>Nothing to review yet</strong> — fill in some fields on this page first, then ask for feedback.</div>`;
@@ -5112,7 +5006,6 @@ window.addEventListener('DOMContentLoaded',()=>{
   migrateLegacyData();
   updateHeaderLabel();
   renderAvailabilityEntries();
-  renderPriorityEntries();
   renderBudgetLineEntries();
   renderTechToolEntries();
   loadSetup();
