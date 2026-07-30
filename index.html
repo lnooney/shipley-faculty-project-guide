@@ -1315,7 +1315,7 @@ a:hover{color:var(--navy);}
     </div>
     <div class="milestone-body" id="m2-body" style="display:none;">
       <div class="alert alert-blue" style="margin-bottom:14px;">
-        <strong>Data collection reminder:</strong> Do not begin collecting data from students until IRB approval (if required) is confirmed. Make sure the survey instrument has been piloted before full deployment.
+        <strong>Data collection reminder:</strong> Remind your faculty team not to begin collecting data from students until IRB approval (if required) is confirmed. Remind the faculty team to pilot the survey instrument before full deployment.
       </div>
       <div id="m2-tasks"></div>
       <div style="margin-top:12px;">
@@ -1334,7 +1334,7 @@ a:hover{color:var(--navy);}
     </div>
     <div class="milestone-body" id="m3-body" style="display:none;">
       <div class="alert alert-blue" style="margin-bottom:14px;">
-        <strong>Dissemination tip:</strong> The Institute Showcase is a key opportunity to share the faculty team's work with the BU community. Conference submissions and journal articles reach broader audiences — the Institute team can help identify appropriate venues for teaching and learning research publication.
+        <strong>Dissemination tip:</strong> The Institute Showcase is a key opportunity to share the faculty team's work with the BU community. Conference submissions and journal articles reach broader audiences — offer to help your faculty team identify appropriate venues for teaching and learning research publication.
       </div>
       <div id="m3-tasks"></div>
       <div style="margin-top:12px;">
@@ -2687,12 +2687,14 @@ const MILESTONE_TASKS = {
     {name:'Hire student workers', lead:'Faculty lead', blocker:null, group:'Hiring'},
     {name:'Prepare and onboard student workers', lead:'Faculty lead', blocker:null, group:'Hiring'},
     // Technology — FIX 8: Finalize agreements second-to-last, Activate licenses last
+    {name:"Meet with the Institute's ATI team to review tech needs and start vetting process", lead:'Faculty lead', blocker:null, group:'Technology'},
     {name:'Identify and vet technology tools (accessibility, privacy, security)', lead:'Faculty lead', blocker:null, group:'Technology'},
     {name:'Finalize vendor agreements', lead:'Faculty lead', blocker:'Vendor contracts may require BU legal review — start well in advance.', group:'Technology'},
     {name:'Activate vendor licenses', lead:'Project team', blocker:null, group:'Technology'},
-    // Learning Analytics
-    {name:'Plan learning analytics and data flow', lead:'Project team', blocker:null, group:'Learning Analytics'},
+    // Learning Analytics — main task's due date constrains the subtasks below it (see Tailor Milestones prompt)
+    {name:'Plan learning analytics: data collection and analysis', lead:'Project team', blocker:null, group:'Learning Analytics'},
     {name:'Complete Impact Evaluation Framework (Problems → Data Analysis)', lead:'Full team', blocker:null, group:'Learning Analytics'},
+    {name:'Finalize data collection and analysis plan', lead:'Full team', blocker:null, group:'Learning Analytics'},
     {name:'Develop data collection instruments (surveys, rubrics, observation protocols)', lead:'Full team', blocker:null, group:'Learning Analytics'},
   ],
   m2: [
@@ -2713,12 +2715,13 @@ const MILESTONE_TASKS = {
     {name:'Present at Institute event', lead:'Faculty lead', blocker:null},
   ],
   m4: [
-    {name:'Review data and assess plan for second iteration or scale', lead:'Full team', blocker:null},
-    {name:'Refine intervention based on findings and faculty feedback', lead:'Faculty lead', blocker:null},
+    {name:'Review and analyze data', lead:'Full team', blocker:null},
+    {name:'Develop plan for second iteration', lead:'Full team', blocker:null},
     {name:'Plan and implement second pilot (if applicable)', lead:'Piloting instructors', blocker:null},
     {name:'Analyze second iteration data', lead:'Project team', blocker:null},
-    {name:'Reflect on lessons learned — what would the team do differently?', lead:'Full team', blocker:null},
     {name:'Develop plan to sustain or scale the intervention', lead:'Faculty lead', blocker:null},
+    {name:'Refine intervention based on findings and faculty feedback', lead:'Faculty lead', blocker:null},
+    {name:'Reflect on lessons learned — what would the team do differently?', lead:'Full team', blocker:null},
   ],
   m5: [
     {name:'Complete project report', lead:'Faculty lead', blocker:null},
@@ -2816,7 +2819,11 @@ For each task ID, decide one of three things:
 2. "not_relevant" — the proposal or the scoping information above makes clear this task does not apply to this project (e.g., no mention of student workers at all, no digital tools involved, no plans for a second pilot).
 3. Ambiguous — neither the proposal nor the scoping information above clearly addresses whether this applies, but it's a common and important task for Shipley projects generally, so a human should be asked rather than the task being silently dropped or kept. Group related ambiguous task IDs together into ONE question wherever they belong together (e.g., all the Hiring-group tasks under one "will this project need to hire student workers?" question) — do not ask a separate question per task when several tasks share the same underlying yes/no decision. Word each question so a "yes" means "add these tasks to the plan" and a "no" means "these tasks don't apply." Never ask about something already answered in the scoping information above — resolve it into "confirmed" or "not_relevant" instead.
 
+Special case — iteration tasks: "Develop plan for second iteration", "Plan and implement second pilot (if applicable)", and "Analyze second iteration data" (Reflect, Iterate & Scale) default to "not_relevant" unless the proposal explicitly stipulates a second iteration or pilot. Do not confirm them on a vague or generic basis, and do not raise them as an investigate question either — silence on iteration means "not_relevant" for these three specifically.
+
 Additionally, for every task ID you mark "confirmed", estimate a realistic due date and include it in "dates". Use your expertise as an experienced project manager: read the proposal's own timeline narrative for explicit signals, and where the proposal is silent, reason from normal project sequencing (e.g., hiring and IRB submission happen early; data collection follows setup; analysis and dissemination come later) and reasonable estimates of how long each kind of task actually takes. Every date must fall between ${windowStart} and ${windowEnd} (this award's full duration — the project cannot run longer than this). Use YYYY-MM-DD format. It is fine and expected to estimate confidently — the staff member reviews and can adjust every date, so a reasonable estimate is far more useful than leaving it blank. Only omit a date for a confirmed task if there is truly no reasonable basis to place it anywhere in the window.
+
+Date constraint — Learning Analytics: "Plan learning analytics: data collection and analysis" is the umbrella task for that group; it isn't truly done until "Complete Impact Evaluation Framework (Problems → Data Analysis)", "Finalize data collection and analysis plan", and "Develop data collection instruments (surveys, rubrics, observation protocols)" are all done. If you assign dates to any of these confirmed tasks, the three subtasks' due dates must fall on or before the umbrella task's due date.
 
 ${!hasHireDate ? `The Setup tab does not yet have a target student-worker hire date. If the proposal states one directly, or states when the student worker's described work begins (from which the hire date is the same as that work-start date), include it as "worker_target_date" in YYYY-MM-DD format. Omit this field entirely if the proposal gives no basis to infer it, or if this project has no student workers.` : `The Setup tab already has a target student-worker hire date — do not include "worker_target_date" in your response.`}
 
@@ -2905,6 +2912,15 @@ function restoreHiddenTask(taskId){
   const relevance = data.task_relevance || {};
   relevance[taskId] = 'confirmed';
   data.task_relevance = relevance;
+  // A task can also be hidden because it's still part of an unresolved investigate
+  // question — remove it from that question so restoring it actually takes effect.
+  const questions = (data.investigate_questions || []).map(q=>{
+    if(!q.resolved && Array.isArray(q.relatedTaskIds) && q.relatedTaskIds.includes(taskId)){
+      return { ...q, relatedTaskIds: q.relatedTaskIds.filter(id=>id!==taskId) };
+    }
+    return q;
+  }).filter(q=>q.resolved || q.relatedTaskIds.length);
+  data.investigate_questions = questions;
   saveAll(data);
   renderMilestones();
 }
@@ -3016,15 +3032,15 @@ function renderMilestones(){
               <input type="text" class="task-meta-input" value="${lead.replace(/"/g,'&quot;')}" placeholder="Person responsible"
                 onchange="saveTaskMeta('${t.id}','lead',this.value)"/>
             </div>
+            <div class="task-meta-field" style="flex:0 0 auto;min-width:0;">
+              <label class="task-meta-label">Start date <span style="font-weight:400;opacity:0.7;">(optional)</span></label>
+              <input type="date" class="task-meta-input" value="${startDate}" style="width:auto;"
+                onchange="saveTaskMeta('${t.id}','start',this.value)"/>
+            </div>
             <div class="task-meta-field">
               <label class="task-meta-label">Due date${dueFlagHTML}</label>
               <input type="date" class="task-meta-input" value="${dueDate}"
                 onchange="saveTaskMeta('${t.id}','due',this.value)"/>
-            </div>
-            <div class="task-meta-field">
-              <label class="task-meta-label">Start date <span style="font-weight:400;opacity:0.7;">(optional)</span></label>
-              <input type="date" class="task-meta-input" value="${startDate}"
-                onchange="saveTaskMeta('${t.id}','start',this.value)"/>
             </div>
           </div>
           ${toolChecks}
@@ -3049,13 +3065,13 @@ function renderMilestones(){
               <label class="task-meta-label">Responsible</label>
               <input type="text" class="task-meta-input" id="nt-lead-${milestone}-${gid}" placeholder="Person responsible"/>
             </div>
+            <div class="task-meta-field" style="flex:0 0 auto;min-width:0;">
+              <label class="task-meta-label">Start date <span style="font-weight:400;opacity:0.7;">(optional)</span></label>
+              <input type="date" class="task-meta-input" id="nt-start-${milestone}-${gid}" style="width:auto;"/>
+            </div>
             <div class="task-meta-field">
               <label class="task-meta-label">Due date</label>
               <input type="date" class="task-meta-input" id="nt-due-${milestone}-${gid}"/>
-            </div>
-            <div class="task-meta-field">
-              <label class="task-meta-label">Start date <span style="font-weight:400;opacity:0.7;">(optional)</span></label>
-              <input type="date" class="task-meta-input" id="nt-start-${milestone}-${gid}"/>
             </div>
           </div>
         </div>
