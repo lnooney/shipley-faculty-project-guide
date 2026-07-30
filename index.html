@@ -404,6 +404,13 @@ a:hover{color:var(--navy);}
   font-size:12px;color:var(--amber-text);background:var(--amber-bg);
   padding:3px 8px;border-radius:4px;margin-top:4px;display:inline-block;
 }
+.due-flag{
+  font-size:9px;font-weight:700;padding:1px 6px;border-radius:9px;
+  margin-left:6px;text-transform:uppercase;letter-spacing:0.03em;
+  vertical-align:middle;display:inline-block;
+}
+.due-flag-overdue{background:var(--red-light);color:var(--red);}
+.due-flag-soon{background:var(--amber-bg);color:var(--amber-text);}
 
 /* ── MILESTONE TAILORING ── */
 .investigate-card{
@@ -1788,6 +1795,8 @@ const SYSTEM = `You are the Shipley Academic Innovation Project Guide — a seas
 
 Your role: help Institute staff plan, execute, measure, and report on the Shipley projects they support. Faculty lead these projects; the person you're advising is the staff member managing the relationship, tracking progress, and keeping the project on track. You are a trusted colleague — warm, direct, and experienced. Staff bring a wide range of grant management experience, from decades of experience to none — meet each person at the level they need without over-explaining to the ones who don't need it.
 
+Keep your feedback tactical and operational — implementation logistics, timeline, budget, staffing, process, and risk. Do not comment on or suggest changes to the pedagogical or academic substance of what faculty are proposing to teach, research, or assess — that is the faculty lead's domain, not yours. If something about the assessment or content approach concerns you, frame it only as a timeline, feasibility, or process risk to raise with the faculty lead — never as a suggestion to change the approach itself.
+
 When you give feedback, make it specific and grounded. Move toward something useful — name problems clearly when you see them, the way an experienced colleague would, without fanfare or excessive hedging. Avoid rhetorical parallel constructions ("you're not just doing X, you're doing Y") — they read as performative rather than genuine. Say what you see, flag what matters, and point toward the next useful step.
 
 Ground every claim in what is actually stated in the project's materials — never invent or assume the capabilities of a specific tool, platform, or LMS (e.g., Blackboard, a named AI tool) that isn't described in the proposal itself. If a proposal states that no existing tool does what they're proposing, take that at face value — assume the faculty team has already surveyed the landscape rather than second-guessing their claim.
@@ -1796,7 +1805,7 @@ Key knowledge you bring:
 - The Shipley project framework: five milestones (Prepare → Conduct & Gather Data → Analyze & Share Findings → Reflect/Iterate/Scale → Report & Close)
 - The Impact Evaluation Framework: Problems → Objectives → Impacts → Measures & Targets → Data Collection → Data Analysis
 - IRB requirements for Scholarship of Teaching and Learning (SoTL) and educational research
-- Common project blockers: student worker hiring takes 4–6 weeks; vendor contracts require BU legal review; technology tools need accessibility/privacy/security vetting; 9-month faculty contracts affect summer availability
+- Common project blockers: student worker hiring takes 4–6 weeks; vendor contracts require BU legal review; technology tools need accessibility/privacy/security vetting; 9-month faculty contracts affect summer availability; building, customizing, or integrating a technology tool typically takes several weeks up to a full semester depending on complexity; developing new assignments, rubrics, or an assessment plan from scratch typically takes 4–8 weeks of faculty time and often competes with an active teaching term
 - Technology considerations: FERPA compliance for student data, WCAG accessibility standards, BU data security requirements
 - Survey design for educational research: validated scales, pre/post design, incentive strategies
 - Data analysis options: paired t-tests for pre/post, thematic coding for qualitative data, descriptive statistics
@@ -1921,7 +1930,7 @@ const RUBRIC_CRITERIA = [
    ]},
   {id:'c6', num:6, title:'Implementation Feasibility', threshold:false,
    question:'Is the scope realistic within a 12-month window (completion before Fall 2027)? Are staffing, technology, and required approvals addressed?',
-   note:"Base this criterion specifically on the proposal's \"Budget Rationale\", \"Project Implementation & Timeline\", \"Shipley Center Health Education Innovation Award Proposal\", and \"Budget Summary\" sections. This information is typically present in the full proposal text even when it is not captured in the structured project fields — do not say this information is unavailable without checking the full proposal text first.",
+   note:"Base this criterion specifically on the proposal's \"Budget Rationale\", \"Project Implementation & Timeline\", \"Shipley Center Health Education Innovation Award Proposal\", and \"Budget Summary\" sections. This information is typically present in the full proposal text even when it is not captured in the structured project fields — do not say this information is unavailable without checking the full proposal text first. When judging realism of the 12-month timeline, weigh the time required for every major work component described — not just hiring (4–6 weeks) and IRB approval (4–8 weeks), but also technology development/customization/integration and developing assignments and an assessment plan, both easy to underestimate and common sources of delay. A proposal that doesn't address how long these components will take is a real feasibility gap, not a neutral omission — score it accordingly rather than assuming best-case timing.",
    tiers:[
      {score:4,name:'Exemplary',text:'Timeline is detailed, realistic, and can be completed before Fall 2027. Key milestones, dependencies, and decision points are identified. Staffing, technology, and required approvals (IRB, IT, FERPA) are addressed. Budget aligns with scope.'},
      {score:3,name:'Proficient',text:'Timeline is reasonable and scope is appropriate for completion before Fall 2027. Major milestones are identified. Some dependencies may not be fully addressed but do not represent significant project risk.'},
@@ -2977,6 +2986,16 @@ function renderInvestigatePanel(){
       </div>`).join('');
 }
 
+function getDueFlag(dueDate, done){
+  if(!dueDate || done) return null;
+  const today = new Date(); today.setHours(0,0,0,0);
+  const due = new Date(dueDate+'T00:00:00');
+  const diffDays = Math.round((due-today)/86400000);
+  if(diffDays < 0) return 'overdue';
+  if(diffDays <= 7) return 'soon';
+  return null;
+}
+
 function renderMilestones(){
   const data = loadAll();
   taskStates = data.task_states || {};
@@ -3024,6 +3043,10 @@ function renderMilestones(){
       const lead = meta.lead !== undefined ? meta.lead : (t.lead||'');
       const dueDate = meta.due || '';
       const startDate = meta.start || '';
+      const isDone = taskStates[t.id]==='done'||taskStates[t.id]===true;
+      const dueFlag = getDueFlag(dueDate, isDone);
+      const dueFlagHTML = dueFlag==='overdue' ? '<span class="due-flag due-flag-overdue">Overdue</span>'
+        : dueFlag==='soon' ? '<span class="due-flag due-flag-soon">Due soon</span>' : '';
       const isTechTask = t.id && t.id.startsWith('tech_');
       const toolChecks = isTechTask && tools.length ? `<div style="margin-top:6px;display:flex;flex-wrap:wrap;gap:6px;">
         ${tools.map(tool=>{
@@ -3047,7 +3070,7 @@ function renderMilestones(){
                 onchange="saveTaskMeta('${t.id}','lead',this.value)"/>
             </div>
             <div class="task-meta-field">
-              <label class="task-meta-label">Due date</label>
+              <label class="task-meta-label">Due date${dueFlagHTML}</label>
               <input type="date" class="task-meta-input" value="${dueDate}"
                 onchange="saveTaskMeta('${t.id}','due',this.value)"/>
             </div>
@@ -3169,6 +3192,7 @@ function saveTaskMeta(id, field, value){
   if(!data.task_meta[id]) data.task_meta[id] = {};
   data.task_meta[id][field] = value;
   saveAll(data);
+  if(field==='due') renderMilestones();
 }
 
 function toggleMilestoneTask(id){
@@ -4306,6 +4330,8 @@ Below is the Institute's RFP scoring rubric for this grant cycle, followed by th
 
 Only give feedback on what has actually been provided — do not reference or flag omissions for fields that weren't shared with you. Be collegial, specific, and direct. Do not reference the BU grants office or university policy. If something raises a concern that needs follow-up, flag it clearly for follow-up with the faculty lead.
 
+Score rigorously against the tier definitions as written — do not default toward generosity. Vagueness, missing detail, or an unaddressed dependency on a criterion is a real gap and should be scored accordingly, not given the benefit of the doubt. Keep every score and comment tactical and operational (timeline, budget, staffing, process, risk) — never suggest changes to the pedagogical or academic substance of what faculty are proposing to teach, research, or assess.
+
 RFP rubric:
 ${buildRubricReferenceText()}
 
@@ -4325,6 +4351,14 @@ RUBRIC SCORES
 
 TOTAL: [total]/28 — [Competitive / Conditionally Competitive — HOLD / Not Competitive]
 (If you could not score all 7 criteria, replace the line above with: TOTAL: Not calculable — [one sentence on what's missing].)
+
+TIMELINE FEASIBILITY (12-month window — must complete before Fall 2027)
+[Include one bullet for each of these work components that applies to this project, in this order, skipping any that clearly don't apply. Never exceed 4 bullets.]
+- Student worker hiring: [your best-estimate duration, e.g. "4-6 weeks"] — [one-sentence feasibility note; if the proposal doesn't give enough detail to estimate confidently, replace this with a specific question the staff member should ask the faculty lead]
+- IRB approval: [duration estimate] — [note or question]
+- Technology development/customization/integration: [duration estimate] — [note or question]
+- Assignment/assessment development: [duration estimate] — [note or question]
+Overall: [Feasible as scoped / Feasible but tight — flag one specific risk / Not feasible within 12 months as scoped]
 
 RED FLAGS
 - [one bullet per applicable red flag from the reference list — if none apply, a single bullet: "None identified."]
