@@ -869,10 +869,17 @@ a:hover{color:var(--navy);}
       </div>
     </div>
     <div class="hint" style="margin-top:-8px;margin-bottom:14px;">This award cycle runs one calendar year, Fall 2026 – Summer 2027. Adjust these dates only if this project's actual timeline differs.</div>
-    <div class="field">
-      <label>Funding transfer confirmed <span style="font-weight:400;opacity:0.7;">(optional)</span></label>
-      <input type="date" id="s-funding-confirmed" style="width:100%;"/>
-      <div class="hint">The date funds actually became available. When filled in, the guide uses this — not the project start date above — as the earliest date any task can be scheduled.</div>
+    <div class="grid2">
+      <div class="field">
+        <label>Funding transfer confirmed <span style="font-weight:400;opacity:0.7;">(optional)</span></label>
+        <input type="date" id="s-funding-confirmed" style="width:100%;"/>
+        <div class="hint">The date funds actually became available. When filled in, the guide uses this — not the project start date above — as the earliest date any task can be scheduled.</div>
+      </div>
+      <div class="field">
+        <label>Funding amount awarded <span style="font-weight:400;opacity:0.7;">(optional)</span></label>
+        <input type="number" min="0" step="100" id="s-funding-amount" style="width:100%;" placeholder="e.g. 23400"/>
+        <div class="hint">The actual dollar amount this project was awarded, based on its budget proposal — not every project receives the full $10,000/$25,000 tier maximum. When filled in, the Budget tab uses this amount instead of the tier maximum for remaining-budget and over/under-budget feedback.</div>
+      </div>
     </div>
     <div class="field">
       <label id="grant-amount-label">Award amount</label>
@@ -881,11 +888,6 @@ a:hover{color:var(--navy);}
         <label class="radio-pill"><input type="radio" name="s-grant" value="25000" onchange="onGrantAmountChange(this)"/> $25,000</label>
       </div>
       <div class="hint">This selects the project's budget template.</div>
-    </div>
-    <div class="field">
-      <label>Funding amount awarded <span style="font-weight:400;opacity:0.7;">(optional)</span></label>
-      <input type="number" min="0" step="100" id="s-funding-amount" style="width:100%;" placeholder="e.g. 23400"/>
-      <div class="hint">The actual dollar amount this project was awarded, based on its budget proposal — not every project receives the full $10,000/$25,000 tier maximum. When filled in, the Budget tab uses this amount instead of the tier maximum for remaining-budget and over/under-budget feedback.</div>
     </div>
   </div>
 
@@ -1050,7 +1052,16 @@ a:hover{color:var(--navy);}
         <option value="yes-both">Yes — both graduate and undergraduate</option>
         <option value="no">No student workers planned</option>
       </select>
-      <div id="worker-note" class="conditional-note hint" style="display:none;color:var(--amber-text);">Please remind your faculty team that hiring student workers involves administrative steps that take longer than most teams expect — someone will need to post positions, conduct interviews, complete HR onboarding paperwork, and set up payroll. Plan for 4–6 weeks minimum before a student worker can begin paid work, and if this project depends on student worker contributions early in the semester, begin this process before the semester starts. They should also confirm with the department whether a stipend or hourly employment is more appropriate for this project.</div>
+      <div id="worker-note" class="conditional-note hint" style="display:none;color:var(--amber-text);">
+        Please remind your faculty team:
+        <ul style="margin:4px 0 0;padding-left:18px;">
+          <li>Hiring involves administrative steps that take longer than most teams expect.</li>
+          <li>Someone will need to post positions, conduct interviews, complete HR onboarding paperwork, and set up payroll.</li>
+          <li>Plan for 4–6 weeks minimum before a student worker can begin paid work.</li>
+          <li>If this project depends on student worker contributions early in the semester, begin this process before the semester starts.</li>
+          <li>Confirm with the department whether a stipend or hourly employment is more appropriate for this project.</li>
+        </ul>
+      </div>
     </div>
 
     <div id="worker-details" style="display:none;">
@@ -1860,13 +1871,14 @@ function toggleImportCard(){
 // PROPOSAL REVIEW RUBRIC — Health Education Innovation Grants, AY 2026–27
 // ═══════════════════════════════════════════════════════
 const RUBRIC_ELIGIBILITY = [
-  {id:'faculty_status', label:'Applicant holds faculty or program director status at BU', note:'Faculty status required; educational leaders and program directors eligible'},
+  {id:'faculty_status', label:'Applicant holds faculty or program director status at BU', note:'AUTO-FAIL — Shipley projects must be submitted and led by BU faculty or program directors. Proposals submitted by students are not fundable regardless of merit. Suggested action: recommend the student identify a faculty sponsor to lead the project.', autoFail:true},
   {id:'health_focus', label:'Project is focused on health education, not health research', note:'Primary outcome must be improvement in teaching and learning, not knowledge generation'},
   {id:'digital_component', label:'Project includes a meaningful digital innovation component', note:'Technology must be central, not decorative or supplementary — explicit CFP requirement'},
   {id:'twelve_month', label:'Project can be completed before the start of Fall 2027 (within 12 months of award)', note:'AUTO-FAIL — Projects that cannot be completed within a 12-month window do not proceed', autoFail:true},
   {id:'components_present', label:'All required application components are present', note:'Challenge, innovation, budget rationale, timeline, assessment plan, dissemination plan, target learners'},
-  {id:'letter_support', label:'Letter of support from chair, dean, or senior BU leadership is included', note:'AUTO-FAIL — Missing or ineligible letter of support; signer must be senior to all applicants', autoFail:true},
+  {id:'letter_support', label:'Letter of support from chair, dean, or senior BU leadership is included', note:"AUTO-FAIL — The letter must come from within BU, and the signer must be senior to the applicant specifically within the applicant's own department or school (not just senior BU leadership generically). The purpose of this letter is to confirm backing from someone with financial decision-making power who can support the project's sustainability or the technology being implemented — an external signer, or one who is not senior to the applicant in their own department/school, does not satisfy this requirement.", autoFail:true},
   {id:'interdisciplinary', label:'Interdisciplinary team or confirmed collaboration plan', note:'Strongly emphasized in CFP; single-discipline projects are at a significant competitive disadvantage'},
+  {id:'bu_student_impact', label:'Learning impact includes BU students among the beneficiaries', note:'AUTO-FAIL — Other beneficiaries (faculty, community members, other institutions) may also be included, but BU students must be among those who benefit from the learning impact.', autoFail:true},
 ];
 
 const RUBRIC_CRITERIA = [
@@ -1881,7 +1893,7 @@ const RUBRIC_CRITERIA = [
    ]},
   {id:'c2', num:2, title:'Digital Innovation', threshold:true,
    question:'⚠ THRESHOLD: a score of 1 is disqualifying per the CFP. Is digital innovation central, meaningful, and specific — not decorative or supplementary?',
-   note:"If the proposal states that no existing tool does what they're proposing, take that at face value rather than second-guessing it — assume the faculty team has already surveyed the landscape. Do not justify a score by asserting what a specific tool or platform (an LLM, the campus LMS, etc.) can or cannot do unless that capability is actually described in the proposal — ground the score only in what the proposal states.",
+   note:"If the proposal states that no existing tool does what they're proposing, take that at face value rather than second-guessing it — assume the faculty team has already surveyed the landscape. Do not justify a score by asserting what a specific tool or platform (an LLM, the campus LMS, etc.) can or cannot do unless that capability is actually described in the proposal — ground the score only in what the proposal states. If the project introduces new technology and there's no indication of support from IS&T leadership and/or Wendy Colby, flag it (see red flag reference) — this approval will be required before the new technology can be piloted, though it does not by itself lower this score.",
    tiers:[
      {score:4,name:'Exemplary',text:'Digital innovation is central, named, specific, and well-justified. Technology meaningfully changes how learners engage with content. Rationale connects the digital component directly to improved health education outcomes.'},
      {score:3,name:'Proficient',text:'A clear digital component is proposed and connected to learning outcomes. Its role is explained, though not yet fully differentiated from existing tools or practices.'},
@@ -1899,7 +1911,7 @@ const RUBRIC_CRITERIA = [
    ]},
   {id:'c4', num:4, title:'Scalability & Transferability', threshold:false,
    question:'Can this be sustained without continued Shipley funding, and can the framework or model transfer to disciplines beyond the one proposed?',
-   note:"Weight two things above all else, in this order: (1) sustainability without continued Shipley funding — most importantly, whether the faculty member's department would realistically commit to covering ongoing costs (e.g., software licenses) if the project succeeds, and (2) potential to transfer the framework or model to other disciplines beyond the proposed project's scope. Research dissemination (publications, presentations, conference talks) is a minor, secondary signal — do not weight it comparably to sustainability or cross-discipline transferability, and do not let a strong dissemination plan substitute for a weak answer on either of those two. A 4 does not require a specific formal plan for either — clear, credible potential is enough.",
+   note:"Weight two things above all else, in this order: (1) sustainability without continued Shipley funding — most importantly, whether the faculty member's department would realistically commit to covering ongoing costs (e.g., software licenses) if the project succeeds, and (2) potential to transfer the framework or model to other disciplines beyond the proposed project's scope. Research dissemination (publications, presentations, conference talks) is a minor, secondary signal — do not weight it comparably to sustainability or cross-discipline transferability, and do not let a strong dissemination plan substitute for a weak answer on either of those two. A 4 does not require a specific formal plan for either — clear, credible potential is enough. A missing or non-qualifying letter of support (see the letter-of-support eligibility item — it must be from within BU, from someone senior to the applicant within their own department or school) is a negative signal for this criterion specifically: a qualifying letter is exactly what's meant to establish that someone with financial decision-making authority backs the project's sustainability, so its absence should cap the score rather than being noted only as a separate eligibility issue.",
    tiers:[
      {score:4,name:'Exemplary',text:"Credible case that the project continues without Shipley funding — e.g., the department would plausibly cover ongoing costs like licenses if it succeeds — combined with a credible case that the framework or model could transfer to other disciplines beyond the one proposed. Dissemination, if mentioned, is a bonus and not the basis for this score."},
      {score:3,name:'Proficient',text:'A plausible (if not yet confirmed or committed) path to sustaining the work without Shipley funding, or a credible case for transfer to other disciplines — at least one of the two is clearly addressed, though not both as strongly as a 4.'},
@@ -1908,7 +1920,7 @@ const RUBRIC_CRITERIA = [
    ]},
   {id:'c5', num:5, title:'Assessment & Evaluation', threshold:false,
    question:'Is there a clear, rigorous plan to measure and document impact on learners?',
-   note:"Do not reference this project's Impact Evaluation Framework for this score — that framework is filled in later, during project execution, so it will always be empty at proposal-review time, and an empty framework is never a detriment. Base this criterion only on the proposal text's own stated intent to measure impact. A fully developed methodology is not expected at this stage — that gets built out after funding is received — so a clear, credible statement of intent to measure impact is sufficient for a strong score here.",
+   note:"Do not reference this project's Impact Evaluation Framework for this score — that framework is filled in later, during project execution, so it will always be empty at proposal-review time, and an empty framework is never a detriment. Base this criterion only on the proposal text's own stated intent to measure impact. A fully developed methodology is not expected at this stage — that gets built out after funding is received — so a clear, credible statement of intent to measure impact is sufficient for a strong score here. Critically, the plan must measure impact on student learning specifically — if it measures only faculty satisfaction, tool usage/adoption, or technical performance without also measuring student learning impact, this criterion must be downgraded regardless of how rigorous that other measurement is. The entire point of these awards is positive impact on student learning, so a well-designed evaluation of the wrong outcome doesn't satisfy this criterion.",
    tiers:[
      {score:4,name:'Exemplary',text:'Specific, measurable learning outcomes are identified. Data collection methods are named and appropriate. Assessment connects to stated impacts and is feasible within the project timeline. IRB considerations addressed where applicable.'},
      {score:3,name:'Proficient',text:'Learning outcomes are stated and an evaluation approach is described. Data collection methods are mentioned. Plan is reasonable but may lack specificity or methodological rigor.'},
@@ -1917,21 +1929,21 @@ const RUBRIC_CRITERIA = [
    ]},
   {id:'c6', num:6, title:'Implementation Feasibility', threshold:false,
    question:'Is the scope realistic within a 12-month window (completion before Fall 2027)? Are staffing, technology, and required approvals addressed?',
-   note:"Base this criterion specifically on the proposal's \"Budget Rationale\", \"Project Implementation & Timeline\", \"Shipley Center Health Education Innovation Award Proposal\", and \"Budget Summary\" sections. This information is typically present in the full proposal text even when it is not captured in the structured project fields — do not say this information is unavailable without checking the full proposal text first. When judging realism of the 12-month timeline, weigh the time required for every major work component described — not just hiring (4–6 weeks) and IRB approval (4–8 weeks), but also technology development/customization/integration and developing assignments and an assessment plan, both easy to underestimate and common sources of delay. A proposal that doesn't address how long these components will take is a real feasibility gap, not a neutral omission — score it accordingly rather than assuming best-case timing.",
+   note:"Base this criterion specifically on the proposal's \"Budget Rationale\", \"Project Implementation & Timeline\", \"Shipley Center Health Education Innovation Award Proposal\", and \"Budget Summary\" sections. This information is typically present in the full proposal text even when it is not captured in the structured project fields — do not say this information is unavailable without checking the full proposal text first. When judging realism of the 12-month timeline, weigh the time required for every major work component described — not just hiring (4–6 weeks) and IRB approval (4–8 weeks), but also technology development/customization/integration and developing assignments and an assessment plan, both easy to underestimate and common sources of delay. A proposal that doesn't address how long these components will take is a real feasibility gap, not a neutral omission — score it accordingly rather than assuming best-case timing. A proposal having detailed steps or tasks does not by itself establish feasibility — detail is not the same as realism. Apply your own project-management judgment, drawing on your 15+ years of experience managing faculty projects, to independently assess whether the described scope is realistically achievable within 12 months, regardless of how much narrative detail is provided. If that judgment identifies significant risk that the project can't be completed within the window without heavy staff hand-holding, or that it will exceed the award timeline, cap the score at 2 (Developing) or lower — do not score generously just because the proposal is detailed or well-organized.",
    tiers:[
      {score:4,name:'Exemplary',text:'Timeline is detailed, realistic, and can be completed before Fall 2027. Key milestones, dependencies, and decision points are identified. Staffing, technology, and required approvals (IRB, IT, FERPA) are addressed. Budget aligns with scope.'},
      {score:3,name:'Proficient',text:'Timeline is reasonable and scope is appropriate for completion before Fall 2027. Major milestones are identified. Some dependencies may not be fully addressed but do not represent significant project risk.'},
      {score:2,name:'Developing',text:'Timeline is vague or potentially unrealistic within the 12-month window. Scope appears underestimated or overly ambitious. Key dependencies (IRB, IT vetting, hiring timelines) are not acknowledged.'},
      {score:1,name:'Insufficient',text:'Timeline is absent or clearly cannot be completed before Fall 2027. Critical dependencies are unaddressed. Budget and scope are significantly misaligned.'},
    ]},
-  {id:'c7', num:7, title:'Grant-Type Alignment', threshold:false,
+  {id:'c7', num:7, title:'Award Level Alignment', threshold:false,
    question:'Does the project scope, budget, and readiness match the requested tier? Seed ($10K): early-stage pilots. Innovation ($25K): program-level, broader adoption.',
-   note:'Determine the grant type directly from the dollar amount given in the project scoping information below — $10,000 is a Seed Grant, $25,000 is an Innovation Grant. Do not infer the grant type from the narrative; the amount already tells you which tier was requested.',
+   note:"This criterion weighs three things: (1) whether the total budget requested falls within the tier's dollar range — determine the tier directly from the dollar amount given in the project scoping information below ($10,000 is a Seed Grant, $25,000 is an Innovation Grant; do not infer the tier from the narrative, the amount already tells you which tier was requested); (2) whether the proposed scope and nature of the work actually matches that tier's stipulated description — Seed is meant for early-stage pilots, Innovation is meant for program-level work with broader adoption, and a project that's really just an early-stage pilot requested at the Innovation tier (or vice versa) should score lower here even if the dollar amount is technically within range; and (3) whether the budget realistically covers what the described line items and work would actually cost — use your project-management experience to independently infer this rather than accepting the proposal's stated figures at face value, similar to how the Budget tab's own tailoring flags under-budgeted line items. A budget that's plausible on paper but clearly underestimates real costs for the described scope should pull this score down.",
    tiers:[
-     {score:4,name:'Exemplary',text:'Project scope, budget, and goals are well-matched to the requested grant type. Seed applications are clearly early-stage; Innovation applications demonstrate readiness for program-level work with measurable outcomes and broader adoption potential.'},
-     {score:3,name:'Proficient',text:'Scope generally aligns with the grant type. Minor recalibration may be suggested but overall fit is appropriate.'},
-     {score:2,name:'Developing',text:"Scope and grant type are somewhat misaligned — too ambitious for Seed or too preliminary for Innovation. Applicant may not have articulated which type fits best."},
-     {score:1,name:'Insufficient',text:'Clear mismatch between project scope and grant type. Scope far exceeds or falls significantly short of what the requested grant is designed to support.'},
+     {score:4,name:'Exemplary',text:'Project scope, budget, and goals are well-matched to the requested award level. Seed applications are clearly early-stage; Innovation applications demonstrate readiness for program-level work with measurable outcomes and broader adoption potential. Budget realistically covers the described costs.'},
+     {score:3,name:'Proficient',text:'Scope generally aligns with the award level. Minor recalibration may be suggested but overall fit is appropriate. Budget is broadly realistic.'},
+     {score:2,name:'Developing',text:"Scope and award level are somewhat misaligned — too ambitious for Seed or too preliminary for Innovation. Applicant may not have articulated which level fits best. Budget may underestimate real costs for what's described."},
+     {score:1,name:'Insufficient',text:'Clear mismatch between project scope and award level. Scope far exceeds or falls significantly short of what the requested award is designed to support. Budget clearly underestimates what the described work would actually cost.'},
    ]},
 ];
 
@@ -1941,9 +1953,10 @@ const RUBRIC_REDFLAGS = [
   {id:'f3', label:'Collaboration Is Nominal or Single-Discipline', desc:'Only one field represented, or interdisciplinary partners listed without clear differentiated contributions.'},
   {id:'f4', label:'Impact Limited to One Course or Team', desc:'No reusable products, no dissemination plan, no pathway for other programs to adopt the work.'},
   {id:'f5', label:'Assessment Plan Is Absent or Vague', desc:'No specific learning outcomes or data collection methods. Required application component not meaningfully addressed.'},
-  {id:'f6', label:'Scope Mismatch with Grant Type', desc:'Project is too ambitious for a Seed Grant or too preliminary for an Innovation Grant.'},
+  {id:'f6', label:'Scope Mismatch with Award Level', desc:'Project is too ambitious for a Seed Grant or too preliminary for an Innovation Grant, or the budget does not realistically cover the described costs.'},
   {id:'f7', label:'Sustainability Is Not Addressed', desc:'No plan for what happens when funding ends. No identified institutional home for the work.'},
   {id:'f8', label:'Technology/Compliance Dependencies Unaddressed', desc:'Student data, voice data, or AI tools used without reference to IRB, FERPA, BU IT vetting, or accessibility requirements.'},
+  {id:'f9', label:'New Technology Lacks IS&T/Wendy Colby Sign-off', desc:'The project introduces new technology, but there is no indication of support from IS&T leadership and/or Wendy Colby. This approval will be required before the new technology can be piloted.'},
 ];
 
 // Serializes the rubric as reference text for the AI Guide to apply itself —
@@ -4313,7 +4326,7 @@ async function aiScopeReview(){
 - Interdisciplinary Collaboration (Criterion 3): "List of Collaborators" section and any Letters of Support — note every named person and role
 - Assessment & Evaluation (Criterion 5): the proposal's own stated plan to measure impact — do not use this project's Impact Evaluation Framework, it is unrelated and filled in later
 - Implementation Feasibility (Criterion 6): "Budget Rationale", "Project Implementation & Timeline", "Shipley Center Health Education Innovation Award Proposal", and "Budget Summary" sections
-- Grant-Type Alignment (Criterion 7): determined directly from the grant amount in the project scoping information below — do not infer it from the narrative`;
+- Award Level Alignment (Criterion 7): determined directly from the grant amount in the project scoping information below — do not infer it from the narrative`;
 
   const prompt = `You are a helpful guide for Institute for Excellence in Teaching & Learning staff supporting a faculty-led Shipley Academic Innovation Fund award (Health Education Innovation Grants, AY 2026–27) at Boston University.
 
@@ -4325,6 +4338,8 @@ Only give feedback on what has actually been provided — do not reference or fl
 
 Score rigorously against the tier definitions as written — do not default toward generosity. Vagueness, missing detail, or an unaddressed dependency on a criterion is a real gap and should be scored accordingly, not given the benefit of the doubt. Keep every score and comment tactical and operational (timeline, budget, staffing, process, risk) — never suggest changes to the pedagogical or academic substance of what faculty are proposing to teach, research, or assess.
 
+If the project includes any digital output (a tool, platform, faculty resource, dataset, or similar), always include, as one of the CHALLENGES & SUGGESTIONS bullets, a question about who will be responsible for maintaining that output after the funding period ends — sustainability planning needs to start at the beginning of the project, not be discovered as a gap at the end.
+
 RFP rubric:
 ${buildRubricReferenceText()}
 
@@ -4333,6 +4348,9 @@ ${filled.join('\n')}
 
 This feedback is for internal staff use and must be fast to scan, not narrative. Reply using EXACTLY this structure, with nothing added before, after, or between sections, and no narrative outside of it. Fill in every bracketed placeholder. Each criterion bullet is capped at ONE sentence of rationale — do not exceed it. Each of the three closing sections is capped at 3 short bullets, not prose paragraphs — one point per bullet, no more than one sentence per bullet:
 
+ELIGIBILITY SCREEN
+- [one bullet per eligibility item from the reference list that is NOT clearly met, including every AUTO-FAIL item — state the concern plainly, and for an AUTO-FAIL item say clearly that this proposal cannot be funded as submitted, including the suggested action from the reference note if one is given. If every item is clearly met or there's no information suggesting a problem, a single bullet: "No eligibility concerns identified."]
+
 RUBRIC SCORES
 - Health Education Focus: [1-4]/4 — [one-sentence rationale]
 - Digital Innovation: [1-4]/4 — [one-sentence rationale]
@@ -4340,7 +4358,7 @@ RUBRIC SCORES
 - Scalability & Transferability: [1-4]/4 — [one-sentence rationale]
 - Assessment & Evaluation: [1-4]/4 — [one-sentence rationale]
 - Implementation Feasibility: [1-4]/4 — [one-sentence rationale]
-- Grant-Type Alignment: [1-4]/4 — [one-sentence rationale]
+- Award Level Alignment: [1-4]/4 — [one-sentence rationale]
 
 TOTAL: [total]/28 — [Competitive / Conditionally Competitive — HOLD / Not Competitive]
 (If you could not score all 7 criteria, replace the line above with: TOTAL: Not calculable — [one sentence on what's missing].)
@@ -4359,12 +4377,12 @@ RED FLAGS
 CHALLENGES & SUGGESTIONS
 - [one bullet per challenge, each pairing the challenge with a specific, practical suggestion to address it]
 
-WHAT'S EXCITING ABOUT THIS PROPOSAL
+WHAT CONCERNS DOES THIS PROPOSAL RAISE
 - [short bullet]
 - [short bullet]
 - [short bullet, if there's a third distinct point — otherwise omit]
 
-WHAT CONCERNS DOES THIS PROPOSAL RAISE
+WHAT'S EXCITING ABOUT THIS PROPOSAL
 - [short bullet]
 - [short bullet]
 - [short bullet, if there's a third distinct point — otherwise omit]
