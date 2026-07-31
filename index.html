@@ -882,6 +882,11 @@ a:hover{color:var(--navy);}
       </div>
       <div class="hint">This selects the project's budget template.</div>
     </div>
+    <div class="field">
+      <label>Funding amount awarded <span style="font-weight:400;opacity:0.7;">(optional)</span></label>
+      <input type="number" min="0" step="100" id="s-funding-amount" style="width:100%;" placeholder="e.g. 23400"/>
+      <div class="hint">The actual dollar amount this project was awarded, based on its budget proposal — not every project receives the full $10,000/$25,000 tier maximum. When filled in, the Budget tab uses this amount instead of the tier maximum for remaining-budget and over/under-budget feedback.</div>
+    </div>
   </div>
 
   <!-- Proposed Budget Line Items -->
@@ -1503,8 +1508,8 @@ a:hover{color:var(--navy);}
       <div class="budget-fringe-ref">
         <strong>Fringe Rate Reference:</strong>&ensp;
         Faculty / PostDoc / Temp Exempt: <strong>31.0%</strong> &nbsp;·&nbsp;
-        PhD Student: <strong>12.5%</strong> &nbsp;·&nbsp;
-        Undergrad / Grad Student (Hourly): <strong>0%</strong> &nbsp;·&nbsp;
+        Graduate Student: <strong>12.5%</strong> &nbsp;·&nbsp;
+        Undergraduate / Graduate Student (Hourly): <strong>0%</strong> &nbsp;·&nbsp;
         Temporary Employee, Non-Exempt: <strong>31.4%</strong>
       </div>
       <div id="budget-table-container" style="overflow-x:auto;"></div>
@@ -1776,6 +1781,8 @@ Keep your feedback tactical and operational — implementation logistics, timeli
 
 When you give feedback, make it specific and grounded. Move toward something useful — name problems clearly when you see them, the way an experienced colleague would, without fanfare or excessive hedging. Avoid rhetorical parallel constructions ("you're not just doing X, you're doing Y") — they read as performative rather than genuine. Say what you see, flag what matters, and point toward the next useful step.
 
+Describe the project itself — its status, timeline, progress, budget, or scope — in the third person ("The project is roughly 4 months into its 12-month timeline," not "You're roughly 4 months into a 12 month project"). Reserve direct "you/your" phrasing for things the staff member themselves should do — action items, follow-ups, questions to raise with the faculty lead. This keeps it clear that project facts belong to the project, while action items belong to the person you're advising.
+
 Ground every claim in what is actually stated in the project's materials — never invent or assume the capabilities of a specific tool, platform, or LMS (e.g., Blackboard, a named AI tool) that isn't described in the proposal itself. If a proposal states that no existing tool does what they're proposing, take that at face value — assume the faculty team has already surveyed the landscape rather than second-guessing their claim.
 
 Key knowledge you bring:
@@ -1996,7 +2003,7 @@ Return ONLY the JSON object with no other text, explanation, or markdown.
 
 For budget_template: "10k" if grant ≤ $10,000; "25k" if grant ≤ $25,000; null if not found.
 For salary keys ($10K): "Summer Stipend (shared between PIs)", "Course Release / Adjunct", "Other Faculty (describe)", "Research Assistant (Hourly)"
-For salary keys ($25K): "Course Release / Adjunct", "Summer Salary", "Overbase", "Other Faculty (describe)", "PostDoc", "PhD Student", "Undergrad/Grad Student (Hourly)", "Temporary Employee, Exempt", "Temporary Employee, Non-Exempt"
+For salary keys ($25K): "Course Release / Adjunct", "Faculty Stipend", "Overbase", "Other Faculty (describe)", "PostDoc", "Graduate Student", "Undergraduate Student (Hourly)", "Graduate Student (Hourly)", "Temporary Employee, Exempt", "Temporary Employee, Non-Exempt"
 Salary values: total amount for the whole award as a number (these projects are funded as a single lump sum, not by term).
 For op keys ($10K): "AI Tools & Software Licenses (e.g., ChatGPT Pro, Jutly)", "Supplies, Equipment, & Materials", "Meeting / Workshop Expense", "Other, please describe"
 For op keys ($25K): "AI Tools & Software Licenses", "Supplies, Equipment, & Materials", "Contracted Services", "Meeting / Workshop Expense", "Travel & Conference Registration", "Participant Incentives", "Other, please describe"
@@ -2291,10 +2298,16 @@ async function extractBudgetLinesFromProposal(){
   setButtonLoading(btn, true);
   guard.innerHTML = `<div class="alert alert-blue" style="margin-bottom:10px;">Your guide is reading the proposal for budget line items…</div>`;
 
-  const prompt = `An Institute staff member needs every budget line item mentioned in the proposal text below, exactly as the proposal describes them.
+  const officialLabels = [...new Set([...BUDGET_DEFS['10k'].salaryRows, ...BUDGET_DEFS['25k'].salaryRows, ...BUDGET_DEFS['10k'].opRows, ...BUDGET_DEFS['25k'].opRows].map(r=>r.name))];
+
+  const prompt = `An Institute staff member needs every budget line item mentioned in the proposal text below.
 
 Proposal text:
 ${data.proposalText}
+
+The official Shipley budget template uses these exact line item labels: "${officialLabels.join('", "')}". Where a line item you find clearly matches one of these official labels, use that exact official label as the description instead of paraphrasing the proposal's own wording. If nothing matches, describe it briefly in your own words as the proposal states it.
+
+Always list graduate student support and undergraduate student support as separate line items — never combine them into a single "student" or "undergrad/grad" line, even if the proposal describes them together in one sentence. Use "Graduate Student" for salaried/stipend graduate compensation, and "Undergraduate Student (Hourly)" / "Graduate Student (Hourly)" for hourly-paid work, matching each item to the correct student level.
 
 Return ONLY a valid JSON object with no other text, explanation, or markdown: {"lines": [{"description": "...", "amount": number_or_null, "category": "salary"|"operating"|null}]}. Include every distinct budget line item you can find — do not invent line items that aren't in the text. Use "salary" for personnel/stipend/compensation items, "operating" for everything else (software, supplies, travel, services), and null for category if you can't tell. Use null for amount if no dollar figure is given for that specific item.`;
 
@@ -2331,6 +2344,7 @@ function saveSetup(){
     start: document.getElementById('s-start').value,
     end: document.getElementById('s-end').value,
     funding_confirmed: document.getElementById('s-funding-confirmed')?.value || '',
+    funding_amount: document.getElementById('s-funding-amount')?.value || '',
     grant: getGrantAmount(),
     challenge: document.getElementById('s-challenge').value,
     vision: document.getElementById('s-vision').value,
@@ -2368,6 +2382,7 @@ function loadSetup(){
     if(r) r.checked = true;
   }
   if(s.funding_confirmed) document.getElementById('s-funding-confirmed').value = s.funding_confirmed;
+  if(s.funding_amount) document.getElementById('s-funding-amount').value = s.funding_amount;
   ['media','data_needs','workers'].forEach(f=>{
     const el = document.getElementById('s-'+f.replace('_needs',''));
     if(el && s[f]) el.value = s[f];
@@ -2712,6 +2727,7 @@ const MILESTONE_TASKS = {
   m3: [
     {name:'Analyze quantitative data (surveys, grades, LMS data)', lead:'Project team', blocker:null},
     {name:'Analyze qualitative data (artifacts, interviews, open-ended responses)', lead:'Project team', blocker:null},
+    {name:'Analyze second iteration data', lead:'Project team', blocker:null},
     {name:'Synthesize findings and draft impact narrative', lead:'Faculty lead', blocker:null},
     {name:'Share findings with the broader BU community', lead:'Project team', blocker:null},
     {name:'Present findings to program and department colleagues', lead:'Faculty lead', blocker:null},
@@ -2722,7 +2738,6 @@ const MILESTONE_TASKS = {
     {name:'Review data analysis', lead:'Full team', blocker:null},
     {name:'Develop plan for second iteration', lead:'Full team', blocker:null},
     {name:'Plan and implement second pilot (if applicable)', lead:'Piloting instructors', blocker:null},
-    {name:'Analyze second iteration data', lead:'Project team', blocker:null},
     {name:'Develop plan to sustain or scale the intervention', lead:'Faculty lead', blocker:null},
     {name:'Refine intervention based on findings and faculty feedback', lead:'Faculty lead', blocker:null},
     {name:'Reflect on lessons learned — what would the team do differently?', lead:'Full team', blocker:null},
@@ -2823,11 +2838,12 @@ For each task ID, decide one of three things:
 2. "not_relevant" — the proposal or the scoping information above makes clear this task does not apply to this project (e.g., no mention of student workers at all, no digital tools involved, no plans for a second pilot).
 3. Ambiguous — neither the proposal nor the scoping information above clearly addresses whether this applies, but it's a common and important task for Shipley projects generally, so a human should be asked rather than the task being silently dropped or kept. Group related ambiguous task IDs together into ONE question wherever they belong together (e.g., all the Hiring-group tasks under one "will this project need to hire student workers?" question) — do not ask a separate question per task when several tasks share the same underlying yes/no decision. Word each question so a "yes" means "add these tasks to the plan" and a "no" means "these tasks don't apply." Never ask about something already answered in the scoping information above — resolve it into "confirmed" or "not_relevant" instead.
 
-Special case — iteration tasks: "Develop plan for second iteration", "Plan and implement second pilot (if applicable)", and "Analyze second iteration data" (Reflect, Iterate & Scale) default to "not_relevant" unless the proposal explicitly stipulates a second iteration or pilot. Do not confirm them on a vague or generic basis, and do not raise them as an investigate question either — silence on iteration means "not_relevant" for these three specifically.
+Special case — iteration tasks: "Develop plan for second iteration" and "Plan and implement second pilot (if applicable)" (Reflect, Iterate & Scale), and "Analyze second iteration data" (Analyze & Share Findings), default to "not_relevant" unless the proposal explicitly stipulates a second iteration or pilot. Do not confirm them on a vague or generic basis, and do not raise them as an investigate question either — silence on iteration means "not_relevant" for these three specifically.
 
 Additionally, for every task ID you mark "confirmed", estimate a realistic start date and due date and include them in "starts" and "dates". Use your expertise as an experienced project manager:
 - Ground every estimate in the actual amount of work the task requires, not just its position in the sequence — a quick task (e.g., a kickoff meeting) can be scheduled within days, but a substantial task (e.g., developing a full data collection and analysis plan) realistically takes several weeks, not days.
 - Read the proposal's own timeline narrative for explicit signals first; where it's silent, reason from normal project sequencing (hiring and IRB submission happen early; data collection follows setup; analysis and dissemination come later).
+- Dependency work-back rule: for any confirmed task that logically cannot begin until another confirmed task is finished, set its start date to the day immediately following that predecessor task's due date — do not rely on sequencing intuition alone, explicitly check each task's proposed start against its logical predecessor's due date and move it later if it would otherwise overlap.
 - No task can start before ${windowStart} — that's the earliest funds are available and work can realistically begin. There is no assumed additional lag beyond that; work can start immediately once funding is confirmed.
 - Every date must fall between ${windowStart} and ${windowEnd} (this award's full duration).
 - Use YYYY-MM-DD format. It's fine and expected to estimate confidently — the staff member reviews and can adjust every date, so a reasonable estimate is far more useful than leaving it blank. Only omit dates for a confirmed task if there is truly no reasonable basis to place it anywhere in the window.
@@ -2837,6 +2853,8 @@ Academic term reference dates for this award cycle — use these when the propos
 Semester availability constraint: "Implement pedagogical intervention in course(s)" and the student-worker hire date both require students to be present, so neither can be scheduled during the gap between terms (winter break, the gap before summer session, etc.) — use the academic term reference dates above as the earliest a student-facing task in a given term can start.
 
 Date constraint — Learning Analytics: "Plan learning analytics: data collection and analysis" is the umbrella task for that group; it isn't truly done until "Complete Impact Evaluation Framework (Problems → Data Analysis)" and "Develop data collection instruments (surveys, rubrics, observation protocols)" are both done. If you assign dates to any of these confirmed tasks, both subtasks' due dates must fall on or before the umbrella task's due date.
+
+Date constraint — second iteration: if "Analyze second iteration data" is confirmed, its start date must fall on or after the due date of "Plan and implement second pilot (if applicable)" — the second-iteration analysis cannot begin until that second pilot has concluded.
 
 ${!hasHireDate ? `The Setup tab does not yet have a target student-worker hire date. If the proposal states one directly, or states when the student worker's described work begins (from which the hire date is the same as that work-start date, subject to the semester availability constraint above), include it as "worker_target_date" in YYYY-MM-DD format. Omit this field entirely if the proposal gives no basis to infer it, or if this project has no student workers.` : `The Setup tab already has a target student-worker hire date — do not include "worker_target_date" in your response.`}
 
@@ -3313,12 +3331,13 @@ const BUDGET_DEFS = {
     max: 25000,
     salaryRows: [
       {name:'Course Release', fringeRate:0.31},
-      {name:'Summer Salary', fringeRate:0.31},
+      {name:'Faculty Stipend', fringeRate:0.31},
       {name:'Overbase', fringeRate:0.31},
       {name:'Other Faculty (describe)', fringeRate:0.31, hasDesc:true},
       {name:'PostDoc', fringeRate:0.31},
-      {name:'PhD Student', fringeRate:0.125},
-      {name:'Undergrad/Grad Student (Hourly)', fringeRate:0},
+      {name:'Graduate Student', fringeRate:0.125},
+      {name:'Undergraduate Student (Hourly)', fringeRate:0},
+      {name:'Graduate Student (Hourly)', fringeRate:0},
       {name:'Temporary Employee, Exempt', fringeRate:0.31},
       {name:'Temporary Employee, Non-Exempt', fringeRate:0.314},
     ],
@@ -3386,6 +3405,7 @@ async function tailorBudgetToProposal(){
   const hasLines = lines.some(l=>l.description && l.description.trim());
   if((!data.proposalText && !hasLines) || !budgetState.template || !btn) return;
   const def = BUDGET_DEFS[budgetState.template];
+  const ceiling = getBudgetCeiling(def);
   setButtonLoading(btn, true);
   const guard = document.getElementById('budget-tailor-guard');
   guard.innerHTML = `<div class="alert alert-blue" style="margin-bottom:10px;">Your guide is comparing the entered budget against the official template…</div>`;
@@ -3402,7 +3422,7 @@ async function tailorBudgetToProposal(){
     ...def.opRows.map(r=>`OPERATING: ${r.name}`),
   ].join('\n');
 
-  const prompt = `You are helping an Institute for Excellence in Teaching & Learning staff member reconcile a faculty proposal's budget with the official Shipley budget template (${budgetState.template} tier, $${def.max.toLocaleString()} maximum, awarded as a single lump sum up front — not disbursed by term).
+  const prompt = `You are helping an Institute for Excellence in Teaching & Learning staff member reconcile a faculty proposal's budget with the official Shipley budget template (${budgetState.template} tier, $${ceiling.toLocaleString()} for this award, awarded as a single lump sum up front — not disbursed by term).
 
 ${proposalSection}Budget line items the staff member confirmed:
 ${linesText}
@@ -3592,10 +3612,13 @@ function renderBudgetBuilder(){
       const fringePrompt = s.fringeMode===null && amt>0 ? `<div id="fringe-prompt-${ri}" class="alert alert-amber" style="font-size:12px;margin-top:5px;padding:7px 10px;">Does this amount include fringe benefits? <button class="btn-sm" onclick="setFringeMode(${ri},'included')" style="margin-left:6px;">Yes, included</button> <button class="btn-sm" onclick="setFringeMode(${ri},'add')" style="margin-left:4px;">No, calculate for me</button></div>` : '';
       fringeToggle += fringePrompt;
     }
+    const splitHtml = (s.fringeMode==='included' && row.fringeRate>0 && amt>0)
+      ? `<div style="font-size:10px;color:var(--text3);margin-top:3px;">Base: $${base.toLocaleString('en-US',{minimumFractionDigits:2})} · Fringe: $${fringe.toLocaleString('en-US',{minimumFractionDigits:2})}</div>`
+      : '';
     salaryRowsHtml+=`<tr class="bgt-data-row">
       <td class="bgt-label-cell">${row.name}${descHtml}${fringeToggle}</td>
       <td class="bgt-input-cell"><input type="number" min="0" step="100" value="${amt||''}" placeholder="0"
-        onchange="budgetState.salary[${ri}].amount=parseFloat(this.value)||0;renderBudgetBuilder();saveBudget();"/></td>
+        onchange="budgetState.salary[${ri}].amount=parseFloat(this.value)||0;renderBudgetBuilder();saveBudget();"/>${splitHtml}</td>
       <td class="bgt-fringe-cell"><span class="fringe-badge">${frLabel}</span></td>
     </tr>`;
   });
@@ -3626,13 +3649,14 @@ function renderBudgetBuilder(){
     </tr>`;
   });
 
+  const ceiling = getBudgetCeiling(def);
   const grandTotal=sfTotal+opTotal;
-  const remaining=def.max-grandTotal;
-  const statusCls=remaining<0?'bgt-status-over':remaining<=def.max*0.1?'bgt-status-warn':'bgt-status-ok';
+  const remaining=ceiling-grandTotal;
+  const statusCls=remaining<0?'bgt-status-over':remaining<=ceiling*0.1?'bgt-status-warn':'bgt-status-ok';
   const statusIcon=remaining<0?'⚠':'✓';
   const statusMsg=remaining<0
-    ?`Over budget by $${Math.abs(remaining).toLocaleString('en-US',{minimumFractionDigits:2})} — exceeds $${def.max.toLocaleString()} maximum`
-    :`Within budget — $${remaining.toLocaleString('en-US',{minimumFractionDigits:2})} remaining of $${def.max.toLocaleString()} maximum`;
+    ?`Over budget by $${Math.abs(remaining).toLocaleString('en-US',{minimumFractionDigits:2})} — exceeds $${ceiling.toLocaleString()} maximum`
+    :`Within budget — $${remaining.toLocaleString('en-US',{minimumFractionDigits:2})} remaining of $${ceiling.toLocaleString()} maximum`;
 
   document.getElementById('budget-table-container').innerHTML=`
     <table class="bgt-main-table">
@@ -3677,6 +3701,14 @@ function renderBudgetBuilder(){
 function getGrantAmount(){
   const sel = document.querySelector('input[name="s-grant"]:checked');
   return sel ? parseFloat(sel.value) : 0;
+}
+
+// The actual dollar amount awarded (from the funded budget proposal) is the real ceiling
+// for budget feedback once it's known — the tier's $10K/$25K figure is only a maximum.
+function getBudgetCeiling(def){
+  const s = (loadAll().setup) || {};
+  const funded = parseFloat(s.funding_amount);
+  return funded > 0 ? funded : def.max;
 }
 
 function onGrantAmountChange(radio){
@@ -4585,6 +4617,12 @@ function renderGantt(rows){
         const left = s*COL_W;
         const width = Math.max(4,(e-s)*COL_W);
         html += `<div style="position:absolute;top:8px;height:18px;left:${left}px;width:${width}px;background:${fill};border-radius:4px;border:1px solid rgba(0,0,0,0.1);box-sizing:border-box;" title="${r.task}: ${r.start} → ${r.end} (${r.status})"></div>`;
+      } else if(s!==null || e!==null){
+        // Only one of start/due is set (or they collapse to the same point) — show a marker rather than dropping the task.
+        const pos = s!==null ? s : e;
+        const left = pos*COL_W - 5;
+        const label = r.start && r.end ? `${r.start} → ${r.end}` : r.start ? `Starts ${r.start}` : `Due ${r.end}`;
+        html += `<div style="position:absolute;top:11px;left:${left}px;width:12px;height:12px;background:${fill};border:1px solid rgba(0,0,0,0.25);transform:rotate(45deg);box-sizing:border-box;" title="${r.task}: ${label} (${r.status})"></div>`;
       }
       html += `</div></div>`;
     });
@@ -4668,6 +4706,7 @@ async function aibudgethelp(){
   }
   const data = loadAll();
   const s = data.setup || {};
+  const ceiling = getBudgetCeiling(def);
   // Project context
   let projectContext = '';
   if(s.title)    projectContext += `Project: ${s.title}\n`;
@@ -4677,7 +4716,7 @@ async function aibudgethelp(){
   if(s.challenge) projectContext += `Teaching challenge: ${s.challenge}\n`;
   if(s.workers)  projectContext += `Student workers: ${s.workers}\n`;
 
-  let summary = `Award: $${def.max.toLocaleString()} (paid up front as a single lump sum)\n\nSalary line items (fringe rates are fixed institutional rates applied by this tool — do not flag them as errors):\n`;
+  let summary = `Award: $${ceiling.toLocaleString()} (paid up front as a single lump sum)\n\nSalary line items (fringe rates are fixed institutional rates applied by this tool — do not flag them as errors):\n`;
   let salTotal=0, fringeTotal=0;
   def.salaryRows.forEach((row,ri)=>{
     const s=budgetState.salary[ri]||{amount:0,fringeMode:null};
@@ -4698,7 +4737,7 @@ async function aibudgethelp(){
     if(amt>0){ opTotal+=amt; summary+=`  ${row.name}: $${amt.toFixed(2)}\n`; }
   });
   const grand=salTotal+fringeTotal+opTotal;
-  const rem=def.max-grand;
+  const rem=ceiling-grand;
   summary+=`\nSalaries subtotal: $${salTotal.toFixed(2)}\nFringe benefits (tool-calculated): $${fringeTotal.toFixed(2)}\nOperating subtotal: $${opTotal.toFixed(2)}\nGrand total: $${grand.toFixed(2)}\nRemaining: $${rem.toFixed(2)}`;
 
   const prompt=`You are a helpful guide for Institute for Excellence in Teaching & Learning staff supporting a faculty-led Shipley Academic Innovation Fund award at Boston University.\n\n${projectContext?'Project context:\n'+projectContext+'\n':''}${summary}\n\nPlease review this budget and give specific, practical feedback based on what has been entered. Only comment on what is actually present — do not flag missing items as problems unless they seem critically inconsistent with what is entered. Do not reference fringe rates as errors — they are automatically calculated by the tool using fixed institutional rates. Do not reference the BU grants office or university policy. If something raises a concern that needs follow-up, flag it clearly for follow-up with the faculty lead.`;
