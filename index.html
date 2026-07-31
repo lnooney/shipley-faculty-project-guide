@@ -113,6 +113,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
 .tabs{
   background:var(--navy2);display:flex;overflow-x:auto;
   padding:0 2rem;border-bottom:1px solid rgba(255,255,255,0.08);
+  position:sticky;top:0;z-index:500;-webkit-overflow-scrolling:touch;
 }
 .tab{
   padding:13px 18px;font-size:13px;font-weight:500;
@@ -124,6 +125,10 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
 .tab.active{color:#ffffff;border-bottom-color:var(--gold);}
 .tab .tab-check{font-size:10px;margin-left:5px;color:var(--gold);opacity:0;}
 .tab.complete .tab-check{opacity:1;}
+@media(max-width:700px){
+  .tabs{padding:0 0.75rem;}
+  .tab{padding:11px 12px;font-size:12px;}
+}
 
 /* ── LAYOUT ── */
 .main{max-width:900px;margin:0 auto;padding:2rem 1.5rem;}
@@ -531,6 +536,7 @@ a:hover{color:var(--navy);}
   color:var(--text2);transition:all .12s;
 }
 .chip:hover{background:var(--gold-pale);border-color:var(--gold);color:var(--navy);}
+.chip.selected{background:var(--navy);border-color:var(--navy);color:#fff;}
 
 /* ── PROGRESS BAR ── */
 .progress-bar{height:4px;background:var(--bg2);border-radius:2px;margin-bottom:1.5rem;overflow:hidden;}
@@ -774,7 +780,7 @@ a:hover{color:var(--navy);}
   <button class="tab" role="tab" aria-selected="false" aria-controls="tab-impact" id="tab-btn-impact" onclick="switchTab('impact',this)">Impact Framework <span class="tab-check" aria-hidden="true">✓</span></button>
   <button class="tab" role="tab" aria-selected="false" aria-controls="tab-milestones" id="tab-btn-milestones" onclick="switchTab('milestones',this)">Milestones <span class="tab-check" aria-hidden="true">✓</span></button>
   <button class="tab" role="tab" aria-selected="false" aria-controls="tab-budget" id="tab-btn-budget" onclick="switchTab('budget',this)">Budget <span class="tab-check" aria-hidden="true">✓</span></button>
-  <button class="tab" role="tab" aria-selected="false" aria-controls="tab-guide" id="tab-btn-guide" onclick="switchTab('guide',this)">Proposal and Project Queries</button>
+  <button class="tab" role="tab" aria-selected="false" aria-controls="tab-guide" id="tab-btn-guide" onclick="switchTab('guide',this)">Ask Guide re: Project</button>
   <button class="tab" role="tab" aria-selected="false" aria-controls="tab-report" id="tab-btn-report" onclick="switchTab('report',this)">Project Report <span class="tab-check" aria-hidden="true">✓</span></button>
 </nav>
 
@@ -1100,10 +1106,10 @@ a:hover{color:var(--navy);}
       </div>
     </div>
     <p style="font-size:14px;color:var(--text2);line-height:1.7;margin-bottom:16px;">
-      This framework is the backbone of this project's impact measurement. Work through each section from top to bottom — each one builds on the last. Use the guided conversation below to think through responses before filling in the framework. You can return to this and refine it as the project evolves.
+      This framework is the backbone of this project's impact measurement. Work through each section from top to bottom — each one builds on the last. Use the guided conversation below to think through responses before filling in the framework. This can be revisited and refined as the project evolves.
     </p>
     <div class="alert alert-blue">
-      <strong>How to use this:</strong> Work down each section — click "Answer questions to draft this section," answer the short prompts, and your guide will draft that section in a few concise bullets you can review and edit. Each section builds on what was drafted before it. Your entries are saved automatically and will inform your survey design, data collection plan, and final report.
+      <strong>How to use this:</strong> Work down each section — click "Answer questions to draft this section," answer the short prompts, and your guide will draft that section in a few concise bullets you can review and edit. Each section builds on what was drafted before it. Entries are saved automatically and will inform the project's survey design, data collection plan, and final report.
     </div>
   </div>
 
@@ -1164,7 +1170,7 @@ a:hover{color:var(--navy);}
           <div class="fw-header-num">3</div>
           <div class="fw-header-text">
             <div class="fw-header-title">Impacts</div>
-            <div class="fw-header-sub">Given the objectives, what impacts/outcomes do we want to measure?</div>
+            <div class="fw-header-sub">Given the objectives, what impacts/outcomes should be measured?</div>
           </div>
         </div>
         <div class="fw-body">
@@ -1185,7 +1191,7 @@ a:hover{color:var(--navy);}
           <div class="fw-header-num">4</div>
           <div class="fw-header-text">
             <div class="fw-header-title">Measures & Targets</div>
-            <div class="fw-header-sub">What data points are good indicators of such impacts? · What targets do we want to hit?</div>
+            <div class="fw-header-sub">What data points are good indicators of such impacts? · What targets should be hit?</div>
           </div>
         </div>
         <div class="fw-body">
@@ -1215,7 +1221,7 @@ a:hover{color:var(--navy);}
           <div class="fw-header-num">5</div>
           <div class="fw-header-text">
             <div class="fw-header-title">Data Collection</div>
-            <div class="fw-header-sub">How do we collect the data points we want?</div>
+            <div class="fw-header-sub">How will these data points be collected?</div>
           </div>
         </div>
         <div class="fw-body">
@@ -1245,7 +1251,7 @@ a:hover{color:var(--navy);}
           <div class="fw-header-num">6</div>
           <div class="fw-header-text">
             <div class="fw-header-title">Data Analysis</div>
-            <div class="fw-header-sub">How do we measure the outcomes with the data collected?</div>
+            <div class="fw-header-sub">How will the outcomes be measured using the data collected?</div>
           </div>
         </div>
         <div class="fw-body">
@@ -1359,7 +1365,7 @@ a:hover{color:var(--navy);}
     </div>
     <div class="milestone-body" id="m3-body" style="display:none;">
       <div class="alert alert-blue" style="margin-bottom:14px;">
-        <strong>Dissemination tip:</strong> The Institute Showcase is a key opportunity to share the faculty team's work with the BU community. Conference submissions and journal articles reach broader audiences — offer to help your faculty team identify appropriate venues for teaching and learning research publication.
+        <strong>Dissemination tip:</strong> The Institute Showcase is a key opportunity to share the faculty team's work with the BU community. Conference submissions and journal articles reach broader audiences — check in with your faculty team about their plans for pursuing publication or conference venues.
       </div>
       <div id="m3-tasks"></div>
       <div style="margin-top:12px;">
@@ -1561,7 +1567,7 @@ a:hover{color:var(--navy);}
       Use the <strong>Milestone Snapshot</strong> throughout the project for progress check-ins. Switch to the <strong>Final Report</strong> at any time to build your end-of-project impact report. Both can be downloaded as a PDF.
     </p>
     <div class="alert alert-blue">
-      <strong>Dissemination goals:</strong> Beyond the project report, consider whether the findings are appropriate for conference presentation or journal publication. Teaching and learning research venues like the International Society for the Scholarship of Teaching and Learning (ISSOTL) and discipline-specific teaching journals are good starting points.
+      <strong>Dissemination goals:</strong> Beyond the project report, note whether the faculty team plans to pursue conference presentation or journal publication for these findings — venue selection is best left to their own disciplinary expertise.
     </div>
     <div class="report-mode-toggle" role="group" aria-label="Report mode">
       <button id="rmode-snapshot" class="active" onclick="switchReportMode('snapshot')">Milestone Snapshot</button>
@@ -1749,30 +1755,29 @@ a:hover{color:var(--navy);}
   <div class="card">
     <div class="section-label" style="margin-bottom:8px;">Ask about the proposal</div>
     <div class="guide-chips" style="margin-bottom:14px;">
-      <button class="chip" onclick="guideChip(this)">Does the proposal mention IRB or human subjects data? What does it say?</button>
+      <button class="chip" onclick="guideChip(this)">What does the proposal say about IRB or human subjects data, if anything?</button>
       <button class="chip" onclick="guideChip(this)">What does the proposal say about how the team will measure impact?</button>
-      <button class="chip" onclick="guideChip(this)">Who are the named collaborators and what are their roles, per the proposal?</button>
-      <button class="chip" onclick="guideChip(this)">Summarize the proposal's implementation timeline</button>
-      <button class="chip" onclick="guideChip(this)">Does the proposal mention hiring student workers? What does it say?</button>
+      <button class="chip" onclick="guideChip(this)">Who are the proposal's named collaborators, and what are their roles?</button>
+      <button class="chip" onclick="guideChip(this)">Can you summarize the proposal's implementation timeline for me?</button>
+      <button class="chip" onclick="guideChip(this)">What does the proposal say about hiring student workers, if anything?</button>
     </div>
     <div class="section-label" style="margin-bottom:8px;">Ask for guidance</div>
     <div class="guide-chips">
       <button class="chip" onclick="guideChip(this)">How do I help the faculty lead write a good survey?</button>
       <button class="chip" onclick="guideChip(this)">This project is behind on its timeline — help me think through options</button>
-      <button class="chip" onclick="guideChip(this)">What teaching and learning research journals should the faculty lead consider?</button>
       <button class="chip" onclick="guideChip(this)">Help me think through this project's data analysis plan</button>
       <button class="chip" onclick="guideChip(this)">The project needs to hire a graduate student — what should I know?</button>
       <button class="chip" onclick="guideChip(this)">How do I approach a vendor contract at BU?</button>
-      <button class="chip" onclick="guideChip(this)">What accessibility requirements apply to this project's technology?</button>
+      <button class="chip" onclick="guideChip(this)">What accessibility requirements do I need to check for this project's technology?</button>
       <button class="chip" onclick="guideChip(this)">Help me think through incentivizing students to complete surveys</button>
-      <button class="chip" onclick="guideChip(this)">What should the faculty team present at the Institute Showcase?</button>
+      <button class="chip" onclick="guideChip(this)">What should I encourage the faculty team to present at the Institute Showcase?</button>
     </div>
     <div class="field">
       <textarea id="guide-input" placeholder="Ask your guide anything about this project…" style="width:100%;min-height:80px;"></textarea>
     </div>
     <div style="display:flex;gap:8px;">
       <button class="btn-gold" onclick="askGuide()">Ask ↗</button>
-      <button onclick="document.getElementById('guide-input').value='';document.getElementById('guide-output').innerHTML='';">Clear</button>
+      <button onclick="document.getElementById('guide-input').value='';document.getElementById('guide-output').innerHTML='';document.getElementById('tab-guide')?.querySelectorAll('.chip.selected').forEach(c=>c.classList.remove('selected'));">Clear</button>
     </div>
     <div id="guide-output" style="margin-top:16px;"></div>
   </div>
@@ -1808,7 +1813,6 @@ Key knowledge you bring:
 - Technology considerations: FERPA compliance for student data, WCAG accessibility standards, BU data security requirements
 - Survey design for educational research: validated scales, pre/post design, incentive strategies
 - Data analysis options: paired t-tests for pre/post, thematic coding for qualitative data, descriptive statistics
-- Dissemination: ISSOTL, discipline-specific teaching journals, conference venues
 - BU context: the Institute Showcase as a dissemination venue, BU IRB office, BU grants administration
 
 Never refer to the Institute for Excellence in Teaching & Learning as "IETL" — always use "the Institute" or "the Institute team."
@@ -1856,6 +1860,9 @@ function switchTab(name, btn){
   }
   if(name==='budget'){
     updateBudgetTailorGuard();
+  }
+  if(name==='impact'){
+    renderFwSubquestions();
   }
 }
 
@@ -2206,8 +2213,8 @@ function syncWorkersToProjectPlan(){
       lead: 'Faculty lead',
       milestone: 'm1',
       blocker: date
-        ? `Target hire date is ${fmtDate(date)} — HR onboarding takes 4–6 weeks minimum, so start posting the position by ${fmtDate(startDate)}.`
-        : 'HR onboarding takes 4–6 weeks minimum. Begin before the semester starts.',
+        ? `Target hire date is ${fmtDate(date)} — onboarding takes 4–6 weeks minimum, so start posting the position by ${fmtDate(startDate)}.`
+        : 'Onboarding takes 4–6 weeks minimum. Begin before the semester starts.',
       custom: true
     });
   }
@@ -2541,7 +2548,7 @@ const FW_SECTION_ORDER = ['problems','objectives','impacts','measures','collecti
 const FW_SUBQUESTIONS = {
   problems: {title:'Problems', type:'bullets', questions:[
     {id:'q1', label:"What isn't working today in the teaching or in students' learning?"},
-    {id:'q2', label:'Who is affected, and what have you observed that shows this is a problem?'},
+    {id:'q2', label:'Who is affected, and what has the faculty team observed that shows this is a problem?'},
   ]},
   objectives: {title:'Objectives', type:'bullets', questions:[
     {id:'q1', label:'Given that problem, what should be different by the end of this project?'},
@@ -2567,6 +2574,10 @@ const FW_SUBQUESTIONS = {
 
 let fwAnswers = {};
 
+// Sections the Guide can infer draft answers for directly from the proposal text —
+// scoped to the earliest, most narrative-dependent sections of the framework.
+const FW_INFER_ELIGIBLE = ['problems','objectives','impacts'];
+
 function toggleSectionGuide(section){
   const el = document.getElementById('fsg-'+section);
   if(!el) return;
@@ -2575,11 +2586,15 @@ function toggleSectionGuide(section){
 }
 
 function renderFwSubquestions(){
+  const hasProposal = !!loadAll().proposalText;
   FW_SECTION_ORDER.forEach(key=>{
     const container = document.getElementById('fwd-'+key);
     if(!container) return;
     const def = FW_SUBQUESTIONS[key];
     const ans = fwAnswers[key] || {};
+    const inferBtn = (hasProposal && FW_INFER_ELIGIBLE.includes(key))
+      ? `<button class="btn-sm" onclick="inferFrameworkAnswers('${key}')" id="fwi-btn-${key}">Infer from proposal ↗</button> `
+      : '';
     container.innerHTML = `
       <div class="fw-question" style="margin-bottom:8px;">Answer these to have your guide draft this section — short answers are fine</div>
       ${def.questions.map(q=>`
@@ -2587,7 +2602,7 @@ function renderFwSubquestions(){
           <label style="font-size:12px;color:var(--text2);display:block;margin-bottom:4px;">${q.label}</label>
           <textarea id="fwq-${key}-${q.id}" oninput="saveFrameworkAnswers()"></textarea>
         </div>`).join('')}
-      <button class="btn-sm btn-gold" onclick="draftFrameworkSection('${key}')" id="fwd-btn-${key}">Draft this section ↗</button>
+      ${inferBtn}<button class="btn-sm btn-gold" onclick="draftFrameworkSection('${key}')" id="fwd-btn-${key}">Draft this section ↗</button>
       <div class="prefill-note hidden" id="fwd-note-${key}"></div>
     `;
     def.questions.forEach(q=>{
@@ -2595,6 +2610,56 @@ function renderFwSubquestions(){
       if(el) el.value = ans[q.id] || '';
     });
   });
+}
+
+async function inferFrameworkAnswers(key){
+  const btn = document.getElementById('fwi-btn-'+key);
+  const noteEl = document.getElementById('fwd-note-'+key);
+  const def = FW_SUBQUESTIONS[key];
+  const data = loadAll();
+  if(!btn || !noteEl || !def || !data.proposalText) return;
+
+  setButtonLoading(btn, true);
+  noteEl.classList.remove('hidden');
+  noteEl.textContent = 'Your guide is reading the proposal to draft answers…';
+
+  const priorContext = [];
+  for(const priorKey of FW_SECTION_ORDER){
+    if(priorKey === key) break;
+    const val = getFrameworkSectionText(priorKey);
+    if(val) priorContext.push(`${FW_SUBQUESTIONS[priorKey].title}: ${val}`);
+  }
+
+  const qList = def.questions.map(q=>`${q.id}: ${q.label}`).join('\n');
+
+  const prompt = `You are helping an Institute for Excellence in Teaching & Learning staff member draft the "${def.title}" section of a Shipley project's Impact Evaluation Framework, using backward design (each section should follow logically from the ones before it).
+
+Full proposal text:
+${data.proposalText}
+
+${priorContext.length ? 'Sections already drafted, for context and continuity:\n' + priorContext.join('\n') + '\n\n' : ''}Infer answers to the following questions directly from the proposal text — ground every answer in what the proposal actually states, do not invent specifics it doesn't support:
+
+${qList}
+
+Return ONLY a valid JSON object with no other text, explanation, or markdown: {"answers": {${def.questions.map(q=>`"${q.id}": "..."`).join(', ')}}}. Each answer should be a short, concrete phrase or sentence — succinct, not a full paragraph.`;
+
+  try{
+    const raw = await callGuide(prompt, {skipCtx:true, maxTokens:600});
+    const jsonMatch = raw.match(/\{[\s\S]*\}/);
+    if(!jsonMatch) throw new Error('No JSON');
+    const parsed = JSON.parse(jsonMatch[0]);
+    const answers = parsed.answers || {};
+    def.questions.forEach(q=>{
+      const el = document.getElementById(`fwq-${key}-${q.id}`);
+      if(el && answers[q.id]) el.value = answers[q.id];
+    });
+    saveFrameworkAnswers();
+    noteEl.textContent = `These answers were inferred from the proposal — please confirm with the faculty team before drafting this section.`;
+  }catch(e){
+    noteEl.textContent = 'Something went wrong inferring answers from the proposal — please try again or answer manually.';
+  }finally{
+    setButtonLoading(btn, false);
+  }
 }
 
 function saveFrameworkAnswers(){
@@ -2719,7 +2784,7 @@ const MILESTONE_TASKS = {
     {name:'Develop / revise assessments', lead:'Faculty lead', blocker:null, group:'Content Development'},
     {name:'Develop / revise instructor guides', lead:'Faculty lead', blocker:null, group:'Content Development'},
     // Hiring — FIX 7: reordered: Post → Find/secure → Hire → Prepare/onboard
-    {name:'Post student worker positions', lead:'Faculty lead', blocker:'Hiring and HR onboarding takes 4–6 weeks minimum. Begin before the semester starts.', group:'Hiring'},
+    {name:'Post student worker positions', lead:'Faculty lead', blocker:'Hiring and onboarding takes 4–6 weeks minimum. Begin before the semester starts.', group:'Hiring'},
     {name:'Find and secure data analysis support', lead:'Faculty lead', blocker:null, group:'Hiring'},
     {name:'Hire student workers', lead:'Faculty lead', blocker:null, group:'Hiring'},
     {name:'Prepare and onboard student workers', lead:'Faculty lead', blocker:null, group:'Hiring'},
@@ -2735,7 +2800,6 @@ const MILESTONE_TASKS = {
     {name:'Develop data collection instruments (surveys, rubrics, observation protocols)', lead:'Full team', blocker:null, group:'Learning Analytics'},
   ],
   m2: [
-    {name:'Finalize data plan', lead:'Project team', blocker:null},
     {name:'Implement pedagogical intervention in course(s)', lead:'Piloting instructors', blocker:null},
     {name:'Administer pre-intervention surveys and baseline measures', lead:'Project team', blocker:'Do not collect data until IRB approval is confirmed.'},
     {name:'Collect ongoing data per the data collection plan', lead:'Project team', blocker:null},
@@ -4111,11 +4175,55 @@ function updatePrefillNotes(mode){
   }
 }
 
+// Shared by prefillReport()/prefillSnapshot() — a legible, bounded summary of task
+// progress: a one-line completion stat, then bulleted Complete / In progress / Due
+// within 30 days groups. Tasks that are not started and not due soon are omitted
+// entirely rather than listed, so this never turns into an overwhelming full dump.
+function buildTaskProgressSummary(tasks, taskStatesData, taskMeta, label){
+  if(!tasks.length) return '';
+  const today = new Date(); today.setHours(0,0,0,0);
+  const done = [], inProg = [], dueSoon = [];
+  tasks.forEach(t=>{
+    const state = taskStatesData[t.id];
+    if(state==='done'||state===true){ done.push(t); return; }
+    if(state==='in_progress'){ inProg.push(t); return; }
+    const due = taskMeta[t.id] && taskMeta[t.id].due;
+    if(due){
+      const d = new Date(due+'T00:00:00');
+      if(!isNaN(d)){
+        const diffDays = Math.round((d-today)/86400000);
+        if(diffDays>=0 && diffDays<=30) dueSoon.push({...t, due});
+      }
+    }
+  });
+  const pct = Math.round((done.length/tasks.length)*100);
+  let out = `${label}: ${done.length} of ${tasks.length} tasks complete (${pct}%)\n`;
+  if(done.length) out += 'Complete:\n' + done.map(t=>`- ${t.name}`).join('\n') + '\n';
+  if(inProg.length) out += 'In progress:\n' + inProg.map(t=>`- ${t.name}`).join('\n') + '\n';
+  if(dueSoon.length) out += 'Due within 30 days:\n' + dueSoon.map(t=>`- ${t.name} — due ${fmtDate(t.due)}`).join('\n') + '\n';
+  return out.trim();
+}
+
 function prefillReport(){
   const data = loadAll();
   const s = data.setup || {};
   const fw = data.framework || {};
   const reflections = data.milestone_reflections || {};
+  const taskStatesData = data.task_states || {};
+  const taskMeta = data.task_meta || {};
+  const customTasksData = data.custom_tasks || [];
+  const taskRelevance = data.task_relevance || {};
+  const pendingTaskIds = new Set();
+  (data.investigate_questions||[]).forEach(q=>{ if(!q.resolved) q.relatedTaskIds.forEach(id=>pendingTaskIds.add(id)); });
+  function isHiddenByTailoring(t){
+    if(t.custom) return false;
+    return taskRelevance[t.id]==='not_relevant' || taskRelevance[t.id]==='pending_faculty' || pendingTaskIds.has(t.id);
+  }
+  function visibleTasks(m){
+    const baseTasks = (MILESTONE_TASKS[m]||[]).map((t,i)=>({...t,id:m+'_'+i}));
+    const custom = customTasksData.filter(t=>t.milestone===m);
+    return [...baseTasks,...custom].filter(t=>!isHiddenByTailoring(t));
+  }
 
   function fill(id, val){
     const el = document.getElementById(id);
@@ -4141,7 +4249,7 @@ function prefillReport(){
   if(fw.objectives) goals += `Objectives: ${fw.objectives}`;
   fill('r-goals', goals.trim());
 
-  // Milestones — from reflection notes
+  // Milestones — reflection notes, plus per-milestone task progress
   let milestones = '';
   const reflectionLabels = {
     m1_IRB: 'IRB',
@@ -4154,14 +4262,22 @@ function prefillReport(){
   Object.entries(reflectionLabels).forEach(([key,label])=>{
     if(reflections[key]) milestones += `${label}:\n${reflections[key]}\n\n`;
   });
+  const milestoneNames = {m1:'Prepare', m2:'Conduct Courses & Gather Data', m3:'Analyze & Share Findings', m4:'Reflect, Iterate & Scale', m5:'Report & Close'};
+  ['m1','m2','m3','m4','m5'].forEach(m=>{
+    const summary = buildTaskProgressSummary(visibleTasks(m), taskStatesData, taskMeta, milestoneNames[m]);
+    if(summary) milestones += summary + '\n\n';
+  });
   fill('r-milestones', milestones.trim());
 
-  // Impact
+  // Impact — framework content, plus Learning Analytics task progress
   let impact = '';
   if(fw.impacts) impact += `Anticipated impacts: ${fw.impacts}\n\n`;
   if(fw.measures) impact += `Measures & targets: ${fw.measures}\n\n`;
   if(fw.collection) impact += `Data collection: ${fw.collection}\n\n`;
-  if(fw.analysis) impact += `Data analysis: ${fw.analysis}`;
+  if(fw.analysis) impact += `Data analysis: ${fw.analysis}\n\n`;
+  const laTasks = visibleTasks('m1').filter(t=>t.group==='Learning Analytics');
+  const laSummary = buildTaskProgressSummary(laTasks, taskStatesData, taskMeta, 'Learning Analytics');
+  if(laSummary) impact += laSummary;
   fill('r-impact', impact.trim());
 
   // Next steps — from snapshot dissemination if available
@@ -4178,6 +4294,25 @@ function prefillSnapshot(){
   const s = data.setup || {};
   const fw = data.framework || {};
   const reflections = data.milestone_reflections || {};
+  const taskStatesData = data.task_states || {};
+  const taskMeta = data.task_meta || {};
+  const customTasksData = data.custom_tasks || [];
+  const taskRelevance = data.task_relevance || {};
+  const pendingTaskIds = new Set();
+  (data.investigate_questions||[]).forEach(q=>{ if(!q.resolved) q.relatedTaskIds.forEach(id=>pendingTaskIds.add(id)); });
+  function isHiddenByTailoring(t){
+    if(t.custom) return false;
+    return taskRelevance[t.id]==='not_relevant' || taskRelevance[t.id]==='pending_faculty' || pendingTaskIds.has(t.id);
+  }
+  function visibleTasks(m){
+    const baseTasks = (MILESTONE_TASKS[m]||[]).map((t,i)=>({...t,id:m+'_'+i}));
+    const custom = customTasksData.filter(t=>t.milestone===m);
+    return [...baseTasks,...custom].filter(t=>!isHiddenByTailoring(t));
+  }
+  const milestoneNames = {
+    m1:'Prepare', m2:'Conduct Courses & Gather Data',
+    m3:'Analyze & Share Findings', m4:'Reflect, Iterate & Scale', m5:'Report & Close'
+  };
 
   function fill(id, val){
     const el = document.getElementById(id);
@@ -4195,14 +4330,17 @@ function prefillSnapshot(){
   if(fw.objectives) goals += `Objectives: ${fw.objectives}`;
   fill('rs-goals', goals.trim());
 
-  // Assessment
+  // Assessment — framework content, plus Learning Analytics task progress
   let assessment = '';
   if(fw.measures) assessment += `Measures & targets: ${fw.measures}\n\n`;
   if(fw.collection) assessment += `Data collection plan: ${fw.collection}\n\n`;
-  if(fw.analysis) assessment += `Data analysis plan: ${fw.analysis}`;
+  if(fw.analysis) assessment += `Data analysis plan: ${fw.analysis}\n\n`;
+  const laTasks = visibleTasks('m1').filter(t=>t.group==='Learning Analytics');
+  const laSummary = buildTaskProgressSummary(laTasks, taskStatesData, taskMeta, 'Learning Analytics');
+  if(laSummary) assessment += laSummary;
   fill('rs-assessment', assessment.trim());
 
-  // Overview — from reflection notes
+  // Overview — reflection notes, plus a single project-wide task progress summary
   let overview = '';
   const reflectionLabels = {
     m1_IRB: 'IRB', m1_Content_Development: 'Content Development',
@@ -4212,31 +4350,23 @@ function prefillSnapshot(){
   Object.entries(reflectionLabels).forEach(([key,label])=>{
     if(reflections[key]) overview += `${label}: ${reflections[key]}\n\n`;
   });
+  const allVisibleTasks = ['m1','m2','m3','m4','m5'].flatMap(visibleTasks);
+  const overallSummary = buildTaskProgressSummary(allVisibleTasks, taskStatesData, taskMeta, 'Overall');
+  if(overallSummary) overview += overallSummary;
   fill('rs-overview', overview.trim());
 
-  // Timeline — pull from project dates + milestone task progress
+  // Dissemination — M3 dissemination-related task progress
+  const dissemNames = ['Share findings with the broader BU community', 'Present findings to program and department colleagues', 'Identify and pursue publication or conference dissemination', 'Present at Institute event'];
+  const dissemTasks = visibleTasks('m3').filter(t=>dissemNames.includes(t.name));
+  const dissemSummary = buildTaskProgressSummary(dissemTasks, taskStatesData, taskMeta, 'Dissemination');
+  fill('rs-dissemination', dissemSummary);
+
+  // Timeline — project dates, plus per-milestone task progress
   let timeline = '';
   if(s.start&&s.end) timeline += `Project period: ${fmtDate(s.start)} – ${fmtDate(s.end)}\n\n`;
-  const taskStatesData = data.task_states || {};
-  const customTasksData = data.custom_tasks || [];
-  const milestoneNames = {
-    m1:'Prepare', m2:'Conduct Courses & Gather Data',
-    m3:'Analyze & Share Findings', m4:'Reflect, Iterate & Scale', m5:'Report & Close'
-  };
   ['m1','m2','m3','m4','m5'].forEach(m=>{
-    const baseTasks = (MILESTONE_TASKS[m]||[]).map((t,i)=>({...t,id:m+'_'+i}));
-    const custom = customTasksData.filter(t=>t.milestone===m);
-    const all = [...baseTasks,...custom];
-    if(!all.length) return;
-    const done = all.filter(t=>taskStatesData[t.id]==='done'||taskStatesData[t.id]===true);
-    const inProg = all.filter(t=>taskStatesData[t.id]==='in_progress');
-    const notStarted = all.filter(t=>!taskStatesData[t.id]||taskStatesData[t.id]===null);
-    const pct = Math.round((done.length/all.length)*100);
-    timeline += `${milestoneNames[m]}: ${done.length} of ${all.length} tasks complete (${pct}%)\n`;
-    if(done.length) timeline += `  Complete: ${done.map(t=>t.name).join(', ')}\n`;
-    if(inProg.length) timeline += `  In progress: ${inProg.map(t=>t.name).join(', ')}\n`;
-    if(notStarted.length) timeline += `  Not started: ${notStarted.map(t=>t.name).join(', ')}\n`;
-    timeline += '\n';
+    const summary = buildTaskProgressSummary(visibleTasks(m), taskStatesData, taskMeta, milestoneNames[m]);
+    if(summary) timeline += summary + '\n\n';
   });
   fill('rs-timeline', timeline.trim());
 
@@ -4461,12 +4591,22 @@ function getAllProjectTasks(){
   const teamRows = [];
   if(setup.lead) teamRows.push({role:'Faculty Lead',name:setup.lead,dept:setup.dept||''});
   (setup.team_members||[]).forEach(m=>{ if(m.name) teamRows.push({role:m.role||'Team Member',name:m.name,dept:''}); });
+  // Skip tasks Tailor Milestones has hidden — mirrors renderMilestones()'s isHiddenByTailoring().
+  // Custom/auto-generated tasks are never hidden by tailoring.
+  const taskRelevance = data.task_relevance || {};
+  const pendingTaskIds = new Set();
+  (data.investigate_questions||[]).forEach(q=>{ if(!q.resolved) q.relatedTaskIds.forEach(id=>pendingTaskIds.add(id)); });
+  function isHiddenByTailoring(t){
+    if(t.custom) return false;
+    return taskRelevance[t.id]==='not_relevant' || taskRelevance[t.id]==='pending_faculty' || pendingTaskIds.has(t.id);
+  }
   // Build task rows
   ['m1','m2','m3','m4','m5'].forEach(m=>{
     const tasks = MILESTONE_TASKS[m];
     const custom = customTasksLocal.filter(t=>t.milestone===m);
     const all = [...tasks.map((t,i)=>({...t,id:m+'_'+i})), ...custom];
     all.forEach(t=>{
+      if(isHiddenByTailoring(t)) return;
       const meta = taskMeta[t.id] || {};
       const lead = meta.lead !== undefined ? meta.lead : (t.lead||'');
       const status = (taskStatesLocal[t.id]==='done'||taskStatesLocal[t.id]===true) ? 'Complete' : taskStatesLocal[t.id]==='in_progress' ? 'In Progress' : 'Not Started';
@@ -4929,7 +5069,12 @@ async function askGuide(){
   }
 }
 
-function guideChip(el){ document.getElementById('guide-input').value = el.textContent.trim(); }
+function guideChip(el){
+  document.getElementById('guide-input').value = el.textContent.trim();
+  document.getElementById('tab-guide')?.querySelectorAll('.chip.selected').forEach(c=>c.classList.remove('selected'));
+  el.classList.add('selected');
+  document.getElementById('guide-input').scrollIntoView({behavior:'smooth', block:'center'});
+}
 
 // ═══════════════════════════════════════════════════════
 // UTILITIES
