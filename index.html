@@ -870,6 +870,11 @@ a:hover{color:var(--navy);}
     </div>
     <div class="hint" style="margin-top:-8px;margin-bottom:14px;">This award cycle runs one calendar year, Fall 2026 – Summer 2027. Adjust these dates only if this project's actual timeline differs.</div>
     <div class="field">
+      <label>Funding transfer confirmed <span style="font-weight:400;opacity:0.7;">(optional)</span></label>
+      <input type="date" id="s-funding-confirmed" style="width:100%;"/>
+      <div class="hint">The date funds actually became available. When filled in, the guide uses this — not the project start date above — as the earliest date any task can be scheduled.</div>
+    </div>
+    <div class="field">
       <label id="grant-amount-label">Award amount</label>
       <div class="radio-pill-group" role="radiogroup" aria-labelledby="grant-amount-label">
         <label class="radio-pill"><input type="radio" name="s-grant" value="10000" onchange="onGrantAmountChange(this)"/> $10,000</label>
@@ -2131,13 +2136,10 @@ function syncDataToProjectPlan(){
   const v = document.getElementById('s-data').value;
   const active = v==='yes-support'||v==='yes-self'||v==='maybe';
   const cost = parseFloat(document.getElementById('s-data-cost')?.value)||0;
-  customTasks = customTasks.filter(t=>t.id!=='data_task');
-  if(active){
-    customTasks.push({id:'data_task', name:'Establish data collection and analysis plan', lead:'Project team & data support', milestone:'m1', date:'', group:'Learning Analytics', blocker:'Identify data support resources and build this into the project budget and timeline from the start.', custom:true});
-  }
+  // No dedicated milestone task here — "Plan learning analytics: data collection and
+  // analysis" and its subtasks in the default Learning Analytics checklist already cover this.
   syncDynamicOpToBudget('data', active ? 'Data & Analytics Support' : null, cost);
   const data = loadAll();
-  data.custom_tasks = customTasks;
   data.data_cost = cost;
   saveAll(data);
   renderMilestones();
@@ -2328,6 +2330,7 @@ function saveSetup(){
     team: document.getElementById('s-team').value,
     start: document.getElementById('s-start').value,
     end: document.getElementById('s-end').value,
+    funding_confirmed: document.getElementById('s-funding-confirmed')?.value || '',
     grant: getGrantAmount(),
     challenge: document.getElementById('s-challenge').value,
     vision: document.getElementById('s-vision').value,
@@ -2364,6 +2367,7 @@ function loadSetup(){
     const r = document.querySelector(`input[name="s-grant"][value="${s.grant}"]`);
     if(r) r.checked = true;
   }
+  if(s.funding_confirmed) document.getElementById('s-funding-confirmed').value = s.funding_confirmed;
   ['media','data_needs','workers'].forEach(f=>{
     const el = document.getElementById('s-'+f.replace('_needs',''));
     if(el && s[f]) el.value = s[f];
@@ -2686,15 +2690,15 @@ const MILESTONE_TASKS = {
     {name:'Find and secure data analysis support', lead:'Faculty lead', blocker:null, group:'Hiring'},
     {name:'Hire student workers', lead:'Faculty lead', blocker:null, group:'Hiring'},
     {name:'Prepare and onboard student workers', lead:'Faculty lead', blocker:null, group:'Hiring'},
-    // Technology — FIX 8: Finalize agreements second-to-last, Activate licenses last
+    // Technology — sortLast: rendered after every other Technology task, including
+    // the dynamic "Confirm ... compliance" tasks, since agreements/licenses come last
     {name:"Meet with the Institute's ATI team to review tech needs and start vetting process", lead:'Faculty lead', blocker:null, group:'Technology'},
     {name:'Identify and vet technology tools (accessibility, privacy, security)', lead:'Faculty lead', blocker:null, group:'Technology'},
-    {name:'Finalize vendor agreements', lead:'Faculty lead', blocker:'Vendor contracts may require BU legal review — start well in advance.', group:'Technology'},
-    {name:'Activate vendor licenses', lead:'Project team', blocker:null, group:'Technology'},
+    {name:'Finalize vendor agreements', lead:'Faculty lead', blocker:'Vendor contracts may require BU legal review — start well in advance.', group:'Technology', sortLast:true},
+    {name:'Activate vendor licenses', lead:'Project team', blocker:null, group:'Technology', sortLast:true},
     // Learning Analytics — main task's due date constrains the subtasks below it (see Tailor Milestones prompt)
     {name:'Plan learning analytics: data collection and analysis', lead:'Project team', blocker:null, group:'Learning Analytics'},
     {name:'Complete Impact Evaluation Framework (Problems → Data Analysis)', lead:'Full team', blocker:null, group:'Learning Analytics'},
-    {name:'Finalize data collection and analysis plan', lead:'Full team', blocker:null, group:'Learning Analytics'},
     {name:'Develop data collection instruments (surveys, rubrics, observation protocols)', lead:'Full team', blocker:null, group:'Learning Analytics'},
   ],
   m2: [
@@ -2715,7 +2719,7 @@ const MILESTONE_TASKS = {
     {name:'Present at Institute event', lead:'Faculty lead', blocker:null},
   ],
   m4: [
-    {name:'Review and analyze data', lead:'Full team', blocker:null},
+    {name:'Review data analysis', lead:'Full team', blocker:null},
     {name:'Develop plan for second iteration', lead:'Full team', blocker:null},
     {name:'Plan and implement second pilot (if applicable)', lead:'Piloting instructors', blocker:null},
     {name:'Analyze second iteration data', lead:'Project team', blocker:null},
@@ -2802,7 +2806,7 @@ async function tailorMilestonesToProposal(){
     ? `Project scoping information the staff member has already manually entered — treat anything answered here as settled and do NOT generate an investigate question asking about it again:\n${setupText}\n\n`
     : '';
   const s = data.setup || {};
-  const windowStart = s.start || '2026-09-01';
+  const windowStart = s.funding_confirmed || s.start || '2026-09-01';
   const windowEnd = s.end || '2027-08-31';
   const hasHireDate = !!(data.worker_details && data.worker_details.date);
 
@@ -2821,19 +2825,28 @@ For each task ID, decide one of three things:
 
 Special case — iteration tasks: "Develop plan for second iteration", "Plan and implement second pilot (if applicable)", and "Analyze second iteration data" (Reflect, Iterate & Scale) default to "not_relevant" unless the proposal explicitly stipulates a second iteration or pilot. Do not confirm them on a vague or generic basis, and do not raise them as an investigate question either — silence on iteration means "not_relevant" for these three specifically.
 
-Additionally, for every task ID you mark "confirmed", estimate a realistic due date and include it in "dates". Use your expertise as an experienced project manager: read the proposal's own timeline narrative for explicit signals, and where the proposal is silent, reason from normal project sequencing (e.g., hiring and IRB submission happen early; data collection follows setup; analysis and dissemination come later) and reasonable estimates of how long each kind of task actually takes. Every date must fall between ${windowStart} and ${windowEnd} (this award's full duration — the project cannot run longer than this). Use YYYY-MM-DD format. It is fine and expected to estimate confidently — the staff member reviews and can adjust every date, so a reasonable estimate is far more useful than leaving it blank. Only omit a date for a confirmed task if there is truly no reasonable basis to place it anywhere in the window.
+Additionally, for every task ID you mark "confirmed", estimate a realistic start date and due date and include them in "starts" and "dates". Use your expertise as an experienced project manager:
+- Ground every estimate in the actual amount of work the task requires, not just its position in the sequence — a quick task (e.g., a kickoff meeting) can be scheduled within days, but a substantial task (e.g., developing a full data collection and analysis plan) realistically takes several weeks, not days.
+- Read the proposal's own timeline narrative for explicit signals first; where it's silent, reason from normal project sequencing (hiring and IRB submission happen early; data collection follows setup; analysis and dissemination come later).
+- No task can start before ${windowStart} — that's the earliest funds are available and work can realistically begin. There is no assumed additional lag beyond that; work can start immediately once funding is confirmed.
+- Every date must fall between ${windowStart} and ${windowEnd} (this award's full duration).
+- Use YYYY-MM-DD format. It's fine and expected to estimate confidently — the staff member reviews and can adjust every date, so a reasonable estimate is far more useful than leaving it blank. Only omit dates for a confirmed task if there is truly no reasonable basis to place it anywhere in the window.
 
-Date constraint — Learning Analytics: "Plan learning analytics: data collection and analysis" is the umbrella task for that group; it isn't truly done until "Complete Impact Evaluation Framework (Problems → Data Analysis)", "Finalize data collection and analysis plan", and "Develop data collection instruments (surveys, rubrics, observation protocols)" are all done. If you assign dates to any of these confirmed tasks, the three subtasks' due dates must fall on or before the umbrella task's due date.
+Academic term reference dates for this award cycle — use these when the proposal references a semester or term by name: Fall 2026 term begins September 1, 2026; Spring 2027 term begins January 19, 2027; Summer 2027 term begins May 17, 2027.
 
-${!hasHireDate ? `The Setup tab does not yet have a target student-worker hire date. If the proposal states one directly, or states when the student worker's described work begins (from which the hire date is the same as that work-start date), include it as "worker_target_date" in YYYY-MM-DD format. Omit this field entirely if the proposal gives no basis to infer it, or if this project has no student workers.` : `The Setup tab already has a target student-worker hire date — do not include "worker_target_date" in your response.`}
+Semester availability constraint: "Implement pedagogical intervention in course(s)" and the student-worker hire date both require students to be present, so neither can be scheduled during the gap between terms (winter break, the gap before summer session, etc.) — use the academic term reference dates above as the earliest a student-facing task in a given term can start.
+
+Date constraint — Learning Analytics: "Plan learning analytics: data collection and analysis" is the umbrella task for that group; it isn't truly done until "Complete Impact Evaluation Framework (Problems → Data Analysis)" and "Develop data collection instruments (surveys, rubrics, observation protocols)" are both done. If you assign dates to any of these confirmed tasks, both subtasks' due dates must fall on or before the umbrella task's due date.
+
+${!hasHireDate ? `The Setup tab does not yet have a target student-worker hire date. If the proposal states one directly, or states when the student worker's described work begins (from which the hire date is the same as that work-start date, subject to the semester availability constraint above), include it as "worker_target_date" in YYYY-MM-DD format. Omit this field entirely if the proposal gives no basis to infer it, or if this project has no student workers.` : `The Setup tab already has a target student-worker hire date — do not include "worker_target_date" in your response.`}
 
 Return ONLY a valid JSON object with no other text, explanation, or markdown, in exactly this shape:
-{"confirmed": ["m1_0", "m2_3", ...], "not_relevant": ["m1_5", ...], "investigate": [{"question": "...", "relatedTaskIds": ["m1_11","m1_12","m1_13","m1_14"]}, ...], "dates": {"m1_0": "2026-09-15", ...}, "worker_target_date": "2026-10-01"}
+{"confirmed": ["m1_0", "m2_3", ...], "not_relevant": ["m1_5", ...], "investigate": [{"question": "...", "relatedTaskIds": ["m1_11","m1_12","m1_13","m1_14"]}, ...], "starts": {"m1_0": "2026-09-08", ...}, "dates": {"m1_0": "2026-09-15", ...}, "worker_target_date": "2026-10-01"}
 
 Every task ID from the checklist above must appear in exactly one place: either in "confirmed", in "not_relevant", or inside exactly one "investigate" entry's "relatedTaskIds". Do not leave any task ID out. Omit "worker_target_date" per the instructions above when it doesn't apply.`;
 
   try{
-    const raw = await callGuide(prompt, {skipCtx:true, maxTokens:3800});
+    const raw = await callGuide(prompt, {skipCtx:true, maxTokens:4200});
     const jsonMatch = raw.match(/\{[\s\S]*\}/);
     if(!jsonMatch) throw new Error('No JSON');
     const parsed = JSON.parse(jsonMatch[0]);
@@ -2857,8 +2870,13 @@ function applyMilestoneTailoring(parsed){
   data.task_relevance = relevance;
   data.investigate_questions = questions;
 
-  // Estimated due dates for confirmed tasks — never overwrite a date the PM already entered.
+  // Estimated start/due dates for confirmed tasks — never overwrite a date the PM already entered.
   const meta = data.task_meta || {};
+  Object.entries(parsed.starts||{}).forEach(([id, date])=>{
+    if(!date || relevance[id]!=='confirmed') return;
+    if(meta[id] && meta[id].start) return;
+    meta[id] = { ...(meta[id]||{}), start: date };
+  });
   Object.entries(parsed.dates||{}).forEach(([id, date])=>{
     if(!date || relevance[id]!=='confirmed') return;
     if(meta[id] && meta[id].due) return;
@@ -2866,6 +2884,7 @@ function applyMilestoneTailoring(parsed){
   });
   data.task_meta = meta;
   saveAll(data);
+  syncTechComplianceDates();
 
   // If the proposal reveals a target hire date and the PM has already indicated this
   // project needs student workers but hasn't set a date yet, fill it in.
@@ -2991,6 +3010,7 @@ function renderMilestones(){
         const ga = M1_GROUPS.indexOf(a.group||'');
         const gb = M1_GROUPS.indexOf(b.group||'');
         if(ga!==gb) return (ga===-1?999:ga)-(gb===-1?999:gb);
+        if(!!a.sortLast !== !!b.sortLast) return a.sortLast ? 1 : -1;
         return 0;
       });
     }
@@ -3805,7 +3825,30 @@ function syncTechToMilestones(){
   const data = loadAll();
   data.custom_tasks = customTasks;
   saveAll(data);
+  syncTechComplianceDates();
   renderMilestones();
+}
+
+// Vendor agreements can't be finalized until every tech compliance item is confirmed, so
+// give each "Confirm ... compliance" task a due date on or before "Finalize vendor
+// agreements" — never overwriting a date the PM already set on that task directly.
+function syncTechComplianceDates(){
+  const data = loadAll();
+  const meta = data.task_meta || {};
+  const flat = getAllDefaultTasksFlat();
+  const finalizeTask = flat.find(t=>t.name==='Finalize vendor agreements');
+  const finalizeDue = finalizeTask && meta[finalizeTask.id] && meta[finalizeTask.id].due;
+  if(!finalizeDue) return;
+  let changed = false;
+  (data.custom_tasks||[]).filter(t=>t.id && t.id.startsWith('tech_')).forEach(t=>{
+    if(meta[t.id] && meta[t.id].due) return;
+    meta[t.id] = { ...(meta[t.id]||{}), due: finalizeDue };
+    changed = true;
+  });
+  if(changed){
+    data.task_meta = meta;
+    saveAll(data);
+  }
 }
 
 function saveBudget(){
@@ -4152,13 +4195,14 @@ async function callGuide(userMsg, opts){
     ctx = s.title ? `\n\nProject context:\nTitle: ${s.title}\nFaculty lead: ${s.lead||'not specified'}\nDept: ${s.dept||'not specified'}\nChallenge: ${s.challenge||'not specified'}\nVision: ${s.vision||'not specified'}\nAudience: ${s.audience||'not specified'}\nMedia needs: ${s.media||'not specified'}\nData analysis needs: ${s.data_needs||'not specified'}\nTechnology: ${s.tech||'not specified'}\nStudent workers: ${s.workers||'not specified'}\nAvailability constraints: ${s.availability||'not specified'}\n\nImpact Framework:\nProblems: ${fw.problems||'not yet filled'}\nObjectives: ${fw.objectives||'not yet filled'}\nImpacts: ${fw.impacts||'not yet filled'}\nMeasures: ${fw.measures||'not yet filled'}\nData collection: ${fw.collection||'not yet filled'}\nData analysis: ${fw.analysis||'not yet filled'}${proposalTextBlock}` : '';
   }
 
+  const todayStr = new Date().toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
   const res = await fetch('https://lnooney--b59323963f5711f1a86342b51c65c3df.web.val.run',{
     method:'POST',
     headers:{'Content-Type':'application/json'},
     body:JSON.stringify({
       model:'claude-sonnet-4-5',
       max_tokens: opts.maxTokens || 1000,
-      system: SYSTEM,
+      system: SYSTEM + `\n\nToday's date is ${todayStr}.`,
       messages:[{role:'user',content: userMsg + ctx}]
     })
   });
