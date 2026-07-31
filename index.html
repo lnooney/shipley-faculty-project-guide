@@ -387,7 +387,7 @@ a:hover{color:var(--navy);}
 .ai-actions{display:flex;gap:8px;margin-top:6px;margin-bottom:14px;}
 .ai-actions button{font-size:12px;padding:4px 12px;border-width:1px;}
 /* FIX 15: Gantt scrollbar always visible */
-#gantt-scroll-area{overflow-x:scroll;overflow-y:visible;scrollbar-width:auto;}
+#gantt-scroll-area{overflow-x:scroll;overflow-y:auto;scrollbar-width:auto;}
 #gantt-scroll-area::-webkit-scrollbar{height:12px;display:block;}
 #gantt-scroll-area::-webkit-scrollbar-track{background:#f0f0f0;border-radius:5px;}
 #gantt-scroll-area::-webkit-scrollbar-thumb{background:var(--navy2);border-radius:5px;}
@@ -1055,9 +1055,7 @@ a:hover{color:var(--navy);}
       <div id="worker-note" class="conditional-note hint" style="display:none;color:var(--amber-text);">
         Please remind your faculty team:
         <ul style="margin:4px 0 0;padding-left:18px;">
-          <li>Hiring involves administrative steps that take longer than most teams expect.</li>
-          <li>Someone will need to post positions, conduct interviews, complete HR onboarding paperwork, and set up payroll.</li>
-          <li>Plan for 4–6 weeks minimum before a student worker can begin paid work.</li>
+          <li>Hiring and onboarding takes 4–6 weeks minimum — someone will need to post the position, conduct interviews, and onboard the student before they can begin paid work.</li>
           <li>If this project depends on student worker contributions early in the semester, begin this process before the semester starts.</li>
           <li>Confirm with the department whether a stipend or hourly employment is more appropriate for this project.</li>
         </ul>
@@ -1286,6 +1284,12 @@ a:hover{color:var(--navy);}
     <p style="font-size:14px;color:var(--text2);line-height:1.7;">
       Shipley projects typically follow four milestones. Check off tasks as they are completed, add notes, and flag blockers. Use the guide to think through sequencing or troubleshoot delays.
     </p>
+    <div style="display:flex;gap:20px;flex-wrap:wrap;align-items:center;font-size:12px;color:var(--text2);padding-top:6px;border-top:1px solid var(--border);margin-top:4px;">
+      <span style="font-weight:600;color:var(--text3);">Task status:</span>
+      <span style="display:flex;align-items:center;gap:6px;"><span class="task-check" style="cursor:default;"></span> Not started</span>
+      <span style="display:flex;align-items:center;gap:6px;"><span class="task-check in-progress" style="cursor:default;">—</span> In progress</span>
+      <span style="display:flex;align-items:center;gap:6px;"><span class="task-check done" style="cursor:default;"></span> Complete</span>
+    </div>
   </div>
 
   <!-- Tailor Milestones to Proposal -->
@@ -1448,7 +1452,7 @@ a:hover{color:var(--navy);}
         <span><span style="display:inline-block;width:14px;height:14px;background:#FFE599;border-radius:3px;border:1px solid rgba(0,0,0,0.15);vertical-align:middle;margin-right:4px;"></span>In Progress</span>
         <span><span style="display:inline-block;width:14px;height:14px;background:#EA9999;border-radius:3px;border:1px solid rgba(0,0,0,0.15);vertical-align:middle;margin-right:4px;"></span>Not Started</span>
       </div>
-      <div id="gantt-scroll-area" style="flex:1;overflow-x:scroll;"></div>
+      <div id="gantt-scroll-area" style="flex:1;overflow-x:scroll;min-height:0;"></div>
     </div>
   </div>
 
@@ -1520,7 +1524,7 @@ a:hover{color:var(--navy);}
         <strong>Fringe Rate Reference:</strong>&ensp;
         Faculty / PostDoc / Temp Exempt: <strong>31.0%</strong> &nbsp;·&nbsp;
         Graduate Student: <strong>12.5%</strong> &nbsp;·&nbsp;
-        Undergraduate / Graduate Student (Hourly): <strong>0%</strong> &nbsp;·&nbsp;
+        Undergraduate Student (Hourly): <strong>0%</strong> &nbsp;·&nbsp;
         Temporary Employee, Non-Exempt: <strong>31.4%</strong>
       </div>
       <div id="budget-table-container" style="overflow-x:auto;"></div>
@@ -2016,7 +2020,7 @@ Return ONLY the JSON object with no other text, explanation, or markdown.
 
 For budget_template: "10k" if grant ≤ $10,000; "25k" if grant ≤ $25,000; null if not found.
 For salary keys ($10K): "Summer Stipend (shared between PIs)", "Course Release / Adjunct", "Other Faculty (describe)", "Research Assistant (Hourly)"
-For salary keys ($25K): "Course Release / Adjunct", "Faculty Stipend", "Overbase", "Other Faculty (describe)", "PostDoc", "Graduate Student", "Undergraduate Student (Hourly)", "Graduate Student (Hourly)", "Temporary Employee, Exempt", "Temporary Employee, Non-Exempt"
+For salary keys ($25K): "Course Release / Adjunct", "Faculty Stipend", "Overbase", "Other Faculty (describe)", "PostDoc", "Graduate Student", "Undergraduate Student (Hourly)", "Temporary Employee, Exempt", "Temporary Employee, Non-Exempt"
 Salary values: total amount for the whole award as a number (these projects are funded as a single lump sum, not by term).
 For op keys ($10K): "AI Tools & Software Licenses (e.g., ChatGPT Pro, Jutly)", "Supplies, Equipment, & Materials", "Meeting / Workshop Expense", "Other, please describe"
 For op keys ($25K): "AI Tools & Software Licenses", "Supplies, Equipment, & Materials", "Contracted Services", "Meeting / Workshop Expense", "Travel & Conference Registration", "Participant Incentives", "Other, please describe"
@@ -2320,7 +2324,7 @@ ${data.proposalText}
 
 The official Shipley budget template uses these exact line item labels: "${officialLabels.join('", "')}". Where a line item you find clearly matches one of these official labels, use that exact official label as the description instead of paraphrasing the proposal's own wording. If nothing matches, describe it briefly in your own words as the proposal states it.
 
-Always list graduate student support and undergraduate student support as separate line items — never combine them into a single "student" or "undergrad/grad" line, even if the proposal describes them together in one sentence. Use "Graduate Student" for salaried/stipend graduate compensation, and "Undergraduate Student (Hourly)" / "Graduate Student (Hourly)" for hourly-paid work, matching each item to the correct student level.
+Always list graduate student support and undergraduate student support as separate line items — never combine them into a single "student" or "undergrad/grad" line, even if the proposal describes them together in one sentence. Use "Graduate Student" for any graduate compensation, salaried or hourly, and "Undergraduate Student (Hourly)" for undergraduate hourly work, matching each item to the correct student level.
 
 Return ONLY a valid JSON object with no other text, explanation, or markdown: {"lines": [{"description": "...", "amount": number_or_null, "category": "salary"|"operating"|null}]}. Include every distinct budget line item you can find — do not invent line items that aren't in the text. Use "salary" for personnel/stipend/compensation items, "operating" for everything else (software, supplies, travel, services), and null for category if you can't tell. Use null for amount if no dollar figure is given for that specific item.`;
 
@@ -2702,6 +2706,7 @@ const MILESTONE_TASKS = {
     // General
     {name:'Identify project team and confirm roles', lead:'Faculty lead', blocker:null, group:'General'},
     {name:'Hold project kickoff', lead:'Faculty lead', blocker:null, group:'General'},
+    {name:'Meet with the project team to review and complete the Impact Evaluation Framework', lead:'Faculty lead', blocker:"Share the Impact Evaluation Framework with the project team as soon as funding is confirmed, and set up a meeting in the first week or two to walk through the framework tab's questions together — completing it typically takes the team a minimum of a week.", group:'General'},
     {name:'Share project team bios and photos with the Institute team', lead:'Project team', blocker:null, group:'General'},
     // IRB
     {name:'Confirm IRB review requirement', lead:'Faculty lead', blocker:'IRB review takes 4–8 weeks. Do not collect data before formal approval.', group:'IRB'},
@@ -2868,6 +2873,8 @@ Semester availability constraint: "Implement pedagogical intervention in course(
 Date constraint — Learning Analytics: "Plan learning analytics: data collection and analysis" is the umbrella task for that group; it isn't truly done until "Complete Impact Evaluation Framework (Problems → Data Analysis)" and "Develop data collection instruments (surveys, rubrics, observation protocols)" are both done. If you assign dates to any of these confirmed tasks, both subtasks' due dates must fall on or before the umbrella task's due date.
 
 Date constraint — second iteration: if "Analyze second iteration data" is confirmed, its start date must fall on or after the due date of "Plan and implement second pilot (if applicable)" — the second-iteration analysis cannot begin until that second pilot has concluded.
+
+Date constraint — Impact Evaluation Framework kickoff: "Meet with the project team to review and complete the Impact Evaluation Framework" should start within the first two weeks of ${windowStart}, with a due date reflecting at least a week of work — this is meant to happen at the very beginning of the project, not be scheduled loosely alongside other early tasks.
 
 ${!hasHireDate ? `The Setup tab does not yet have a target student-worker hire date. If the proposal states one directly, or states when the student worker's described work begins (from which the hire date is the same as that work-start date, subject to the semester availability constraint above), include it as "worker_target_date" in YYYY-MM-DD format. Omit this field entirely if the proposal gives no basis to infer it, or if this project has no student workers.` : `The Setup tab already has a target student-worker hire date — do not include "worker_target_date" in your response.`}
 
@@ -3350,7 +3357,6 @@ const BUDGET_DEFS = {
       {name:'PostDoc', fringeRate:0.31},
       {name:'Graduate Student', fringeRate:0.125},
       {name:'Undergraduate Student (Hourly)', fringeRate:0},
-      {name:'Graduate Student (Hourly)', fringeRate:0},
       {name:'Temporary Employee, Exempt', fringeRate:0.31},
       {name:'Temporary Employee, Non-Exempt', fringeRate:0.314},
     ],
@@ -3444,13 +3450,14 @@ Official template rows (every row must be addressed):
 ${rowsText}
 
 For each official template row:
-1. If a line item clearly maps to it, include a mapping with your best estimate of the TOTAL amount for that row across the whole award.
-2. If nothing addresses this row, but it is a commonly needed cost for a Shipley project of this scope, add a flag with type "missing" and a short question the staff member should raise with the faculty lead.
-3. If a line item does map to this row but the dollar amount looks too low for what is actually needed to accomplish what's described, add a flag with type "under_budgeted" (in addition to the mapping) — no explanation needed, just the rowName and type; the message is standardized and added automatically.
+1. If a line item clearly maps to it AND an explicit dollar amount was stated for it — either in the confirmed budget line items above, or directly in the full proposal text — include it in "mappings" with that EXACT amount. Copy it precisely; never adjust, round, or re-estimate a dollar figure that was actually stated somewhere.
+2. If a line item clearly maps to it but no explicit dollar amount is stated anywhere for it, include it in "estimates" with your best-estimate TOTAL amount for that row across the whole award. This will never be entered directly into the budget — it will only be shown to the staff member as a suggested figure to confirm with the faculty lead, so estimate confidently.
+3. If nothing addresses this row, but it is a commonly needed cost for a Shipley project of this scope, add a flag with type "missing" and a short question the staff member should raise with the faculty lead.
+4. If a line item does map to this row with an explicit stated amount (item 1) but the dollar amount looks too low for what is actually needed to accomplish what's described, add a flag with type "under_budgeted" (in addition to the mapping) — no explanation needed, just the rowName and type; the message is standardized and added automatically.
 Rows that are genuinely not applicable (e.g., a generic "Other, please describe" row with nothing described) need no flag — skip them silently, do not force a flag on every row.
 
 Return ONLY a valid JSON object with no other text, explanation, or markdown, in exactly this shape:
-{"mappings": [{"rowName": "...", "amount": number}], "flags": [{"rowName": "...", "type": "missing", "message": "..."}]}
+{"mappings": [{"rowName": "...", "amount": number}], "estimates": [{"rowName": "...", "amount": number}], "flags": [{"rowName": "...", "type": "missing", "message": "..."}]}
 For type "under_budgeted" flags, "message" can be omitted — it is filled in automatically.`;
 
   try{
@@ -3505,7 +3512,19 @@ function applyBudgetTailoring(parsed){
     message: f.type==='under_budgeted' ? UNDER_BUDGETED_MESSAGE : f.message,
     dismissed:false,
   }));
-  data.budget_flags = flags;
+  // Estimated amounts are never written directly into the budget — they're surfaced as a
+  // flag with a suggested figure so the staff member confirms with the faculty lead first.
+  const estimateFlags = (parsed.estimates||[]).filter(e=>e.rowName && e.amount!=null && getBudgetRowAmount(def, e.rowName)===0).map((e,i)=>{
+    const amount = parseFloat(e.amount)||0;
+    return {
+      id:'bf_est_'+Date.now()+'_'+i,
+      rowName:e.rowName,
+      type:'suggested',
+      message:`The Guide estimates this may need approximately $${amount.toLocaleString('en-US',{minimumFractionDigits:2})}, based on what the proposal describes. Please confirm the actual amount with your faculty project lead.`,
+      dismissed:false,
+    };
+  });
+  data.budget_flags = [...flags, ...estimateFlags];
   saveAll(data);
   renderBudgetBuilder();
   saveBudget();
@@ -3538,7 +3557,7 @@ function renderBudgetFlags(){
   if(!flags.length){ el.innerHTML = ''; renderFollowUpsCard(); return; }
   el.innerHTML = flags.map(f=>`
     <div class="budget-flag-card">
-      <div class="budget-flag-row"><span class="budget-flag-type">${f.type==='under_budgeted'?'Under-budgeted':'Missing'}</span>${f.rowName}</div>
+      <div class="budget-flag-row"><span class="budget-flag-type">${f.type==='under_budgeted'?'Under-budgeted':f.type==='suggested'?'Suggested amount':'Missing'}</span>${f.rowName}</div>
       <div class="budget-flag-message">${f.message}</div>
       <button class="btn-sm" onclick="dismissBudgetFlag('${f.id}')">Dismiss</button>
     </div>`).join('');
@@ -3583,7 +3602,7 @@ function renderFollowUpsCard(){
     html += `<div class="section-label" style="margin-bottom:8px;${askFacultyQuestions.length?'margin-top:14px;':''}">From Budget</div>`;
     html += budgetFlags.map(f=>`
       <div class="budget-flag-card">
-        <div class="budget-flag-row"><span class="budget-flag-type">${f.type==='under_budgeted'?'Under-budgeted':'Missing'}</span>${f.rowName}</div>
+        <div class="budget-flag-row"><span class="budget-flag-type">${f.type==='under_budgeted'?'Under-budgeted':f.type==='suggested'?'Suggested amount':'Missing'}</span>${f.rowName}</div>
         <div class="budget-flag-message">${f.message}</div>
         <div style="display:flex;gap:8px;flex-wrap:wrap;">
           <button class="btn-sm" onclick="dismissBudgetFlag('${f.id}')">Dismiss</button>
@@ -4370,6 +4389,7 @@ TIMELINE FEASIBILITY (12-month window — must complete before Fall 2027)
 - Technology development/customization/integration: [duration estimate] — [note or question]
 - Assignment/assessment development: [duration estimate] — [note or question]
 Overall: [Feasible as scoped / Feasible but tight — flag one specific risk / Not feasible within 12 months as scoped]
+[If Overall is "Feasible but tight" or "Not feasible", add one more sentence naming the specific compressed window and stating plainly that the faculty team will be starting behind where they'd need to be, by design, given the proposal's own timeline — e.g. "Given that X needs to be accomplished Sept–Dec, the faculty team will need to hit the ground running as soon as funds arrive — the proposal's own timeline leaves no buffer, so the team starts out behind where they'd need to be to complete the project as proposed." Do not just label the timeline "tight" without explaining the specific bind.]
 
 RED FLAGS
 - [one bullet per applicable red flag from the reference list — if none apply, a single bullet: "None identified."]
@@ -4603,9 +4623,9 @@ function renderGantt(rows){
   milestoneOrder.forEach(m=>{ grouped[m]=[]; });
   rows.forEach(r=>{ if(grouped[r.milestone]) grouped[r.milestone].push(r); });
   let html = `<div style="min-width:${LABEL_W+COL_W*totalMonths}px;">`;
-  // Header row
-  html += `<div style="display:flex;background:var(--navy);color:#fff;font-size:11px;font-weight:700;border-radius:6px 6px 0 0;">`;
-  html += `<div style="width:${LABEL_W}px;min-width:${LABEL_W}px;padding:8px 10px;">Task</div>`;
+  // Header row — sticky on top so the date columns stay visible while scrolling down.
+  html += `<div style="display:flex;background:var(--navy);color:#fff;font-size:11px;font-weight:700;border-radius:6px 6px 0 0;position:sticky;top:0;z-index:3;">`;
+  html += `<div style="width:${LABEL_W}px;min-width:${LABEL_W}px;padding:8px 10px;position:sticky;left:0;z-index:4;background:var(--navy);">Task</div>`;
   months.forEach(m=>{
     html += `<div style="width:${COL_W}px;min-width:${COL_W}px;text-align:center;padding:8px 2px;">${m.toLocaleDateString('en-US',{month:'short',year:'2-digit'})}</div>`;
   });
@@ -4614,9 +4634,9 @@ function renderGantt(rows){
   milestoneOrder.forEach(milestone=>{
     const mRows = grouped[milestone]||[];
     if(!mRows.length) return;
-    // Milestone header
+    // Milestone header — label cell sticky on the left so it stays visible while scrolling right.
     html += `<div style="display:flex;align-items:center;background:#4A86E8;color:#fff;font-size:12px;font-weight:700;padding:6px 10px;">`;
-    html += `<div style="width:${LABEL_W}px;min-width:${LABEL_W}px;">${milestone}</div>`;
+    html += `<div style="width:${LABEL_W-20}px;min-width:${LABEL_W-20}px;position:sticky;left:10px;z-index:2;">${milestone}</div>`;
     html += `<div style="flex:1;"></div></div>`;
     // Task rows
     mRows.forEach((r,ri)=>{
@@ -4625,7 +4645,7 @@ function renderGantt(rows){
       const s = colPos(r.start);
       const e = colPos(r.end);
       html += `<div style="display:flex;align-items:center;background:${bg};border-bottom:1px solid #eee;min-height:${ROW_H}px;">`;
-      html += `<div style="width:${LABEL_W}px;min-width:${LABEL_W}px;padding:4px 8px;font-size:11px;line-height:1.3;color:var(--text1);">${r.task}</div>`;
+      html += `<div style="width:${LABEL_W}px;min-width:${LABEL_W}px;padding:4px 8px;font-size:11px;line-height:1.3;color:var(--text1);position:sticky;left:0;z-index:1;background:${bg};">${r.task}</div>`;
       // Draw bar in monthly grid
       html += `<div style="flex:1;position:relative;height:${ROW_H}px;display:flex;">`;
       months.forEach((mo,mi)=>{
@@ -4635,11 +4655,14 @@ function renderGantt(rows){
         const left = s*COL_W;
         const width = Math.max(4,(e-s)*COL_W);
         html += `<div style="position:absolute;top:8px;height:18px;left:${left}px;width:${width}px;background:${fill};border-radius:4px;border:1px solid rgba(0,0,0,0.1);box-sizing:border-box;" title="${r.task}: ${r.start} → ${r.end} (${r.status})"></div>`;
-      } else if(s!==null || e!==null){
-        // Only one of start/due is set (or they collapse to the same point) — show a marker rather than dropping the task.
-        const pos = s!==null ? s : e;
-        const left = pos*COL_W - 5;
-        const label = r.start && r.end ? `${r.start} → ${r.end}` : r.start ? `Starts ${r.start}` : `Due ${r.end}`;
+      } else if(s!==null && e===null){
+        // Start date only — right-pointing arrow: work begins here, no end plotted.
+        const left = s*COL_W - 2;
+        html += `<div style="position:absolute;top:9px;left:${left}px;width:0;height:0;border-top:7px solid transparent;border-bottom:7px solid transparent;border-left:11px solid ${fill};" title="${r.task}: Starts ${r.start} (${r.status})"></div>`;
+      } else if(e!==null){
+        // Due date only (or both dates present but collapsed/invalid) — diamond marks the deadline.
+        const left = e*COL_W - 5;
+        const label = r.start && r.end ? `${r.start} → ${r.end}` : `Due ${r.end}`;
         html += `<div style="position:absolute;top:11px;left:${left}px;width:12px;height:12px;background:${fill};border:1px solid rgba(0,0,0,0.25);transform:rotate(45deg);box-sizing:border-box;" title="${r.task}: ${label} (${r.status})"></div>`;
       }
       html += `</div></div>`;
@@ -4663,7 +4686,34 @@ async function aiTimelineHelp(btn){
   const taskStatesData = data.task_states || {};
   const notes = data.milestone_notes || {};
   const s = data.setup || {};
-  const dateRange = s.start&&s.end ? `Project runs ${fmtDate(s.start)} through ${fmtDate(s.end)}.` : '';
+  // Computed in JS, not left to the AI's own date arithmetic — LLMs are unreliable at
+  // calculating elapsed time from raw dates, which previously produced wrong "months in"
+  // claims (e.g. claiming progress on a project that hadn't started yet).
+  let dateRange;
+  if(s.start && s.end){
+    const today = new Date(); today.setHours(0,0,0,0);
+    const start = new Date(s.start+'T00:00:00');
+    const end = new Date(s.end+'T00:00:00');
+    if(!isNaN(start) && !isNaN(end)){
+      const totalDays = Math.round((end-start)/86400000);
+      const totalMonths = Math.max(1, Math.round(totalDays/30.44));
+      if(today < start){
+        const daysUntil = Math.round((start-today)/86400000);
+        dateRange = `The project has not yet started — today is ${daysUntil} day${daysUntil===1?'':'s'} before the scheduled start date of ${fmtDate(s.start)}. Do not describe any progress as having occurred yet.`;
+      } else if(today > end){
+        const daysPast = Math.round((today-end)/86400000);
+        dateRange = `The project's scheduled end date (${fmtDate(s.end)}) passed ${daysPast} day${daysPast===1?'':'s'} ago.`;
+      } else {
+        const elapsedDays = Math.round((today-start)/86400000);
+        const elapsedMonths = Math.round((elapsedDays/30.44)*10)/10;
+        dateRange = `The project is approximately ${elapsedMonths} month${elapsedMonths===1?'':'s'} into its ${totalMonths}-month timeline (started ${fmtDate(s.start)}, ends ${fmtDate(s.end)}).`;
+      }
+    } else {
+      dateRange = 'No valid project start/end dates have been entered — do not speculate about elapsed time or how far into the timeline the project is.';
+    }
+  } else {
+    dateRange = 'No project start/end dates have been entered — do not speculate about elapsed time or how far into the timeline the project is.';
+  }
   const customTasksData = data.custom_tasks || [];
   const milestoneLabels = {m1:'Prepare',m2:'Conduct & Gather Data',m3:'Analyze & Share Findings',m4:'Reflect, Iterate & Scale',m5:'Report & Close'};
   let milestoneBreakdown = '';
@@ -4679,7 +4729,7 @@ async function aiTimelineHelp(btn){
     if(inProgList.length) milestoneBreakdown += `\n  In progress: ${inProgList.join('; ')}`;
     if(notes[m]) milestoneBreakdown += `\n  Notes: ${notes[m]}`;
   });
-  const prompt = `You are a helpful guide for Institute for Excellence in Teaching & Learning staff supporting a faculty-led Shipley Academic Innovation Fund award at Boston University. An Institute staff member wants feedback on this project's timeline. ${dateRange}\n\nTask status by milestone:${milestoneBreakdown}\n\nGive specific, practical feedback on timeline progress. Reference specific completed and in-progress tasks by name where relevant. Note any sequencing risks and concrete next steps. Do not reference the BU grants office or university policy. If something raises a concern that needs follow-up, flag it clearly for follow-up with the faculty lead.`;
+  const prompt = `You are a helpful guide for Institute for Excellence in Teaching & Learning staff supporting a faculty-led Shipley Academic Innovation Fund award at Boston University. An Institute staff member wants feedback on this project's timeline.\n\nTimeline status (already calculated — state this as given fact, do not recalculate or second-guess it): ${dateRange}\n\nTask status by milestone:${milestoneBreakdown}\n\nGive specific, practical feedback on timeline progress. Reference specific completed and in-progress tasks by name where relevant. Note any sequencing risks and concrete next steps. Do not reference the BU grants office or university policy. If something raises a concern that needs follow-up, flag it clearly for follow-up with the faculty lead.`;
   try{
     const r = await callGuide(prompt);
     renderAIResponse(out, r);
