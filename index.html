@@ -174,7 +174,9 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
 .card-header{
   display:flex;align-items:flex-start;gap:12px;margin-bottom:16px;
   padding-bottom:14px;border-bottom:0.5px solid var(--border);
+  flex-wrap:wrap;
 }
+.card-header > div:not(.card-icon){flex:1;min-width:0;}
 .card-icon{
   width:36px;height:36px;border-radius:8px;
   background:var(--gold-pale);display:flex;align-items:center;justify-content:center;
@@ -3650,9 +3652,62 @@ function goToTab(name){
   if(btn) switchTab(name, btn);
 }
 
+// Extracts bulleted lines from a labeled section within an AI response that follows a
+// "SECTION HEADER\n- bullet\n- bullet\n\nNEXT SECTION" structure. Stops at the first blank
+// line once bullets have started, or the first non-bullet line. Sentinel "none identified"
+// lines are dropped rather than turned into a follow-up item.
+function extractBulletSection(text, sectionHeader){
+  if(!text) return [];
+  const lines = text.split('\n');
+  const startIdx = lines.findIndex(l => l.trim().toUpperCase().startsWith(sectionHeader.toUpperCase()));
+  if(startIdx === -1) return [];
+  const bullets = [];
+  for(let i=startIdx+1; i<lines.length; i++){
+    const line = lines[i].trim();
+    if(!line){ if(bullets.length) break; else continue; }
+    if(!line.startsWith('-')) break;
+    const content = line.replace(/^-\s*/, '').replace(/\*\*/g, '').trim();
+    if(content && !/^none\b/i.test(content) && !/no .* identified/i.test(content)) bullets.push(content);
+  }
+  return bullets;
+}
+
+// Follow-up items pulled automatically from AI feedback (proposal review, timeline
+// feedback, framework review, budget review) — kept alongside the existing investigate
+// questions and budget flags in the same consolidated card.
+const FOLLOWUP_SOURCE_META = {
+  proposal: {label:'From Proposal Review'},
+  timeline: {label:'From Timeline Feedback', tab:'milestones', tabLabel:'Milestones'},
+  framework: {label:'From Impact Framework Review', tab:'impact', tabLabel:'Impact Framework'},
+  budget: {label:'From Budget Feedback', tab:'budget', tabLabel:'Budget'},
+};
+
+// Replaces only this source's prior batch of items — so re-running one feedback function
+// doesn't wipe out follow-ups pulled from a different one, and doesn't pile up duplicates
+// across repeated clicks of the same button.
+function setFollowUpItems(source, items){
+  const data = loadAll();
+  const existing = (data.follow_up_items || []).filter(i => i.source !== source);
+  const fresh = items.map((text, i) => ({ id: 'fu_'+source+'_'+Date.now()+'_'+i, source, text, dismissed:false }));
+  data.follow_up_items = [...existing, ...fresh];
+  saveAll(data);
+  renderFollowUpsCard();
+}
+
+function dismissFollowUpItem(id){
+  const data = loadAll();
+  const items = data.follow_up_items || [];
+  const it = items.find(x=>x.id===id);
+  if(it) it.dismissed = true;
+  data.follow_up_items = items;
+  saveAll(data);
+  renderFollowUpsCard();
+}
+
 // Consolidated PM to-do list: gathers open "ask faculty team" investigate questions
-// (Milestones) and undismissed flags (Budget) into one place, surfaced on Project Setup
-// so a PM sees outstanding follow-ups as soon as they load a project.
+// (Milestones), undismissed flags (Budget), and undismissed AI-feedback action items
+// into one place, surfaced on Project Setup so a PM sees outstanding follow-ups as soon
+// as they load a project.
 function renderFollowUpsCard(){
   const card = document.getElementById('followups-card');
   const list = document.getElementById('followups-list');
@@ -3660,13 +3715,15 @@ function renderFollowUpsCard(){
   const data = loadAll();
   const askFacultyQuestions = (data.investigate_questions||[]).filter(q=>q.resolved==='ask_faculty');
   const budgetFlags = (data.budget_flags||[]).filter(f=>!f.dismissed);
-  if(!askFacultyQuestions.length && !budgetFlags.length){
+  const followUpItems = (data.follow_up_items||[]).filter(i=>!i.dismissed);
+  if(!askFacultyQuestions.length && !budgetFlags.length && !followUpItems.length){
     card.style.display = 'none';
     list.innerHTML = '';
     return;
   }
   card.style.display = 'block';
   let html = '';
+  let hasPriorSection = false;
   if(askFacultyQuestions.length){
     html += `<div class="section-label" style="margin-bottom:8px;">From Milestones</div>`;
     html += askFacultyQuestions.map(q=>`
@@ -3678,9 +3735,10 @@ function renderFollowUpsCard(){
           <button class="btn-sm" onclick="goToTab('milestones')">Go to Milestones</button>
         </div>
       </div>`).join('');
+    hasPriorSection = true;
   }
   if(budgetFlags.length){
-    html += `<div class="section-label" style="margin-bottom:8px;${askFacultyQuestions.length?'margin-top:14px;':''}">From Budget</div>`;
+    html += `<div class="section-label" style="margin-bottom:8px;${hasPriorSection?'margin-top:14px;':''}">From Budget</div>`;
     html += budgetFlags.map(f=>`
       <div class="budget-flag-card">
         <div class="budget-flag-row"><span class="budget-flag-type">${f.type==='under_budgeted'?'Under-budgeted':f.type==='suggested'?'Suggested amount':'Missing'}</span>${f.rowName}</div>
@@ -3690,7 +3748,23 @@ function renderFollowUpsCard(){
           <button class="btn-sm" onclick="goToTab('budget')">Go to Budget</button>
         </div>
       </div>`).join('');
+    hasPriorSection = true;
   }
+  Object.keys(FOLLOWUP_SOURCE_META).forEach(source=>{
+    const items = followUpItems.filter(i=>i.source===source);
+    if(!items.length) return;
+    const meta = FOLLOWUP_SOURCE_META[source];
+    html += `<div class="section-label" style="margin-bottom:8px;${hasPriorSection?'margin-top:14px;':''}">${meta.label}</div>`;
+    html += items.map(it=>`
+      <div class="investigate-card">
+        <div class="investigate-question">${it.text}</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <button class="btn-sm" onclick="dismissFollowUpItem('${it.id}')">Dismiss</button>
+          ${meta.tab ? `<button class="btn-sm" onclick="goToTab('${meta.tab}')">Go to ${meta.tabLabel}</button>` : ''}
+        </div>
+      </div>`).join('');
+    hasPriorSection = true;
+  });
   list.innerHTML = html;
 }
 
@@ -4561,6 +4635,12 @@ WHAT IMPACT WILL THIS PROJECT HAVE IF SELECTED
   try{
     const r = await callGuide(prompt, {skipCtx:true, maxTokens:3000});
     renderAIResponse(out, r);
+    const items = [
+      ...extractBulletSection(r, 'ELIGIBILITY SCREEN'),
+      ...extractBulletSection(r, 'RED FLAGS'),
+      ...extractBulletSection(r, 'CHALLENGES & SUGGESTIONS'),
+    ];
+    setFollowUpItems('proposal', items);
   }catch(e){
     out.innerHTML=`<div class="ai-response" style="border-left-color:var(--red);">Something went wrong — please try again.</div>`;
   }finally{ setButtonLoading(btn, false); }
@@ -4583,10 +4663,11 @@ async function reviewFramework(){
     out.innerHTML=`<div class="ai-response"><strong>Nothing to review yet</strong> — fill in some fields first.</div>`;
     return;
   }
-  const prompt = `You are a helpful guide for Institute for Excellence in Teaching & Learning staff supporting a faculty-led Shipley Academic Innovation Fund award at Boston University. Please review only the Impact Evaluation Framework entries provided below — do not flag fields that haven't been filled in yet. Are the objectives measurable? Do the measures align with the impacts? Is the data collection plan realistic? Do not reference the BU grants office or university policy. If something raises a concern that needs follow-up, flag it clearly for follow-up with the faculty lead.\n\n${filled.join('\n')}`;
+  const prompt = `You are a helpful guide for Institute for Excellence in Teaching & Learning staff supporting a faculty-led Shipley Academic Innovation Fund award at Boston University. Please review only the Impact Evaluation Framework entries provided below — do not flag fields that haven't been filled in yet. Are the objectives measurable? Do the measures align with the impacts? Is the data collection plan realistic? Do not reference the BU grants office or university policy. If something raises a concern that needs follow-up, flag it clearly for follow-up with the faculty lead.\n\n${filled.join('\n')}\n\nEnd your response with a section titled exactly "ACTION ITEMS FOR THE PM:" followed by 0–4 bullet points (each one concise sentence) naming concrete follow-ups to raise with the faculty lead — or a single bullet "None identified." if there's nothing actionable.`;
   try{
     const r = await callGuide(prompt);
     renderAIResponse(out, r);
+    setFollowUpItems('framework', extractBulletSection(r, 'ACTION ITEMS FOR THE PM:'));
   }catch(e){
     out.innerHTML=`<div class="ai-response" style="border-left-color:var(--red);">Something went wrong.</div>`;
   }
@@ -4886,10 +4967,11 @@ async function aiTimelineHelp(btn){
     if(inProgList.length) milestoneBreakdown += `\n  In progress: ${inProgList.join('; ')}`;
     if(notes[m]) milestoneBreakdown += `\n  Notes: ${notes[m]}`;
   });
-  const prompt = `You are a helpful guide for Institute for Excellence in Teaching & Learning staff supporting a faculty-led Shipley Academic Innovation Fund award at Boston University. An Institute staff member wants feedback on this project's timeline.\n\nTimeline status (already calculated — state this as given fact, do not recalculate or second-guess it): ${dateRange}\n\nTask status by milestone:${milestoneBreakdown}\n\nGive specific, practical feedback on timeline progress. Reference specific completed and in-progress tasks by name where relevant. Note any sequencing risks and concrete next steps. Do not reference the BU grants office or university policy. If something raises a concern that needs follow-up, flag it clearly for follow-up with the faculty lead.`;
+  const prompt = `You are a helpful guide for Institute for Excellence in Teaching & Learning staff supporting a faculty-led Shipley Academic Innovation Fund award at Boston University. An Institute staff member wants feedback on this project's timeline.\n\nTimeline status (already calculated — state this as given fact, do not recalculate or second-guess it): ${dateRange}\n\nTask status by milestone:${milestoneBreakdown}\n\nGive specific, practical feedback on timeline progress. Reference specific completed and in-progress tasks by name where relevant. Note any sequencing risks and concrete next steps. Do not reference the BU grants office or university policy. If something raises a concern that needs follow-up, flag it clearly for follow-up with the faculty lead.\n\nEnd your response with a section titled exactly "ACTION ITEMS FOR THE PM:" followed by 0–4 bullet points (each one concise sentence) naming concrete follow-ups to raise with the faculty lead — or a single bullet "None identified." if there's nothing actionable.`;
   try{
     const r = await callGuide(prompt);
     renderAIResponse(out, r);
+    setFollowUpItems('timeline', extractBulletSection(r, 'ACTION ITEMS FOR THE PM:'));
   }catch(e){
     out.innerHTML=`<div class="ai-response" style="border-left-color:var(--red);">Something went wrong — please try again.</div>`;
   }finally{ if(btn) setButtonLoading(btn, false); }
@@ -4965,12 +5047,13 @@ async function aibudgethelp(){
   const rem=ceiling-grand;
   summary+=`\nSalaries subtotal: $${salTotal.toFixed(2)}\nFringe benefits (tool-calculated): $${fringeTotal.toFixed(2)}\nOperating subtotal: $${opTotal.toFixed(2)}\nGrand total: $${grand.toFixed(2)}\nRemaining: $${rem.toFixed(2)}`;
 
-  const prompt=`You are a helpful guide for Institute for Excellence in Teaching & Learning staff supporting a faculty-led Shipley Academic Innovation Fund award at Boston University.\n\n${projectContext?'Project context:\n'+projectContext+'\n':''}${summary}\n\nPlease review this budget and give specific, practical feedback based on what has been entered. Only comment on what is actually present — do not flag missing items as problems unless they seem critically inconsistent with what is entered. Do not reference fringe rates as errors — they are automatically calculated by the tool using fixed institutional rates. These line item names (e.g., "Faculty Stipend," "Overbase") are BU's own standardized central-finance budget categories — do not flag or question the fact that a cost was mapped into one of these categories, even if the proposal itself used different wording for the same cost; that mapping is expected and correct. Do not reference the BU grants office or university policy. If something raises a concern that needs follow-up, flag it clearly for follow-up with the faculty lead.`;
+  const prompt=`You are a helpful guide for Institute for Excellence in Teaching & Learning staff supporting a faculty-led Shipley Academic Innovation Fund award at Boston University.\n\n${projectContext?'Project context:\n'+projectContext+'\n':''}${summary}\n\nPlease review this budget and give specific, practical feedback based on what has been entered. Only comment on what is actually present — do not flag missing items as problems unless they seem critically inconsistent with what is entered. Do not reference fringe rates as errors — they are automatically calculated by the tool using fixed institutional rates. These line item names (e.g., "Faculty Stipend," "Overbase") are BU's own standardized central-finance budget categories — do not flag or question the fact that a cost was mapped into one of these categories, even if the proposal itself used different wording for the same cost; that mapping is expected and correct. Do not reference the BU grants office or university policy. If something raises a concern that needs follow-up, flag it clearly for follow-up with the faculty lead.\n\nEnd your response with a section titled exactly "ACTION ITEMS FOR THE PM:" followed by 0–4 bullet points (each one concise sentence) naming concrete follow-ups to raise with the faculty lead — or a single bullet "None identified." if there's nothing actionable.`;
   try{
     const r = await callGuide(prompt);
     budgetHistory.push({role:'user',content:prompt});
     budgetHistory.push({role:'assistant',content:r});
     renderAIResponse(out, r);
+    setFollowUpItems('budget', extractBulletSection(r, 'ACTION ITEMS FOR THE PM:'));
   }catch(e){
     out.innerHTML=`<div class="ai-response" style="border-left-color:var(--red);">Something went wrong.</div>`;
   }
