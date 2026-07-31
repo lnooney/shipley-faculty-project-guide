@@ -111,9 +111,22 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
 
 /* ── TABS ── */
 .tabs{
-  background:var(--navy2);display:flex;overflow-x:auto;
+  display:flex;overflow-x:auto;
   padding:0 2rem;border-bottom:1px solid rgba(255,255,255,0.08);
   position:sticky;top:0;z-index:500;-webkit-overflow-scrolling:touch;
+  /* Scroll-shadow affordance: the two "local" gradients mask the edges and travel
+     with the scrolled content, so they fade out exactly when there's nothing left
+     to scroll to — no JS needed to detect overflow. */
+  background-image:
+    linear-gradient(to right, var(--navy2) 30%, rgba(36,50,88,0)),
+    linear-gradient(to left, var(--navy2) 30%, rgba(36,50,88,0)),
+    linear-gradient(to right, rgba(0,0,0,0.3), rgba(0,0,0,0) 100%),
+    linear-gradient(to left, rgba(0,0,0,0.3), rgba(0,0,0,0) 100%);
+  background-position: left center, right center, left center, right center;
+  background-repeat: no-repeat;
+  background-color: var(--navy2);
+  background-size: 40px 100%, 40px 100%, 14px 100%, 14px 100%;
+  background-attachment: local, local, scroll, scroll;
 }
 .tab{
   padding:13px 18px;font-size:13px;font-weight:500;
@@ -125,7 +138,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
 .tab.active{color:#ffffff;border-bottom-color:var(--gold);}
 .tab .tab-check{font-size:10px;margin-left:5px;color:var(--gold);opacity:0;}
 .tab.complete .tab-check{opacity:1;}
-@media(max-width:700px){
+@media(max-width:900px){
   .tabs{padding:0 0.75rem;}
   .tab{padding:11px 12px;font-size:12px;}
 }
@@ -1949,7 +1962,7 @@ const RUBRIC_CRITERIA = [
    ]},
   {id:'c7', num:7, title:'Award Level Alignment', threshold:false,
    question:'Does the project scope, budget, and readiness match the requested tier? Seed ($10K): early-stage pilots. Innovation ($25K): program-level, broader adoption.',
-   note:"This criterion weighs three things: (1) whether the total budget requested falls within the tier's dollar range — determine the tier directly from the dollar amount given in the project scoping information below ($10,000 is a Seed Grant, $25,000 is an Innovation Grant; do not infer the tier from the narrative, the amount already tells you which tier was requested); (2) whether the proposed scope and nature of the work actually matches that tier's stipulated description — Seed is meant for early-stage pilots, Innovation is meant for program-level work with broader adoption, and a project that's really just an early-stage pilot requested at the Innovation tier (or vice versa) should score lower here even if the dollar amount is technically within range; and (3) whether the budget realistically covers what the described line items and work would actually cost — use your project-management experience to independently infer this rather than accepting the proposal's stated figures at face value, similar to how the Budget tab's own tailoring flags under-budgeted line items. A budget that's plausible on paper but clearly underestimates real costs for the described scope should pull this score down.",
+   note:"This criterion weighs three things: (1) whether the total budget requested falls within the tier's dollar range — determine the tier directly from the dollar amount given in the project scoping information below ($10,000 is a Seed Grant, $25,000 is an Innovation Grant; do not infer the tier from the narrative, the amount already tells you which tier was requested); (2) whether the proposed scope and nature of the work actually matches that tier's stipulated description — Seed is meant for early-stage pilots, Innovation is meant for program-level work with broader adoption, and a project that's really just an early-stage pilot requested at the Innovation tier (or vice versa) should score lower here even if the dollar amount is technically within range; and (3) whether the budget realistically covers what the described line items and work would actually cost — use your project-management experience to independently infer this rather than accepting the proposal's stated figures at face value, similar to how the Budget tab's own tailoring flags under-budgeted line items. A budget that's plausible on paper but clearly underestimates real costs for the described scope should pull this score down. Note: the Budget tab's official line item names (e.g., \"Faculty Stipend,\" \"Overbase\") are BU's own standardized central-finance categories — a cost being mapped into one of these categories under different wording than the proposal used is expected and correct, not a discrepancy to flag here.",
    tiers:[
      {score:4,name:'Exemplary',text:'Project scope, budget, and goals are well-matched to the requested award level. Seed applications are clearly early-stage; Innovation applications demonstrate readiness for program-level work with measurable outcomes and broader adoption potential. Budget realistically covers the described costs.'},
      {score:3,name:'Proficient',text:'Scope generally aligns with the award level. Minor recalibration may be suggested but overall fit is appropriate. Budget is broadly realistic.'},
@@ -3520,6 +3533,10 @@ For each official template row:
 4. If a line item does map to this row with an explicit stated amount (item 1) but the dollar amount looks too low for what is actually needed to accomplish what's described, add a flag with type "under_budgeted" (in addition to the mapping) — no explanation needed, just the rowName and type; the message is standardized and added automatically.
 Rows that are genuinely not applicable (e.g., a generic "Other, please describe" row with nothing described) need no flag — skip them silently, do not force a flag on every row.
 
+Each distinct line item or dollar amount described in the proposal must map to exactly one official row — never map the same underlying payment to more than one row, even if it could plausibly fit multiple categories (e.g., a single "faculty stipend" payment must not be mapped to both "Faculty Stipend" and "Overbase"). When a described payment is ambiguous between overlapping categories like Course Release, Faculty Stipend, and Overbase, pick the single best-fitting row based on context rather than including it in more than one — double-counting the same payment inflates the budget and is a real error to avoid.
+
+The official row names above (e.g., "Faculty Stipend," "Overbase") are BU's own standardized central-finance budget categories — they are the correct target regardless of the different wording the proposal itself uses for the same cost. Mapping the proposal's own phrasing into these standardized category names is expected, correct behavior, not a discrepancy — never flag or comment on the fact that a line item's wording differs from the official row name it was mapped to.
+
 Return ONLY a valid JSON object with no other text, explanation, or markdown, in exactly this shape:
 {"mappings": [{"rowName": "...", "amount": number}], "estimates": [{"rowName": "...", "amount": number}], "flags": [{"rowName": "...", "type": "missing", "message": "..."}]}
 For type "under_budgeted" flags, "message" can be omitted — it is filled in automatically.`;
@@ -3705,7 +3722,7 @@ function renderBudgetBuilder(){
         <button class="btn-sm" ${modeAdd} onclick="setFringeMode(${ri},'add')" style="font-size:11px;padding:2px 8px;">+ Calculate fringe</button>
         <button class="btn-sm" ${modeInc} onclick="setFringeMode(${ri},'included')" style="font-size:11px;padding:2px 8px;">Included in amount</button>
       </div>`;
-      const fringePrompt = s.fringeMode===null && amt>0 ? `<div id="fringe-prompt-${ri}" class="alert alert-amber" style="font-size:12px;margin-top:5px;padding:7px 10px;">Does this amount include fringe benefits? <button class="btn-sm" onclick="setFringeMode(${ri},'included')" style="margin-left:6px;">Yes, included</button> <button class="btn-sm" onclick="setFringeMode(${ri},'add')" style="margin-left:4px;">No, calculate for me</button></div>` : '';
+      const fringePrompt = s.fringeMode===null && amt>0 ? `<div id="fringe-prompt-${ri}" class="alert alert-amber" style="font-size:12px;margin-top:5px;padding:7px 10px;">Does this amount include fringe benefits? Use the buttons above to answer.</div>` : '';
       fringeToggle += fringePrompt;
     }
     const splitHtml = (s.fringeMode==='included' && row.fringeRate>0 && amt>0)
@@ -4948,7 +4965,7 @@ async function aibudgethelp(){
   const rem=ceiling-grand;
   summary+=`\nSalaries subtotal: $${salTotal.toFixed(2)}\nFringe benefits (tool-calculated): $${fringeTotal.toFixed(2)}\nOperating subtotal: $${opTotal.toFixed(2)}\nGrand total: $${grand.toFixed(2)}\nRemaining: $${rem.toFixed(2)}`;
 
-  const prompt=`You are a helpful guide for Institute for Excellence in Teaching & Learning staff supporting a faculty-led Shipley Academic Innovation Fund award at Boston University.\n\n${projectContext?'Project context:\n'+projectContext+'\n':''}${summary}\n\nPlease review this budget and give specific, practical feedback based on what has been entered. Only comment on what is actually present — do not flag missing items as problems unless they seem critically inconsistent with what is entered. Do not reference fringe rates as errors — they are automatically calculated by the tool using fixed institutional rates. Do not reference the BU grants office or university policy. If something raises a concern that needs follow-up, flag it clearly for follow-up with the faculty lead.`;
+  const prompt=`You are a helpful guide for Institute for Excellence in Teaching & Learning staff supporting a faculty-led Shipley Academic Innovation Fund award at Boston University.\n\n${projectContext?'Project context:\n'+projectContext+'\n':''}${summary}\n\nPlease review this budget and give specific, practical feedback based on what has been entered. Only comment on what is actually present — do not flag missing items as problems unless they seem critically inconsistent with what is entered. Do not reference fringe rates as errors — they are automatically calculated by the tool using fixed institutional rates. These line item names (e.g., "Faculty Stipend," "Overbase") are BU's own standardized central-finance budget categories — do not flag or question the fact that a cost was mapped into one of these categories, even if the proposal itself used different wording for the same cost; that mapping is expected and correct. Do not reference the BU grants office or university policy. If something raises a concern that needs follow-up, flag it clearly for follow-up with the faculty lead.`;
   try{
     const r = await callGuide(prompt);
     budgetHistory.push({role:'user',content:prompt});
@@ -5126,6 +5143,28 @@ function migrateLegacyData(){
     setActiveId(id);
     localStorage.setItem(KEY, JSON.stringify(data)); // keep KEY in sync
   }catch(e){}
+}
+
+// Removing a task from MILESTONE_TASKS or from an auto-generation function only stops
+// NEW projects from getting it — projects saved before the change still carry the old
+// custom_task in their stored data forever unless swept out here. Run once per load,
+// across the live document and every saved project snapshot.
+const DEPRECATED_TASK_IDS = ['data_task'];
+function cleanupDeprecatedTasks(){
+  function stripDeprecated(data){
+    if(!data || !Array.isArray(data.custom_tasks)) return false;
+    const before = data.custom_tasks.length;
+    data.custom_tasks = data.custom_tasks.filter(t=>!DEPRECATED_TASK_IDS.includes(t.id));
+    return data.custom_tasks.length !== before;
+  }
+  const live = loadAll();
+  if(stripDeprecated(live)) saveAll(live);
+  const projects = loadProjects();
+  let changed = false;
+  Object.values(projects).forEach(p=>{
+    if(p && p.data && stripDeprecated(p.data)) changed = true;
+  });
+  if(changed) saveProjects(projects);
 }
 
 function updateHeaderLabel(){
@@ -5323,6 +5362,7 @@ document.addEventListener('keydown', e=>{
 // ═══════════════════════════════════════════════════════
 window.addEventListener('DOMContentLoaded',()=>{
   migrateLegacyData();
+  cleanupDeprecatedTasks();
   updateHeaderLabel();
   renderAvailabilityEntries();
   renderBudgetLineEntries();
