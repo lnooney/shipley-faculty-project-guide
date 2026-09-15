@@ -281,6 +281,9 @@ a:hover{color:var(--navy);}
 .alert-blue{background:var(--blue-bg);border-left:3px solid var(--blue);color:var(--blue-text);}
 .alert-green{background:var(--green-bg);border-left:3px solid var(--green);color:var(--green-text);}
 .alert-navy{background:rgba(26,39,68,0.06);border-left:3px solid var(--navy);color:var(--navy);}
+/* Marks a field the proposal import didn't find anything for, so it's easy to spot what
+   still needs manual entry. Cleared the moment the PM interacts with the field. */
+.needs-input{background:var(--amber-bg)!important;border-left:3px solid var(--amber)!important;}
 .alert strong{font-weight:600;}
 
 /* ── IMPACT FRAMEWORK ── */
@@ -968,7 +971,7 @@ a:hover{color:var(--navy);}
     </div>
 
     <div class="alert alert-amber">
-      <strong>Projects that research teaching and learning require IRB approval</strong>, even if many are deemed exempt. If the project plans to collect, analyze, or publish findings from student data (surveys, grades, work samples, interviews), IRB review is required. The faculty lead will need to complete <a href="https://www.bu.edu/research/ethics-compliance/human-subjects/human-subjects-training/" target="_blank" style="color:var(--blue-text);font-weight:600;">CITI Training</a> and receive certification as well. Starting data collection before approval can invalidate the findings entirely and put the faculty lead and their students at risk.
+      <strong>Projects that research teaching and learning may require IRB approval</strong>, even if many are deemed exempt. A review is likely needed if a project 1) is a systematic investigation, 2) is designed to contribute to generalizable knowledge, and 3) involves human subjects and their information. The faculty lead will need to complete <a href="https://www.bu.edu/research/ethics-compliance/human-subjects/human-subjects-training/" target="_blank" style="color:var(--blue-text);font-weight:600;">CITI Training</a> and receive certification as well. Starting data collection before receiving it risks violating federal regulations and BU policy, and can jeopardize the ability to publish or present the findings.
     </div>
 
     <div class="section-label" style="margin-bottom:10px;">What data will the project collect? How will it be used?</div>
@@ -2037,7 +2040,13 @@ Return ONLY the JSON object with no other text, explanation, or markdown.
   "prior": null,
   "budget_template": null,
   "salary": {},
-  "op": {}
+  "op": {},
+  "media": null,
+  "media_cost": null,
+  "data_needs": null,
+  "data_cost": null,
+  "workers": null,
+  "tech_tools": []
 }
 
 For budget_template: "10k" if grant ≤ $10,000; "25k" if grant ≤ $25,000; null if not found.
@@ -2047,6 +2056,11 @@ Salary values: total amount for the whole award as a number (these projects are 
 For op keys ($10K): "AI Tools & Software Licenses (e.g., ChatGPT Pro, Jutly)", "Supplies, Equipment, & Materials", "Meeting / Workshop Expense", "Other, please describe"
 For op keys ($25K): "AI Tools & Software Licenses", "Supplies, Equipment, & Materials", "Contracted Services", "Meeting / Workshop Expense", "Travel & Conference Registration", "Participant Incentives", "Other, please describe"
 Op values: total amount as a number.
+
+For "media": "yes" if the proposal clearly plans to create video, animation, graphics, or other media; "maybe" if media production is mentioned but scope is still undetermined; "no" if the proposal explicitly indicates no media production; null if not addressed at all. "media_cost": a number if the proposal states a specific dollar figure for media/content production specifically, else null.
+For "data_needs": "yes-support" if the proposal plans to analyze learning data (grades, LMS data, surveys) AND explicitly needs analytical support/help for it; "yes-self" if it plans this analysis and the team can clearly handle it themselves; "maybe" if data analysis is mentioned but unclear; "no" if the proposal explicitly indicates no data analysis; null if not addressed. "data_cost": a number if the proposal states a specific dollar figure for data/analytics support specifically, else null.
+For "workers": "yes-grad" if the proposal plans to hire only graduate student worker(s); "yes-undergrad" if only undergraduate; "yes-both" if both graduate and undergraduate; "no" if the proposal explicitly indicates no student workers; null if not addressed.
+For "tech_tools": an array of specific technology tool/platform names the proposal states it will use or acquire (e.g., ["ChatGPT Pro", "Qualtrics"]) — only names actually stated, not general categories; empty array if none are named.
 
 Proposal text:
 ${text}`;
@@ -2091,16 +2105,73 @@ function applyProposalImport(data, out){
     saveBudget();
   }
 
+  // Project Support Needs & Capacity — media, data & analytics, student workers, tech tools
+  if(data.media){
+    const el = document.getElementById('s-media');
+    if(el){ el.value = data.media; filled.push('media'); showMediaNote(); }
+  }
+  if(data.media_cost!=null){
+    const el = document.getElementById('s-media-cost');
+    if(el) el.value = data.media_cost;
+  }
+  if(data.media || data.media_cost!=null) syncMediaToProjectPlan();
+
+  if(data.data_needs){
+    const el = document.getElementById('s-data');
+    if(el){ el.value = data.data_needs; filled.push('data_needs'); showDataNote(); }
+  }
+  if(data.data_cost!=null){
+    const el = document.getElementById('s-data-cost');
+    if(el) el.value = data.data_cost;
+  }
+  if(data.data_needs || data.data_cost!=null) syncDataToProjectPlan();
+
+  if(data.workers){
+    const el = document.getElementById('s-workers');
+    if(el){ el.value = data.workers; filled.push('workers'); showWorkerNote(); syncWorkersToProjectPlan(); }
+  }
+
+  if(Array.isArray(data.tech_tools) && data.tech_tools.length){
+    const names = data.tech_tools.map(n=>String(n).trim()).filter(Boolean);
+    if(names.length){
+      techTools = names.map(name=>({name}));
+      renderTechToolEntries();
+      saveTechConsiderations();
+      renderTechConsiderations();
+      filled.push('tech_tools');
+    }
+  }
+
   updateProjectName();
   saveSetup();
   updateBudgetLineGuard();
+  highlightUnfilledFields();
   const count=filled.length;
   out.innerHTML=`<div class="alert alert-green">
     <strong>Import complete —</strong> ${count} field${count!==1?'s':''} pre-filled from the proposal.
     Review each field below, then check the <strong>Budget tab</strong> if budget figures were found.
     ${data.budget_template?'<br/>💰 Budget figures were detected and pre-filled.':''}
+    <br/>Fields highlighted in amber below found nothing in the proposal — fill those in manually.
   </div>`;
 }
+
+// Marks every field the proposal import attempts to fill but came up empty, so it's easy
+// to spot what still needs manual entry. Excludes start/end (they carry default award
+// dates, so they're never truly empty) and the tech-tools list (a repeating field where
+// "empty" isn't necessarily wrong). Clears on the PM's next interaction with that field.
+const IMPORT_HIGHLIGHT_FIELDS = ['s-title','s-lead','s-dept','s-team','s-challenge','s-vision','s-audience','s-prior','s-media','s-data','s-workers'];
+function highlightUnfilledFields(){
+  IMPORT_HIGHLIGHT_FIELDS.forEach(id=>{
+    const el = document.getElementById(id);
+    if(!el) return;
+    el.classList.toggle('needs-input', !el.value || !el.value.trim());
+  });
+}
+['input','change'].forEach(evt=>{
+  document.addEventListener(evt, e=>{
+    if(e.target && e.target.classList && e.target.classList.contains('needs-input')) e.target.classList.remove('needs-input');
+  });
+});
 
 // ═══════════════════════════════════════════════════════
 // PROJECT NAME
