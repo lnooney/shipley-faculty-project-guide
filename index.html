@@ -356,6 +356,9 @@ a:hover{color:var(--navy);}
 .fw-header-title{font-family:var(--serif);font-size:16px;font-weight:400;line-height:1.2;}
 .fw-header-sub{font-size:12px;opacity:0.75;margin-top:2px;line-height:1.4;}
 .fw-header.gold .fw-header-sub{opacity:0.7;}
+.fw-guiding{padding:10px 16px 0 16px;display:flex;flex-direction:column;gap:3px;}
+.fw-guiding-q{font-size:12px;color:var(--text2);line-height:1.4;}
+.fw-guiding-q:before{content:"— ";color:var(--border2);}
 .fw-body{padding:16px;background:#fff;}
 .fw-body textarea{
   width:100%;min-height:100px;font-size:14px;resize:vertical;
@@ -1127,8 +1130,9 @@ a:hover{color:var(--navy);}
       This framework is the backbone of this project's impact measurement. Work through each section from top to bottom — each one builds on the last. Use the guided conversation below to think through responses before filling in the framework. This can be revisited and refined as the project evolves.
     </p>
     <div class="alert alert-blue">
-      <strong>How to use this:</strong> Work down each section — click "Answer questions to draft this section," answer the short prompts, and your guide will draft that section in a few concise bullets you can review and edit. Each section builds on what was drafted before it. Entries are saved automatically and will inform the project's survey design, data collection plan, and final report.
+      <strong>How to use this:</strong> If you've imported the proposal, click <strong>"Autofill entire framework ↗"</strong> below for a first draft of all six sections at once. From there, your job is to review, adjust, and refine as a team — now that you can see how each section drives the next (a Measure only matters if it traces back to a stated Impact; a weak Data Collection plan undermines Analysis downstream). You can also work through any section manually using the guiding questions shown under each header. Entries are saved automatically and will inform the project's survey design, data collection plan, and final report.
     </div>
+    <div id="fw-autofill-row"></div>
   </div>
 
   <!-- The Framework Stack -->
@@ -1149,6 +1153,7 @@ a:hover{color:var(--navy);}
             <div class="fw-header-sub">What are the major learning and pedagogical challenges?</div>
           </div>
         </div>
+        <div class="fw-guiding" id="fwg-problems"></div>
         <div class="fw-body">
           <textarea id="fw-problems" placeholder="e.g. Students struggle to transfer conceptual understanding to novel problems; low engagement in large lecture format…" oninput="autoSaveFramework()"></textarea>
         </div>
@@ -1170,6 +1175,7 @@ a:hover{color:var(--navy);}
             <div class="fw-header-sub">What are the core objectives in addressing these teaching/learning challenges?</div>
           </div>
         </div>
+        <div class="fw-guiding" id="fwg-objectives"></div>
         <div class="fw-body">
           <textarea id="fw-objectives" placeholder="e.g. Students will demonstrate improved ability to apply concepts to unfamiliar contexts; increase active participation by 40%…" oninput="autoSaveFramework()"></textarea>
         </div>
@@ -1191,6 +1197,7 @@ a:hover{color:var(--navy);}
             <div class="fw-header-sub">Given the objectives, what impacts/outcomes should be measured?</div>
           </div>
         </div>
+        <div class="fw-guiding" id="fwg-impacts"></div>
         <div class="fw-body">
           <textarea id="fw-impacts" placeholder="e.g. Increased self-efficacy in problem-solving; improved critical thinking; greater sense of belonging in STEM…" oninput="autoSaveFramework()"></textarea>
         </div>
@@ -1212,6 +1219,7 @@ a:hover{color:var(--navy);}
             <div class="fw-header-sub">What data points are good indicators of such impacts? · What targets should be hit?</div>
           </div>
         </div>
+        <div class="fw-guiding" id="fwg-measures"></div>
         <div class="fw-body">
           <table class="fw-table" id="fw-measures-table">
             <thead><tr>
@@ -1242,6 +1250,7 @@ a:hover{color:var(--navy);}
             <div class="fw-header-sub">How will these data points be collected?</div>
           </div>
         </div>
+        <div class="fw-guiding" id="fwg-collection"></div>
         <div class="fw-body">
           <table class="fw-table" id="fw-collection-table">
             <thead><tr>
@@ -1272,6 +1281,7 @@ a:hover{color:var(--navy);}
             <div class="fw-header-sub">How will the outcomes be measured using the data collected?</div>
           </div>
         </div>
+        <div class="fw-guiding" id="fwg-analysis"></div>
         <div class="fw-body">
           <textarea id="fw-analysis" placeholder="e.g. Paired t-test on pre/post scores; thematic coding of open-ended responses; descriptive statistics on participation rates; graduate student will lead analysis with faculty oversight…" oninput="autoSaveFramework()"></textarea>
         </div>
@@ -1287,6 +1297,7 @@ a:hover{color:var(--navy);}
 
     <div style="display:flex;gap:10px;margin-top:16px;justify-content:flex-end;">
       <button onclick="saveFramework()" class="btn-primary">Save framework</button>
+      <button onclick="downloadFrameworkExcel()" class="btn-primary">⬇ Download Framework (.xlsx)</button>
       <button onclick="reviewFramework()" class="btn-gold">Ask guide to review ↗</button>
     </div>
     <div id="framework-review" style="margin-top:14px;"></div>
@@ -1881,6 +1892,7 @@ function switchTab(name, btn){
   }
   if(name==='impact'){
     renderFwSubquestions();
+    renderFwAutofillButton();
   }
 }
 
@@ -2530,7 +2542,7 @@ const FW_COLLECTION_EXAMPLES = [
   {source:'Student focus group', freq:'End of semester'},
   {source:'Instructor reflection log', freq:'Weekly'},
 ];
-const FW_FREQ_OPTIONS = ['','Pre/Post only','Weekly','Bi-weekly','Monthly','End of semester','Once'];
+const FW_FREQ_OPTIONS = ['','Pre/Post only','Weekly','Bi-weekly','Monthly','End of semester','Once','Automatic collection'];
 
 let fwMeasureRows = [];
 let fwCollectionRows = [];
@@ -2669,6 +2681,116 @@ function toggleSectionGuide(section){
   if(!el) return;
   el.classList.toggle('open');
   if(el.classList.contains('open')) document.getElementById('fwq-'+section+'-q1')?.focus();
+}
+
+function renderFwGuidingHeaders(){
+  FW_SECTION_ORDER.forEach(key=>{
+    const el = document.getElementById('fwg-'+key);
+    if(!el) return;
+    const def = FW_SUBQUESTIONS[key];
+    el.innerHTML = def.questions.map(q=>`<div class="fw-guiding-q">${q.label}</div>`).join('');
+  });
+}
+
+function renderFwAutofillButton(){
+  const row = document.getElementById('fw-autofill-row');
+  if(!row) return;
+  const hasProposal = !!loadAll().proposalText;
+  row.innerHTML = hasProposal
+    ? `<button class="btn-sm btn-gold" onclick="autofillEntireFramework()" id="fw-autofill-btn" style="margin-top:12px;">Autofill entire framework from proposal ↗</button>
+       <div class="prefill-note hidden" id="fw-autofill-note" style="margin-top:8px;"></div>`
+    : '';
+}
+
+async function autofillEntireFramework(){
+  const btn = document.getElementById('fw-autofill-btn');
+  const noteEl = document.getElementById('fw-autofill-note');
+  const data = loadAll();
+  if(!btn || !noteEl || !data.proposalText) return;
+
+  saveFramework();
+
+  // Never overwrite a section the PM (or faculty team) has already filled in — only draft what's still empty.
+  const emptySections = FW_SECTION_ORDER.filter(key=>{
+    if(key==='measures') return !fwMeasureRows.some(r=>r.measure && r.measure.trim());
+    if(key==='collection') return !fwCollectionRows.some(r=>r.source && r.source.trim());
+    const el = document.getElementById('fw-'+key);
+    return el && !el.value.trim();
+  });
+
+  if(!emptySections.length){
+    noteEl.classList.remove('hidden');
+    noteEl.textContent = 'Every section already has content, so there is nothing to autofill — clear a section first if you want your guide to redraft it from the proposal.';
+    return;
+  }
+
+  setButtonLoading(btn, true);
+  noteEl.classList.remove('hidden');
+  noteEl.textContent = 'Your guide is reading the proposal and drafting the framework…';
+
+  const sectionBlocks = emptySections.map(key=>{
+    const def = FW_SUBQUESTIONS[key];
+    const qList = def.questions.map(q=>`- ${q.label}`).join('\n');
+    return `${def.title}:\n${qList}`;
+  }).join('\n\n');
+
+  const jsonTemplate = '{' + emptySections.map(key=>{
+    const def = FW_SUBQUESTIONS[key];
+    const answersShape = `{${def.questions.map(q=>`"${q.id}":"..."`).join(',')}}`;
+    const contentKey = def.type==='table' ? 'rows' : 'bullets';
+    const contentShape = def.type==='table'
+      ? `[{"${def.tableCols[0]}":"...","${def.tableCols[1]}":"..."}]`
+      : `["...","..."]`;
+    return `"${key}":{"answers":${answersShape},"${contentKey}":${contentShape}}`;
+  }).join(',') + '}';
+
+  const prompt = `You are helping an Institute for Excellence in Teaching & Learning staff member draft a Shipley project's Impact Evaluation Framework directly from its proposal, using backward design — Problems → Objectives → Impacts → Measures & Targets → Data Collection → Data Analysis, each following logically from the one before it, even though you are only being asked to draft some of these sections below.
+
+Full proposal text:
+${data.proposalText}
+
+For each section below, answer its guiding questions and then draft the section's content — ground everything in what the proposal actually states, do not invent specifics it doesn't support. Keep bullets/table values short (a phrase or one short sentence), 2–4 per section.
+
+${sectionBlocks}
+
+Return ONLY a valid JSON object with no other text, explanation, or markdown, in exactly this shape: ${jsonTemplate}`;
+
+  try{
+    const raw = await callGuide(prompt, {skipCtx:true, maxTokens:2200});
+    const jsonMatch = raw.match(/\{[\s\S]*\}/);
+    if(!jsonMatch) throw new Error('No JSON');
+    const parsed = JSON.parse(jsonMatch[0]);
+    const draftedSections = [];
+    emptySections.forEach(key=>{
+      const sec = parsed[key];
+      if(!sec) return;
+      const def = FW_SUBQUESTIONS[key];
+      const hasContent = def.type==='table'
+        ? (Array.isArray(sec.rows) && sec.rows.some(r=>r[def.tableCols[0]]))
+        : (Array.isArray(sec.bullets) && sec.bullets.length);
+      if(!hasContent) return;
+      if(sec.answers){
+        fwAnswers[key] = fwAnswers[key] || {};
+        def.questions.forEach(q=>{ if(sec.answers[q.id]) fwAnswers[key][q.id] = sec.answers[q.id]; });
+      }
+      applyFrameworkDraft(key, sec);
+      draftedSections.push(key);
+    });
+    renderFwSubquestions();
+    saveFrameworkAnswers();
+    saveFramework();
+    draftedSections.forEach(key=>{
+      const secNote = document.getElementById('fwd-note-'+key);
+      if(secNote){ secNote.classList.remove('hidden'); secNote.textContent = 'Drafted from the proposal — review and refine with your faculty team.'; }
+    });
+    noteEl.textContent = draftedSections.length
+      ? `${draftedSections.length} section${draftedSections.length!==1?'s':''} drafted from the proposal — review each below with your faculty team. Sections that already had content were left untouched.`
+      : 'Something went wrong — your guide did not return usable drafts. Please try again.';
+  }catch(e){
+    noteEl.textContent = 'Something went wrong drafting the framework — please try again.';
+  }finally{
+    setButtonLoading(btn, false);
+  }
 }
 
 function renderFwSubquestions(){
@@ -4734,9 +4856,20 @@ async function reviewFramework(){
     out.innerHTML=`<div class="ai-response"><strong>Nothing to review yet</strong> — fill in some fields first.</div>`;
     return;
   }
-  const prompt = `You are a helpful guide for Institute for Excellence in Teaching & Learning staff supporting a faculty-led Shipley Academic Innovation Fund award at Boston University. Please review only the Impact Evaluation Framework entries provided below — do not flag fields that haven't been filled in yet. Are the objectives measurable? Do the measures align with the impacts? Is the data collection plan realistic? Do not reference the BU grants office or university policy. If something raises a concern that needs follow-up, flag it clearly for follow-up with the faculty lead.\n\n${filled.join('\n')}\n\nEnd your response with a section titled exactly "ACTION ITEMS FOR THE PM:" followed by 0–4 bullet points (each one concise sentence) naming concrete follow-ups to raise with the faculty lead — or a single bullet "None identified." if there's nothing actionable.`;
+  const prompt = `You are a helpful guide for Institute for Excellence in Teaching & Learning staff supporting a faculty-led Shipley Academic Innovation Fund award at Boston University. Review only the Impact Evaluation Framework entries provided below — do not flag fields that haven't been filled in yet. Do not reference the BU grants office or university policy.
+
+Focus specifically on three things — be concise, this is a working review for a busy PM, not a full narrative critique:
+1. MISALIGNMENT ACROSS SECTIONS: where a later section doesn't follow from an earlier one (a measure with no corresponding impact, an impact with no measure, a data source that doesn't match the analysis method, etc.).
+2. REALISM: whether the number of objectives/impacts/measures/data sources is realistic for this project's likely scope and timeline (e.g. many objectives paired with many measures is often a sign of an unrealistically broad plan).
+3. RELEVANCE: whether the plan is measuring only what actually matters to the stated impacts, rather than collecting data that doesn't serve a clear purpose.
+
+${filled.join('\n')}
+
+Format your response as three short labeled sections — "Misalignment," "Realism," "Relevance" — each with 0–3 concise one-sentence bullet points. Omit a section entirely if there's nothing to flag in it; do not pad with "no concerns" bullets.
+
+End your response with a section titled exactly "ACTION ITEMS FOR THE PM:" followed by 0–4 bullet points (each one concise sentence) naming concrete follow-ups to raise with the faculty lead — or a single bullet "None identified." if there's nothing actionable.`;
   try{
-    const r = await callGuide(prompt);
+    const r = await callGuide(prompt, {maxTokens:1300});
     renderAIResponse(out, r);
     setFollowUpItems('framework', extractBulletSection(r, 'ACTION ITEMS FOR THE PM:'));
   }catch(e){
@@ -4881,6 +5014,72 @@ async function downloadProjectExcel(){
   const a = document.createElement('a');
   a.href = url;
   a.download = `${(setup.title||'Shipley-Project').replace(/\s+/g,'_')}_Project_Plan.xlsx`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+async function downloadFrameworkExcel(){
+  saveFramework();
+  const data = loadAll();
+  const fw = data.framework || {};
+  const setup = data.setup || {};
+  const wb = new ExcelJS.Workbook();
+  const ws = wb.addWorksheet('Impact Framework');
+  ws.columns = [{key:'a',width:55},{key:'b',width:35}];
+
+  function addHeader(title){
+    const row = ws.addRow([title]);
+    row.font = {bold:true,size:13,color:{argb:'FFFFFF'}};
+    row.getCell(1).fill = {type:'pattern',pattern:'solid',fgColor:{argb:'1A2744'}};
+    ws.mergeCells(row.number,1,row.number,2);
+  }
+  function addBullets(text){
+    const lines = (text||'').split('\n').map(l=>l.replace(/^[-•]\s*/,'').trim()).filter(Boolean);
+    if(!lines.length){ ws.addRow(['—']); return; }
+    lines.forEach(l=>ws.addRow(['• '+l]));
+  }
+  function addTable(rows, keys, headers){
+    const hdrRow = ws.addRow(headers);
+    hdrRow.font = {bold:true};
+    hdrRow.eachCell(cell=>{ cell.fill = {type:'pattern',pattern:'solid',fgColor:{argb:'F2F2F2'}}; });
+    const realRows = (rows||[]).filter(r=>r[keys[0]] && r[keys[0]].trim());
+    if(!realRows.length){ ws.addRow(['—','']); return; }
+    realRows.forEach(r=>ws.addRow([r[keys[0]], r[keys[1]] || '']));
+  }
+
+  ws.addRow([setup.title || 'Shipley Project']).font = {bold:true,size:15};
+  ws.addRow(['Impact Evaluation Framework']);
+  ws.addRow([]);
+
+  addHeader('1. Problems');
+  addBullets(fw.problems);
+  ws.addRow([]);
+
+  addHeader('2. Objectives');
+  addBullets(fw.objectives);
+  ws.addRow([]);
+
+  addHeader('3. Impacts');
+  addBullets(fw.impacts);
+  ws.addRow([]);
+
+  addHeader('4. Measures & Targets');
+  addTable(fw.measures_rows, ['measure','target'], ['Measure','Target']);
+  ws.addRow([]);
+
+  addHeader('5. Data Collection');
+  addTable(fw.collection_rows, ['source','freq'], ['Source','Frequency']);
+  ws.addRow([]);
+
+  addHeader('6. Data Analysis');
+  addBullets(fw.analysis);
+
+  const buffer = await wb.xlsx.writeBuffer();
+  const blob = new Blob([buffer],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `${(setup.title||'Shipley-Project').replace(/\s+/g,'_')}_Impact_Framework.xlsx`;
   a.click();
   URL.revokeObjectURL(url);
 }
@@ -5527,6 +5726,8 @@ window.addEventListener('DOMContentLoaded',()=>{
   loadFrameworkAnswers();
   renderMeasuresTable();
   renderCollectionTable();
+  renderFwGuidingHeaders();
+  renderFwAutofillButton();
   loadBudget();
   loadReport();
   renderMilestones();
