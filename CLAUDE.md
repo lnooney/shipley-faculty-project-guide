@@ -148,12 +148,14 @@ Project → Project Report.**
   Impact Framework tab or this function primes it, so without it the framework autofill
   step would silently no-op on a PM's very first import.
 
-**Intake Summary (Project Report tab)**
-- Lives on the Project Report tab (moved from Setup, Laura's explicit request) — sits as
-  its own card right above the Milestone Snapshot/Final Report mode toggle, since it's a
-  standalone document independent of which report mode is selected. `downloadIntakeSummary()`
-  reads entirely from `loadAll()` saved data, not live Setup-tab DOM state, so the move
-  was a pure HTML relocation with no logic change.
+**Intake Summary (Project Reports tab)**
+- Lives on the Project Reports tab (moved from Setup, Laura's explicit request) — it's
+  the very first card on the tab, above the Milestone Snapshot/Final Report header card
+  itself (also Laura's explicit request, moved up from originally sitting just above the
+  mode toggle), since it's a standalone document independent of which report mode is
+  selected and she wanted it to be the first thing a PM sees on the tab.
+  `downloadIntakeSummary()` reads entirely from `loadAll()` saved data, not live
+  Setup-tab DOM state, so the move was a pure HTML relocation with no logic change.
 - Generates a true `.docx` matching the Institute's official Intake Summary template
   exactly (pink `F4CCCC` shaded table headers, same fields, same BU logo) — Laura wanted
   it SharePoint-uploadable and further editable in Word, which ruled out a styled-HTML/
@@ -381,9 +383,15 @@ Project → Project Report.**
 
 **Tab nav / general layout**
 - Tab order is now **Project Setup → Impact Framework → Timeline → Budget → Project
-  Report → Ask Guide re: Project** (Project Report moved to sit right after Budget, was
-  last). Only the `<nav class="tabs">` button order changed — `switchTab()` shows/hides
-  panels by `id`, not DOM position, so the panel `<div>`s themselves didn't need to move.
+  Reports → Ask Guide re: Project** (Project Report(s) moved to sit right after Budget,
+  was last). Only the `<nav class="tabs">` button order changed — `switchTab()`
+  shows/hides panels by `id`, not DOM position, so the panel `<div>`s themselves didn't
+  need to move.
+- The tab's nav label is now **"Project Reports"** (was "Project Report") — a
+  visible-label-only swap, same pattern as the Milestones → Timeline rename: `id="tab-
+  btn-report"`, the panel's own card title ("Project Report"), `switchReportMode()`, and
+  everything else internal are unchanged. The Follow-ups card's "Go to Project Reports"
+  link label (`FOLLOWUP_SOURCE_META.report.tabLabel`) was updated to match.
 - The tab bar is sticky (`position:sticky;top:0`) with a CSS-only scroll-shadow
   affordance (paired `background-attachment: local/scroll` gradients — no JS) so it's
   obvious there's more to scroll to, without needing a wrapper element that would risk

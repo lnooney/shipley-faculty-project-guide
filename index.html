@@ -830,7 +830,7 @@ a:hover{color:var(--navy);}
   <button class="tab" role="tab" aria-selected="false" aria-controls="tab-impact" id="tab-btn-impact" onclick="switchTab('impact',this)">Impact Framework <span class="tab-check" aria-hidden="true">✓</span></button>
   <button class="tab" role="tab" aria-selected="false" aria-controls="tab-milestones" id="tab-btn-milestones" onclick="switchTab('milestones',this)">Timeline <span class="tab-check" aria-hidden="true">✓</span></button>
   <button class="tab" role="tab" aria-selected="false" aria-controls="tab-budget" id="tab-btn-budget" onclick="switchTab('budget',this)">Budget <span class="tab-check" aria-hidden="true">✓</span></button>
-  <button class="tab" role="tab" aria-selected="false" aria-controls="tab-report" id="tab-btn-report" onclick="switchTab('report',this)">Project Report <span class="tab-check" aria-hidden="true">✓</span></button>
+  <button class="tab" role="tab" aria-selected="false" aria-controls="tab-report" id="tab-btn-report" onclick="switchTab('report',this)">Project Reports <span class="tab-check" aria-hidden="true">✓</span></button>
   <button class="tab" role="tab" aria-selected="false" aria-controls="tab-guide" id="tab-btn-guide" onclick="switchTab('guide',this)">Ask Guide re: Project</button>
 </nav>
 
@@ -1663,6 +1663,22 @@ a:hover{color:var(--navy);}
 ══════════════════════════════════════════════ -->
 <div id="tab-report" class="panel" role="tabpanel" aria-labelledby="tab-btn-report">
 
+  <!-- Intake Summary -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-icon" aria-hidden="true">📄</div>
+      <div>
+        <div class="card-title">Intake Summary</div>
+        <div class="card-sub">Generate the Institute's official Intake Summary document, pre-filled from this project</div>
+      </div>
+    </div>
+    <div class="alert alert-blue" style="margin-bottom:14px;">
+      Produces a real Word (.docx) document matching the Institute's Intake Summary template exactly — review and edit it like any other Word file, then upload it to SharePoint or share it as needed.
+    </div>
+    <button class="btn-primary" onclick="downloadIntakeSummary()" id="intake-summary-btn">⬇ Download Intake Summary (.docx)</button>
+    <div id="intake-summary-status" style="margin-top:10px;"></div>
+  </div>
+
   <div class="card">
     <div class="card-header">
       <div class="card-icon">📄</div>
@@ -1681,22 +1697,6 @@ a:hover{color:var(--navy);}
       <button id="rmode-snapshot" class="active" onclick="switchReportMode('snapshot')">Milestone Snapshot</button>
       <button id="rmode-final" onclick="switchReportMode('final')">Final Report</button>
     </div>
-  </div>
-
-  <!-- Intake Summary -->
-  <div class="card">
-    <div class="card-header">
-      <div class="card-icon" aria-hidden="true">📄</div>
-      <div>
-        <div class="card-title">Intake Summary</div>
-        <div class="card-sub">Generate the Institute's official Intake Summary document, pre-filled from this project</div>
-      </div>
-    </div>
-    <div class="alert alert-blue" style="margin-bottom:14px;">
-      Produces a real Word (.docx) document matching the Institute's Intake Summary template exactly — review and edit it like any other Word file, then upload it to SharePoint or share it as needed.
-    </div>
-    <button class="btn-primary" onclick="downloadIntakeSummary()" id="intake-summary-btn">⬇ Download Intake Summary (.docx)</button>
-    <div id="intake-summary-status" style="margin-top:10px;"></div>
   </div>
 
   <!-- ── MILESTONE SNAPSHOT ── -->
@@ -4234,7 +4234,7 @@ const FOLLOWUP_SOURCE_META = {
   timeline: {label:'From Timeline Feedback', tab:'milestones', tabLabel:'Timeline'},
   framework: {label:'From Impact Framework Review', tab:'impact', tabLabel:'Impact Framework'},
   budget: {label:'From Budget Feedback', tab:'budget', tabLabel:'Budget'},
-  report: {label:'From Final Report Feedback', tab:'report', tabLabel:'Project Report'},
+  report: {label:'From Final Report Feedback', tab:'report', tabLabel:'Project Reports'},
 };
 
 // Replaces only this source's prior batch of items — so re-running one feedback function
