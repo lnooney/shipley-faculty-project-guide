@@ -830,8 +830,8 @@ a:hover{color:var(--navy);}
   <button class="tab" role="tab" aria-selected="false" aria-controls="tab-impact" id="tab-btn-impact" onclick="switchTab('impact',this)">Impact Framework <span class="tab-check" aria-hidden="true">✓</span></button>
   <button class="tab" role="tab" aria-selected="false" aria-controls="tab-milestones" id="tab-btn-milestones" onclick="switchTab('milestones',this)">Timeline <span class="tab-check" aria-hidden="true">✓</span></button>
   <button class="tab" role="tab" aria-selected="false" aria-controls="tab-budget" id="tab-btn-budget" onclick="switchTab('budget',this)">Budget <span class="tab-check" aria-hidden="true">✓</span></button>
-  <button class="tab" role="tab" aria-selected="false" aria-controls="tab-guide" id="tab-btn-guide" onclick="switchTab('guide',this)">Ask Guide re: Project</button>
   <button class="tab" role="tab" aria-selected="false" aria-controls="tab-report" id="tab-btn-report" onclick="switchTab('report',this)">Project Report <span class="tab-check" aria-hidden="true">✓</span></button>
+  <button class="tab" role="tab" aria-selected="false" aria-controls="tab-guide" id="tab-btn-guide" onclick="switchTab('guide',this)">Ask Guide re: Project</button>
 </nav>
 
 <div class="main" id="main-content">
@@ -916,22 +916,6 @@ a:hover{color:var(--navy);}
     </div>
   </div>
 
-  <!-- Intake Summary -->
-  <div class="card">
-    <div class="card-header">
-      <div class="card-icon" aria-hidden="true">📄</div>
-      <div>
-        <div class="card-title">Intake Summary</div>
-        <div class="card-sub">Generate the Institute's official Intake Summary document, pre-filled from this project</div>
-      </div>
-    </div>
-    <div class="alert alert-blue" style="margin-bottom:14px;">
-      Produces a real Word (.docx) document matching the Institute's Intake Summary template exactly — review and edit it like any other Word file, then upload it to SharePoint or share it as needed.
-    </div>
-    <button class="btn-primary" onclick="downloadIntakeSummary()" id="intake-summary-btn">⬇ Download Intake Summary (.docx)</button>
-    <div id="intake-summary-status" style="margin-top:10px;"></div>
-  </div>
-
   <!-- Project Basics -->
   <div class="card">
     <div class="card-header">
@@ -996,10 +980,10 @@ a:hover{color:var(--navy);}
       <div class="card-icon">🧾</div>
       <div>
         <div class="card-title">Proposed Budget Line Items</div>
-        <div class="card-sub">List what the proposal itself asked for — this feeds the Budget tab's tailoring</div>
+        <div class="card-sub" id="budget-lines-card-sub">List what the proposal itself asked for — this feeds the Budget tab's tailoring</div>
       </div>
     </div>
-    <div class="hint" style="margin-bottom:10px;">Enter each budget line item as the proposal states it. On the Budget tab, the guide will compare this list against the official template and flag anything that looks missing or under-budgeted.</div>
+    <div class="hint" style="margin-bottom:10px;" id="budget-lines-hint">Enter each budget line item as the proposal states it. On the Budget tab, the guide will compare this list against the official template and flag anything that looks missing or under-budgeted.</div>
     <div id="budget-line-guard"></div>
     <button class="btn-sm btn-gold" onclick="extractBudgetLinesFromProposal()" id="btn-extract-budget-lines" style="margin-bottom:10px;">Extract from proposal ↗</button>
     <div id="budget-line-entries"></div>
@@ -1699,6 +1683,22 @@ a:hover{color:var(--navy);}
     </div>
   </div>
 
+  <!-- Intake Summary -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-icon" aria-hidden="true">📄</div>
+      <div>
+        <div class="card-title">Intake Summary</div>
+        <div class="card-sub">Generate the Institute's official Intake Summary document, pre-filled from this project</div>
+      </div>
+    </div>
+    <div class="alert alert-blue" style="margin-bottom:14px;">
+      Produces a real Word (.docx) document matching the Institute's Intake Summary template exactly — review and edit it like any other Word file, then upload it to SharePoint or share it as needed.
+    </div>
+    <button class="btn-primary" onclick="downloadIntakeSummary()" id="intake-summary-btn">⬇ Download Intake Summary (.docx)</button>
+    <div id="intake-summary-status" style="margin-top:10px;"></div>
+  </div>
+
   <!-- ── MILESTONE SNAPSHOT ── -->
   <div id="report-snapshot" class="card">
     <div id="snapshot-title-preview" class="alert alert-navy" style="margin-bottom:16px;font-size:13px;line-height:1.8;"></div>
@@ -2117,6 +2117,7 @@ async function handleBudgetSheetUpload(input){
     saveAll(data);
     renderBudgetSheetStatus();
     updateBudgetTailorGuard();
+    updateBudgetLineGuard();
   }catch(e){
     statusEl.innerHTML = `<span style="color:var(--red);">Couldn't read that spreadsheet — please check the file and try again.</span>`;
   }
@@ -2142,6 +2143,7 @@ function clearBudgetSheetUpload(){
   if(fileInput) fileInput.value = '';
   renderBudgetSheetStatus();
   updateBudgetTailorGuard();
+  updateBudgetLineGuard();
 }
 
 // ═══════════════════════════════════════════════════════
@@ -2370,11 +2372,16 @@ async function chainTabAutofills(out, filledCount, budgetTemplateSet){
 
 // Marks a field the proposal import actually wrote a value into, distinct from the
 // amber .needs-input treatment for fields that came up empty — a PM's own edit clears
-// it immediately (see the delegated input/change listener below).
+// it immediately (see the delegated input/change listener below). The id is also kept
+// in autoFilledFieldIds and persisted via saveSetup() so the marker survives a page
+// reload or a project switch, not just the live DOM until the next navigation.
+let autoFilledFieldIds = new Set();
+let setupImportCompleted = false;
 function markAutoFilled(el){
   if(!el) return;
   el.classList.remove('needs-input');
   el.classList.add('auto-filled');
+  if(el.id) autoFilledFieldIds.add(el.id);
 }
 
 function applyProposalImport(data){
@@ -2453,29 +2460,45 @@ function applyProposalImport(data){
   }
 
   updateProjectName();
+  setupImportCompleted = true;
   saveSetup();
   updateBudgetLineGuard();
-  highlightUnfilledFields();
+  applyFieldMarkers();
   return { filledCount: filled.length, budgetTemplateSet: !!(data.budget_template && BUDGET_DEFS[data.budget_template]) };
 }
 
-// Marks every field the proposal import attempts to fill but came up empty, so it's easy
-// to spot what still needs manual entry. Excludes start/end (they carry default award
-// dates, so they're never truly empty) and the tech-tools list (a repeating field where
-// "empty" isn't necessarily wrong). Clears on the PM's next interaction with that field.
+// Applies both field markers from current in-memory state: green .auto-filled for any
+// field in autoFilledFieldIds that still has a value, amber .needs-input for anything
+// still empty — but only once an import has actually run for this project
+// (setupImportCompleted), so a pristine never-imported project isn't highlighted amber
+// with no import having ever explained why. Called both right after an import and from
+// loadSetup() on every page load/project switch, so the distinction survives a reload
+// instead of only existing in the live DOM until the next navigation. Excludes start/end
+// (they carry default award dates, so they're never truly empty) and the tech-tools list
+// (a repeating field where "empty" isn't necessarily wrong). Clears on the PM's next
+// interaction with that field (see the delegated input/change listener below).
 const IMPORT_HIGHLIGHT_FIELDS = ['s-title','s-lead','s-dept','s-team','s-challenge','s-vision','s-audience','s-prior','s-media','s-data','s-workers','s-instr-design','s-ped-support'];
-function highlightUnfilledFields(){
+function applyFieldMarkers(){
   IMPORT_HIGHLIGHT_FIELDS.forEach(id=>{
     const el = document.getElementById(id);
     if(!el) return;
-    el.classList.toggle('needs-input', !el.value || !el.value.trim());
+    el.classList.remove('auto-filled','needs-input');
+    const hasValue = !!(el.value && el.value.trim());
+    if(autoFilledFieldIds.has(id) && hasValue){
+      el.classList.add('auto-filled');
+    } else if(setupImportCompleted && !hasValue){
+      el.classList.add('needs-input');
+    }
   });
 }
 ['input','change'].forEach(evt=>{
   document.addEventListener(evt, e=>{
     if(!e.target || !e.target.classList) return;
     e.target.classList.remove('needs-input');
-    e.target.classList.remove('auto-filled');
+    if(e.target.classList.contains('auto-filled')){
+      e.target.classList.remove('auto-filled');
+      if(e.target.id) autoFilledFieldIds.delete(e.target.id);
+    }
   });
 });
 
@@ -2696,34 +2719,58 @@ function removeBudgetLineEntry(i){
 
 function getBudgetLineEntries(){ return budgetLineEntries; }
 
+// Which document "Extract from proposal" reads from: the budget spreadsheet when one's
+// uploaded (the authoritative working budget document, same priority as Tailor Budget
+// gives it), otherwise the proposal narrative. Keeps the button/labels honest about
+// which source staff are about to confirm line items against.
+function updateBudgetLineExtractSource(){
+  const data = loadAll();
+  const hasSheet = !!data.budgetSheetText;
+  const btn = document.getElementById('btn-extract-budget-lines');
+  const sub = document.getElementById('budget-lines-card-sub');
+  const hint = document.getElementById('budget-lines-hint');
+  if(btn) btn.textContent = hasSheet ? 'Extract from budget spreadsheet ↗' : 'Extract from proposal ↗';
+  if(sub) sub.textContent = hasSheet
+    ? "List what the uploaded budget spreadsheet states — this feeds the Budget tab's tailoring"
+    : "List what the proposal itself asked for — this feeds the Budget tab's tailoring";
+  if(hint) hint.textContent = hasSheet
+    ? 'Enter each budget line item as the uploaded spreadsheet states it. On the Budget tab, the guide will compare this list against the official template and flag anything that looks missing or under-budgeted.'
+    : 'Enter each budget line item as the proposal states it. On the Budget tab, the guide will compare this list against the official template and flag anything that looks missing or under-budgeted.';
+}
+
 function updateBudgetLineGuard(){
   const data = loadAll();
   const guard = document.getElementById('budget-line-guard');
+  updateBudgetLineExtractSource();
   if(!guard) return;
-  guard.innerHTML = data.proposalText ? '' : `<div class="alert alert-navy" style="margin-bottom:10px;">Import a proposal above to enable "Extract from proposal" — or add line items manually below.</div>`;
+  const ready = data.budgetSheetText ? true : !!data.proposalText;
+  guard.innerHTML = ready ? '' : `<div class="alert alert-navy" style="margin-bottom:10px;">Import a proposal above to enable "Extract from proposal" — or add line items manually below.</div>`;
 }
 
 async function extractBudgetLinesFromProposal(){
   const btn = document.getElementById('btn-extract-budget-lines');
   const guard = document.getElementById('budget-line-guard');
   const data = loadAll();
-  if(!data.proposalText){
+  const hasSheet = !!data.budgetSheetText;
+  const sourceText = hasSheet ? data.budgetSheetText : data.proposalText;
+  if(!sourceText){
     updateBudgetLineGuard();
     return;
   }
   setButtonLoading(btn, true);
-  guard.innerHTML = `<div class="alert alert-blue" style="margin-bottom:10px;">Your guide is reading the proposal for budget line items…</div>`;
+  const sourceLabel = hasSheet ? 'budget spreadsheet' : 'proposal';
+  guard.innerHTML = `<div class="alert alert-blue" style="margin-bottom:10px;">Your guide is reading the ${sourceLabel} for budget line items…</div>`;
 
   const officialLabels = [...new Set([...BUDGET_DEFS['10k'].salaryRows, ...BUDGET_DEFS['25k'].salaryRows, ...BUDGET_DEFS['10k'].opRows, ...BUDGET_DEFS['25k'].opRows].map(r=>r.name))];
 
-  const prompt = `An Institute staff member needs every budget line item mentioned in the proposal text below.
+  const prompt = `An Institute staff member needs every budget line item mentioned in the ${sourceLabel} text below.
 
-Proposal text:
-${data.proposalText}
+${hasSheet ? 'Budget spreadsheet text (extracted cell-by-cell, one sheet at a time)' : 'Proposal text'}:
+${sourceText}
 
-The official Shipley budget template uses these exact line item labels: "${officialLabels.join('", "')}". Where a line item you find clearly matches one of these official labels, use that exact official label as the description instead of paraphrasing the proposal's own wording. If nothing matches, describe it briefly in your own words as the proposal states it.
+The official Shipley budget template uses these exact line item labels: "${officialLabels.join('", "')}". Where a line item you find clearly matches one of these official labels, use that exact official label as the description instead of paraphrasing the ${sourceLabel}'s own wording. If nothing matches, describe it briefly in your own words as the ${sourceLabel} states it.
 
-Always list graduate student support and undergraduate student support as separate line items — never combine them into a single "student" or "undergrad/grad" line, even if the proposal describes them together in one sentence. Use "Graduate Student" for any graduate compensation, salaried or hourly, and "Undergraduate Student (Hourly)" for undergraduate hourly work, matching each item to the correct student level.
+Always list graduate student support and undergraduate student support as separate line items — never combine them into a single "student" or "undergrad/grad" line, even if the ${sourceLabel} describes them together in one sentence or row. Use "Graduate Student" for any graduate compensation, salaried or hourly, and "Undergraduate Student (Hourly)" for undergraduate hourly work, matching each item to the correct student level.
 
 Return ONLY a valid JSON object with no other text, explanation, or markdown: {"lines": [{"description": "...", "amount": number_or_null, "category": "salary"|"operating"|null}]}. Include every distinct budget line item you can find — do not invent line items that aren't in the text. Use "salary" for personnel/stipend/compensation items, "operating" for everything else (software, supplies, travel, services), and null for category if you can't tell. Use null for amount if no dollar figure is given for that specific item.`;
 
@@ -2737,9 +2784,9 @@ Return ONLY a valid JSON object with no other text, explanation, or markdown: {"
       budgetLineEntries = lines.map(l=>({description:l.description||'', amount:(l.amount!=null?l.amount:''), category:l.category||''}));
       renderBudgetLineEntries();
       saveSetup();
-      guard.innerHTML = `<div class="alert alert-green" style="margin-bottom:10px;">${lines.length} line item${lines.length!==1?'s':''} extracted — review each one below, then add or edit as needed.</div>`;
+      guard.innerHTML = `<div class="alert alert-green" style="margin-bottom:10px;">${lines.length} line item${lines.length!==1?'s':''} extracted from the ${sourceLabel} — review each one below, then add or edit as needed.</div>`;
     } else {
-      guard.innerHTML = `<div class="alert alert-amber" style="margin-bottom:10px;">No budget line items found in the proposal text — add them manually below.</div>`;
+      guard.innerHTML = `<div class="alert alert-amber" style="margin-bottom:10px;">No budget line items found in the ${sourceLabel} text — add them manually below.</div>`;
     }
   }catch(e){
     guard.innerHTML = `<div class="alert alert-amber" style="margin-bottom:10px;">Something went wrong extracting line items — please try again or add them manually.</div>`;
@@ -2775,6 +2822,8 @@ function saveSetup(){
     availability: getAvailabilityEntries(),
     budget_lines: getBudgetLineEntries(),
     irb_notes: document.getElementById('s-irb-notes').value,
+    auto_filled_fields: Array.from(autoFilledFieldIds),
+    import_completed: setupImportCompleted,
   };
   saveAll(data);
   updateBudgetTotal();
@@ -2789,7 +2838,12 @@ function loadSetup(){
   const wd = data.worker_details || {};
   if(wd.date) document.getElementById('s-worker-date').value = wd.date;
   const s = data.setup;
-  if(!s){ showWorkerNote(); return; }
+  if(!s){
+    showWorkerNote();
+    autoFilledFieldIds = new Set();
+    setupImportCompleted = false;
+    return;
+  }
   const fields = ['title','lead','dept','team','start','end','challenge','vision','audience','prior'];
   fields.forEach(f=>{
     const el = document.getElementById('s-'+f);
@@ -2816,6 +2870,9 @@ function loadSetup(){
   renderBudgetLineEntries();
   updateBudgetLineGuard();
   updateProjectName();
+  autoFilledFieldIds = new Set(Array.isArray(s.auto_filled_fields) ? s.auto_filled_fields : []);
+  setupImportCompleted = !!s.import_completed;
+  applyFieldMarkers();
 }
 
 // ═══════════════════════════════════════════════════════

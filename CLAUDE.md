@@ -123,6 +123,18 @@ Project → Project Report.**
   previously an auto-filled field looked identical to one the PM typed by hand. Both
   markers clear the instant the PM edits that field (same delegated `input`/`change`
   listener).
+- **Both markers are persisted, not just applied to the live DOM.** They used to vanish
+  on any page reload or saved-project switch, since they were plain CSS classes never
+  written to `localStorage` and never reapplied by `loadSetup()` — confirmed by Laura
+  reporting the green/amber distinction had "been lost," and reproduced directly (a real
+  browser reload wiped every marker while field values themselves persisted correctly).
+  Fixed by persisting `auto_filled_fields` (which field IDs the Guide filled) and
+  `import_completed` (whether an import has ever run for this project) in `data.setup`,
+  tracked in memory via `autoFilledFieldIds`/`setupImportCompleted` and kept in sync by
+  the same clear-on-edit listener. `applyFieldMarkers()` (renamed from
+  `highlightUnfilledFields()`) now runs both right after an import and from `loadSetup()`
+  on every load/switch, gated by `import_completed` so a pristine project that's never
+  had an import run doesn't show amber with no import having explained why.
 - **"Import from Proposal" now chains the other three tabs' own tailor/autofill actions**
   automatically (`chainTabAutofills()`): Budget → Milestones → Impact Framework, right
   after Setup fields are filled — the PM no longer has to separately visit each tab and
@@ -136,7 +148,12 @@ Project → Project Report.**
   Impact Framework tab or this function primes it, so without it the framework autofill
   step would silently no-op on a PM's very first import.
 
-**Intake Summary (Setup tab)**
+**Intake Summary (Project Report tab)**
+- Lives on the Project Report tab (moved from Setup, Laura's explicit request) — sits as
+  its own card right above the Milestone Snapshot/Final Report mode toggle, since it's a
+  standalone document independent of which report mode is selected. `downloadIntakeSummary()`
+  reads entirely from `loadAll()` saved data, not live Setup-tab DOM state, so the move
+  was a pure HTML relocation with no logic change.
 - Generates a true `.docx` matching the Institute's official Intake Summary template
   exactly (pink `F4CCCC` shaded table headers, same fields, same BU logo) — Laura wanted
   it SharePoint-uploadable and further editable in Word, which ruled out a styled-HTML/
@@ -167,19 +184,20 @@ Project → Project Report.**
   session. If no proposal review has been run yet, each subsection shows a placeholder
   telling the PM to run "Feedback on Proposal and Scope" first, rather than a misleading
   "None identified." (which would imply a review ran and found nothing).
-- **Confirmed bug + fix:** Laura hit a download failure whose exact error text
-  confirmed `window.docx` was undefined when the button was clicked — the `docx` CDN
-  library itself never loaded in her browser (not an API-usage bug in the generation
-  code, which the earlier diagnostic-message work correctly surfaced). Fixed with an
-  `onerror` handler on the `docx` `<script>` tag that automatically retries from a
-  second CDN host (unpkg, serving the identical npm package) if the primary
-  (cdn.jsdelivr.net) fails to load — addresses "this CDN host is blocked/unreachable
-  for this user" without needing to know the exact reason it failed. Verified the
-  fallback fires and succeeds when the primary is blocked, and stays completely
-  dormant (no wasted request) when the primary loads normally. If a `.docx` download
-  ever fails again, `docxLibraryReady()`/`docxErrorMessage()` (used by both
-  `downloadIntakeSummary()` and `downloadReportDocx()`) will say plainly whether the
-  library failed to load at all vs. some other error — check that message first.
+- **Download bug — still unresolved after two fix attempts, see "Open items" below.**
+  Laura's exact error text confirmed `window.docx` was undefined when the button was
+  clicked — the `docx` library itself never loaded (not an API-usage bug in the
+  generation code, which the earlier diagnostic-message work correctly surfaced). Added
+  an `onerror` handler on the `docx` `<script>` tag that retries from a second CDN host
+  (unpkg) if the primary (cdn.jsdelivr.net) fails to load. Laura then hit the download
+  again and got the **exact same generic error text** — meaning either both CDN hosts
+  are failing for her, or (more likely, since `onerror` only fires on an actual load
+  failure) the script is loading successfully but not exposing `window.docx` the way
+  the code expects, which a load-failure fallback can never catch. Not yet fixed —
+  needs real diagnostic data (see "Open items") before attempting another change here.
+  `docxLibraryReady()`/`docxErrorMessage()` (used by both `downloadIntakeSummary()` and
+  `downloadReportDocx()`) still correctly distinguish "library didn't load" from other
+  errors — that part of the earlier work holds up.
 
 **Proposal review rubric (Setup tab)**
 - Backend AI-scored, not a manual UI — 7 weighted criteria plus an eligibility screen
@@ -225,6 +243,17 @@ Project → Project Report.**
   Proposal" as a second source alongside the proposal text. When the spreadsheet and the
   proposal narrative disagree on an amount for the same row, the spreadsheet wins — it's
   the authoritative working budget document, prose isn't.
+- The Setup tab's own "Extract from proposal" line-item button (in the "Proposed Budget
+  Line Items" card) now sources from the uploaded budget spreadsheet instead of the
+  proposal narrative whenever one's uploaded — button label, card subtitle, and hint text
+  (`updateBudgetLineExtractSource()`) all switch to say "budget spreadsheet" so it's clear
+  which document staff are confirming lines against, and revert automatically if the
+  spreadsheet is later removed. This exists because, with both a spreadsheet and
+  proposal-derived Setup line items in play, Tailor Budget was treating both as
+  "confirmed" sources that could describe the same payment differently — a plausible
+  contributor to a reported false budget-overage discrepancy. Sourcing the Setup
+  extraction from whichever single document is authoritative removes that two-source
+  conflict at the root, rather than just resolving it downstream in the tailoring prompt.
 - Tailor Budget only ever writes a dollar amount into the budget when it's copying a
   figure actually stated somewhere (confirmed proposal line item or proposal text
   verbatim) — never an AI estimate. Anything inferred becomes a "Suggested amount" flag
@@ -351,6 +380,10 @@ Project → Project Report.**
   exact-caps-over-vague-adjectives principle used throughout this tool.
 
 **Tab nav / general layout**
+- Tab order is now **Project Setup → Impact Framework → Timeline → Budget → Project
+  Report → Ask Guide re: Project** (Project Report moved to sit right after Budget, was
+  last). Only the `<nav class="tabs">` button order changed — `switchTab()` shows/hides
+  panels by `id`, not DOM position, so the panel `<div>`s themselves didn't need to move.
 - The tab bar is sticky (`position:sticky;top:0`) with a CSS-only scroll-shadow
   affordance (paired `background-attachment: local/scroll` gradients — no JS) so it's
   obvious there's more to scroll to, without needing a wrapper element that would risk
@@ -369,8 +402,20 @@ Project → Project Report.**
 
 ## Open items — not yet done, don't lose these
 
-None currently. See "Design decisions and why," below (Intake Summary section), for the
-Intake Summary download bug's confirmed root cause and fix.
+1. **Intake Summary (.docx) download — still failing after two fix attempts.** Laura's
+   exact error text ("The Word document library didn't load...") was identical both
+   before and after adding a CDN fallback (jsdelivr → unpkg) for the `docx` library —
+   meaning the fallback didn't change the outcome. Since that fallback only triggers on
+   an actual script load failure, the same recurring message is a strong signal the real
+   cause might not be a blocked/failed request at all, but the script loading
+   successfully without exposing `window.docx` the way the generation code expects
+   (would explain why a second CDN host made no difference). Can't be tested locally —
+   both cdn.jsdelivr.net and unpkg.com are blocked from this sandbox's network policy, so
+   this feature has only ever run against a hand-built mock of the library, never the
+   real one. **Asked Laura** to open browser DevTools → Network tab, retry the download,
+   and report the actual status of the request to
+   `cdn.jsdelivr.net/npm/docx@8/build/index.js` (200 / 404 / blocked / etc.) — that's
+   needed before attempting another fix here, rather than guessing a third time.
 
 ## Future direction (discussed before, details not preserved)
 
