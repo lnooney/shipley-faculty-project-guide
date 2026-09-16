@@ -78,6 +78,14 @@ Project → Project Report.**
   lines become `<ol><li>`. Fixing formatting for the whole tool only ever requires
   touching this one function — no need to rewrite every prompt's phrasing to get
   consistent headers/bullets everywhere.
+- **Generated Word documents (.docx):** the `docx` JS library (CDN, same no-build-step
+  pattern as ExcelJS/PDF.js) builds real, SharePoint-compatible Word files client-side.
+  `BU_LOGO_BASE64` is the official Institute logo (extracted directly from Laura's Intake
+  Summary template's page header) embedded as a base64 constant and used via
+  `docxLogoParagraph()` at the top of every generated document, for a consistent
+  letterhead. Shared builders (`docxHeaderCell`, `docxFieldRow`, `docxFullWidthTable`,
+  `textToDocxParagraphs`, etc.) live just above `showGanttModal()` — reuse them for any
+  future generated document rather than hand-rolling table/paragraph construction again.
 
 ## Design decisions and why (by area)
 
@@ -90,6 +98,32 @@ Project → Project Report.**
   tells the PM to paste manually instead of quietly feeding near-empty text into the AI
   extraction call. Extraction fills the box but does not auto-run "Import from
   proposal" — the PM still reviews the extracted text and clicks it themselves.
+- **Instructional design** and **Pedagogical support** are two Project Support Needs
+  fields (same yes/maybe/no pattern and proposal-import auto-fill as Media/Data/Workers),
+  added specifically to give the Intake Summary's "Support Needs" checkboxes a real,
+  non-AI-guessed source — see Intake Summary below.
+
+**Intake Summary (Setup tab)**
+- Generates a true `.docx` matching the Institute's official Intake Summary template
+  exactly (pink `F4CCCC` shaded table headers, same fields, same BU logo) — Laura wanted
+  it SharePoint-uploadable and further editable in Word, which ruled out a styled-HTML/
+  print approach; only a real generated `.docx` behaves like a native Word file in
+  SharePoint (previews, co-authoring, version history).
+- Direct fields (title, lead, team, challenge → Teaching & Learning Challenge, vision →
+  Proposed Academic Innovation, audience → Target Learners, Impact Framework's Impacts,
+  IRB status/notes, start/end dates) come straight from existing tool data — never
+  re-derived or AI-guessed when a dedicated field already holds the answer.
+- The **Support Needs checkboxes are never AI-inferred** — each one maps to a specific
+  existing structured field, confirmed explicitly with Laura rather than assumed:
+  Instructional design/Pedagogical support ← their own fields; Technology investigation
+  ← the Technology tools list being non-empty; Other technology support ← Data &
+  Analytics; Other support ← Media (Laura's explicit call — Media doesn't get its own
+  checkbox).
+- Only the handful of fields with no dedicated home anywhere in the tool (Budget
+  Rationale, Scaling/Dissemination, Anticipated concerns/risks, Timeline flexibility,
+  Timeline risk factors, Institute support needs) go through one AI call, grounded in
+  the proposal text, Impact Framework, and Budget — same literal-JSON-template pattern
+  as everywhere else.
 
 **Proposal review rubric (Setup tab)**
 - Backend AI-scored, not a manual UI — 7 weighted criteria plus an eligibility screen
@@ -224,6 +258,13 @@ Project → Project Report.**
 - All prefilled fields use a `fill()` helper that only writes to an empty field — a PM's
   manual edit is never overwritten by re-running a prefill, and it's still tested for
   every time this area changes.
+- Both **Download as Word (.docx)** buttons (`downloadReportDocx('snapshot'|'final')`)
+  replaced a bare print-popup with a real generated Word file — same BU Institute logo
+  header as the Intake Summary, for a consistent look across all three generated
+  documents. Bulleted field content ("- " lines from task-summary prefills) renders as
+  real Word bullets via `textToDocxParagraphs()`, reusing the same bullet-vs-paragraph
+  line-detection logic as `formatAIResponse()` (on-page AI feedback) — one detection
+  approach, two output targets (HTML vs. docx), kept deliberately consistent.
 
 **Follow-ups With Your Faculty Team (Setup tab)**
 - Consolidates everything the PM needs to raise with faculty into one place, surfaced on
