@@ -167,6 +167,19 @@ Project → Project Report.**
   session. If no proposal review has been run yet, each subsection shows a placeholder
   telling the PM to run "Feedback on Proposal and Scope" first, rather than a misleading
   "None identified." (which would imply a review ran and found nothing).
+- **Confirmed bug + fix:** Laura hit a download failure whose exact error text
+  confirmed `window.docx` was undefined when the button was clicked — the `docx` CDN
+  library itself never loaded in her browser (not an API-usage bug in the generation
+  code, which the earlier diagnostic-message work correctly surfaced). Fixed with an
+  `onerror` handler on the `docx` `<script>` tag that automatically retries from a
+  second CDN host (unpkg, serving the identical npm package) if the primary
+  (cdn.jsdelivr.net) fails to load — addresses "this CDN host is blocked/unreachable
+  for this user" without needing to know the exact reason it failed. Verified the
+  fallback fires and succeeds when the primary is blocked, and stays completely
+  dormant (no wasted request) when the primary loads normally. If a `.docx` download
+  ever fails again, `docxLibraryReady()`/`docxErrorMessage()` (used by both
+  `downloadIntakeSummary()` and `downloadReportDocx()`) will say plainly whether the
+  library failed to load at all vs. some other error — check that message first.
 
 **Proposal review rubric (Setup tab)**
 - Backend AI-scored, not a manual UI — 7 weighted criteria plus an eligibility screen
@@ -356,24 +369,8 @@ Project → Project Report.**
 
 ## Open items — not yet done, don't lose these
 
-1. **Intake Summary download error — defensive fixes shipped, root cause NOT yet
-   confirmed.** Laura hit an error downloading the Intake Summary; she gave no
-   detail (exact text unknown). Code review turned up no logic bug, so the most likely
-   explanation is the `docx` CDN library failing to load or a real-library API mismatch
-   this session's own testing can never catch (the CDN is blocked in this sandbox, so
-   the whole `.docx` feature has only ever been verified against a mocked library, never
-   the real one — flagged as a known risk when that batch shipped). Shipped as a
-   same-batch stopgap: (a) the CDN reference moved from a pinned patch version
-   (`docx@8.5.0`) to a major-version-only pin (`docx@8`), reducing 404 risk if that exact
-   patch was removed; (b) both `.docx` download flows (`downloadIntakeSummary()`,
-   `downloadReportDocx()`) now detect a missing `docx` library specifically
-   (`docxLibraryReady()`/`docxErrorMessage()`) and show an actionable message instead of
-   a generic one, and surface the real error text for any other failure —
-   `downloadReportDocx()` previously had no error handling at all, a failure just
-   silently reset the button. **Still needed:** ask Laura to try the download again and
-   report the exact on-page message this time (it should now be much more specific) —
-   only then can the true root cause be confirmed and, if it's a real API-usage bug
-   rather than a load failure, fixed properly.
+None currently. See "Design decisions and why," below (Intake Summary section), for the
+Intake Summary download bug's confirmed root cause and fix.
 
 ## Future direction (discussed before, details not preserved)
 
