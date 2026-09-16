@@ -221,6 +221,14 @@ Project → Project Report.**
 - Tailor Budget must map each distinct described payment to exactly one official row —
   overlapping categories (Course Release / Faculty Stipend / Overbase) were getting the
   same payment double-counted into two rows, inflating totals.
+- When both a proposal and a budget spreadsheet are uploaded, a dollar figure that
+  appears **only** in the proposal's own narrative can never become a confirmed
+  "mapping" — it's structurally routed into "estimates" (the PM-must-confirm category)
+  instead. Only the spreadsheet or staff-confirmed Setup line items can produce a
+  mapping in that case. This replaced a softer "trust the spreadsheet over the proposal
+  narrative" prose instruction that wasn't reliably followed — a real instance of this
+  tool's own core lesson (free-text instructions in a large context block aren't
+  reliable for anything that must be followed precisely; structural constraints are).
 - The tool's official budget category names are BU's own standardized central-finance
   categories. A proposal using different wording for the same cost and getting mapped
   into the matching standard category is **correct, expected behavior** — several AI
@@ -322,6 +330,12 @@ Project → Project Report.**
   section from that feedback's response; `FOLLOWUP_SOURCE_META`'s `report` entry drives
   its card label/tab link). Each source's items are wholly replaced on every re-run of
   that feedback (not accumulated/duplicated), and items from other sources are untouched.
+- Every text source that feeds this card — Milestones investigate-questions, Budget
+  "missing" flag messages, and the "ACTION ITEMS FOR THE PM" bullets on all five
+  feedback surfaces — has an explicit word cap (**under ~15 words**) instead of vague
+  "short"/"concise" wording. Reported as hard to scan quickly when the underlying text
+  ran long even though each item was technically "one bullet"; matches the same
+  exact-caps-over-vague-adjectives principle used throughout this tool.
 
 **Tab nav / general layout**
 - The tab bar is sticky (`position:sticky;top:0`) with a CSS-only scroll-shadow
@@ -342,18 +356,24 @@ Project → Project Report.**
 
 ## Open items — not yet done, don't lose these
 
-1. **Budget tab calculator bug report — not yet investigated.** Laura reported the Guide
-   flagged a $2,725 "overage" on a submitted budget that doesn't match the actual
-   submitted materials (proposal pages 7–8) — the faculty lead's submitted budget is
-   compliant and under the cap, so the mismatch is in the tool's tracking/calculation,
-   not the proposal. Her hypothesis: either the Guide is reading from a stale/different
-   budget version, or there's a data-entry/formula error somewhere in the budget tab's
-   tracking fields. **Needs careful diagnosis before touching any code** — trace through
-   `BUDGET_DEFS`, `budgetState`, the fringe-rate math in `aibudgethelp()`'s summary
-   builder (`base`/`fringe` split logic), and `getBudgetCeiling()` to find where a
-   real submitted figure and the tool's calculated figure diverge, rather than guessing.
-   Explicitly requested for "the next batch," not this one — investigate first, do not
-   execute a fix without confirming the root cause with Laura.
+1. **Intake Summary download error — defensive fixes shipped, root cause NOT yet
+   confirmed.** Laura hit an error downloading the Intake Summary; she gave no
+   detail (exact text unknown). Code review turned up no logic bug, so the most likely
+   explanation is the `docx` CDN library failing to load or a real-library API mismatch
+   this session's own testing can never catch (the CDN is blocked in this sandbox, so
+   the whole `.docx` feature has only ever been verified against a mocked library, never
+   the real one — flagged as a known risk when that batch shipped). Shipped as a
+   same-batch stopgap: (a) the CDN reference moved from a pinned patch version
+   (`docx@8.5.0`) to a major-version-only pin (`docx@8`), reducing 404 risk if that exact
+   patch was removed; (b) both `.docx` download flows (`downloadIntakeSummary()`,
+   `downloadReportDocx()`) now detect a missing `docx` library specifically
+   (`docxLibraryReady()`/`docxErrorMessage()`) and show an actionable message instead of
+   a generic one, and surface the real error text for any other failure —
+   `downloadReportDocx()` previously had no error handling at all, a failure just
+   silently reset the button. **Still needed:** ask Laura to try the download again and
+   report the exact on-page message this time (it should now be much more specific) —
+   only then can the true root cause be confirmed and, if it's a real API-usage bug
+   rather than a load failure, fixed properly.
 
 ## Future direction (discussed before, details not preserved)
 

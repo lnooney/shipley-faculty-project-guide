@@ -7,7 +7,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
 <script src="https://cdn.jsdelivr.net/npm/exceljs@4.3.0/dist/exceljs.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/docx@8/build/index.js"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 
@@ -1771,6 +1771,7 @@ a:hover{color:var(--navy);}
       <button onclick="downloadReportDocx('snapshot')" id="rdocx-snapshot-btn" class="btn-sm">⬇ Download as Word (.docx)</button>
       <button onclick="prefillSnapshot()">Pre-fill from project data</button>
     </div>
+    <div id="rdocx-snapshot-status" style="margin-top:8px;"></div>
     <div id="snapshot-output" style="margin-top:14px;"></div>
   </div>
 
@@ -1859,6 +1860,7 @@ a:hover{color:var(--navy);}
       <button onclick="aiReportHelp()" class="btn-gold">Feedback on Final Report ↗</button>
       <button onclick="prefillReport()">Pre-fill from project data</button>
     </div>
+    <div id="rdocx-final-status" style="margin-top:8px;"></div>
     <div id="report-output" style="margin-top:14px;"></div>
   </div>
 
@@ -3423,7 +3425,7 @@ ${taskListText}
 For each task ID, decide one of three things:
 1. "confirmed" — the proposal or the scoping information above clearly supports or implies this task applies to this project.
 2. "not_relevant" — the proposal or the scoping information above makes clear this task does not apply to this project (e.g., no mention of student workers at all, no digital tools involved, no plans for a second pilot).
-3. Ambiguous — neither the proposal nor the scoping information above clearly addresses whether this applies, but it's a common and important task for Shipley projects generally, so a human should be asked rather than the task being silently dropped or kept. Group related ambiguous task IDs together into ONE question wherever they belong together (e.g., all the Hiring-group tasks under one "will this project need to hire student workers?" question) — do not ask a separate question per task when several tasks share the same underlying yes/no decision. Word each question so a "yes" means "add these tasks to the plan" and a "no" means "these tasks don't apply." Never ask about something already answered in the scoping information above — resolve it into "confirmed" or "not_relevant" instead.
+3. Ambiguous — neither the proposal nor the scoping information above clearly addresses whether this applies, but it's a common and important task for Shipley projects generally, so a human should be asked rather than the task being silently dropped or kept. Group related ambiguous task IDs together into ONE question wherever they belong together (e.g., all the Hiring-group tasks under one "will this project need to hire student workers?" question) — do not ask a separate question per task when several tasks share the same underlying yes/no decision. Word each question so a "yes" means "add these tasks to the plan" and a "no" means "these tasks don't apply." Never ask about something already answered in the scoping information above — resolve it into "confirmed" or "not_relevant" instead. Keep each question to one short sentence, under ~15 words — a PM needs to scan this in a few seconds, not read a paragraph.
 
 Special case — iteration tasks: "Develop plan for second iteration" and "Plan and implement second pilot (if applicable)" (Reflect, Iterate & Scale), and "Analyze second iteration data" (Analyze & Share Findings), default to "not_relevant" unless the proposal explicitly stipulates a second iteration or pilot. Do not confirm them on a vague or generic basis, and do not raise them as an investigate question either — silence on iteration means "not_relevant" for these three specifically.
 
@@ -4022,9 +4024,11 @@ Official template rows (every row must be addressed):
 ${rowsText}
 
 For each official template row:
-1. If a line item clearly maps to it AND an explicit dollar amount was stated for it — either in the confirmed budget line items above, the uploaded budget spreadsheet, or directly in the full proposal text — include it in "mappings" with that EXACT amount. Copy it precisely; never adjust, round, or re-estimate a dollar figure that was actually stated somewhere. If the same row has different amounts in the budget spreadsheet and the proposal text, use the budget spreadsheet's amount — it is the authoritative working budget document.
-2. If a line item clearly maps to it but no explicit dollar amount is stated anywhere for it, include it in "estimates" with your best-estimate TOTAL amount for that row across the whole award. This will never be entered directly into the budget — it will only be shown to the staff member as a suggested figure to confirm with the faculty lead, so estimate confidently.
-3. If nothing addresses this row, but it is a commonly needed cost for a Shipley project of this scope, add a flag with type "missing" and a short question the staff member should raise with the faculty lead.
+1. If a line item clearly maps to it AND an explicit dollar amount was stated for it, include it in "mappings" with that EXACT amount — but only if the amount comes from a source you're allowed to treat as confirmed for this proposal:
+   - ${data.budgetSheetText ? 'A budget spreadsheet WAS uploaded for this proposal. In this case, ONLY an amount from the confirmed budget line items above or from the uploaded spreadsheet counts as confirmed. An amount that appears ONLY in the proposal\'s own narrative text — with no matching or corroborating figure in the spreadsheet — is NOT a confirmed mapping, even if clearly and unambiguously stated; treat it as unconfirmed per rule 2 below ("estimates") instead. The spreadsheet is the actual working budget document and proposal narratives frequently go stale or diverge from it — never let a narrative-only figure become a mapping when a spreadsheet is present.' : 'No budget spreadsheet was uploaded for this proposal. In this case, an explicit amount stated in the confirmed budget line items above or directly in the full proposal text is confirmed and may be used as a mapping.'}
+   Copy the confirmed amount precisely; never adjust, round, or re-estimate a dollar figure that was actually stated somewhere. If the same row has different amounts in the budget spreadsheet and the proposal text, use the budget spreadsheet's amount — it is the authoritative working budget document.
+2. If a line item clearly maps to it but no dollar amount from an allowed source (per rule 1 above) is available for it, include it in "estimates" with your best-estimate TOTAL amount for that row across the whole award. This will never be entered directly into the budget — it will only be shown to the staff member as a suggested figure to confirm with the faculty lead, so estimate confidently. This includes any amount that was disqualified from "mappings" by rule 1 above (e.g., a proposal-narrative-only figure when a spreadsheet is present) — use it as the basis for your estimate rather than ignoring it.
+3. If nothing addresses this row, but it is a commonly needed cost for a Shipley project of this scope, add a flag with type "missing" and a short question the staff member should raise with the faculty lead — one short sentence, under ~15 words.
 4. If a line item does map to this row with an explicit stated amount (item 1) but the dollar amount looks too low for what is actually needed to accomplish what's described, add a flag with type "under_budgeted" (in addition to the mapping) — no explanation needed, just the rowName and type; the message is standardized and added automatically.
 Rows that are genuinely not applicable (e.g., a generic "Other, please describe" row with nothing described) need no flag — skip them silently, do not force a flag on every row.
 
@@ -5153,7 +5157,7 @@ ${buildRubricReferenceText()}
 Project scoping information:
 ${filled.join('\n')}
 
-This feedback is for internal staff use and must be fast to scan, not narrative. Reply using EXACTLY this structure, with nothing added before, after, or between sections, and no narrative outside of it. Fill in every bracketed placeholder. Each criterion bullet is capped at ONE sentence of rationale — do not exceed it. Each of the three closing sections is capped at 3 short bullets, not prose paragraphs — one point per bullet, no more than one sentence per bullet:
+This feedback is for internal staff use and must be fast to scan, not narrative. Reply using EXACTLY this structure, with nothing added before, after, or between sections, and no narrative outside of it. Fill in every bracketed placeholder. Each criterion bullet is capped at ONE sentence of rationale, under ~15 words — do not exceed it. Each of the three closing sections is capped at 3 short bullets, not prose paragraphs — one point per bullet, under ~15 words each — a PM needs to scan this in a few seconds:
 
 ELIGIBILITY SCREEN
 - [one bullet per eligibility item from the reference list that is NOT clearly met, including every AUTO-FAIL item — state the concern plainly, and for an AUTO-FAIL item say clearly that this proposal cannot be funded as submitted, including the suggested action from the reference note if one is given. If every item is clearly met or there's no information suggesting a problem, a single bullet: "No eligibility concerns identified."]
@@ -5246,7 +5250,7 @@ ${filled.join('\n')}
 
 Format your response as three short labeled sections — "Misalignment," "Realism," "Relevance" — each with 0–3 concise one-sentence bullet points. Omit a section entirely if there's nothing to flag in it; do not pad with "no concerns" bullets.
 
-End your response with a section titled exactly "ACTION ITEMS FOR THE PM:" followed by 0–4 bullet points (each one concise sentence) naming concrete follow-ups to raise with the faculty lead — or a single bullet "None identified." if there's nothing actionable.`;
+End your response with a section titled exactly "ACTION ITEMS FOR THE PM:" followed by 0–4 bullet points (each under ~15 words — a PM needs to scan this in a few seconds) naming concrete follow-ups to raise with the faculty lead — or a single bullet "None identified." if there's nothing actionable.`;
   try{
     const r = await callGuide(prompt, {maxTokens:1300});
     renderAIResponse(out, r);
@@ -5544,6 +5548,21 @@ async function downloadDocxFile(doc, filename){
   URL.revokeObjectURL(url);
 }
 
+// The docx library loads from a CDN — if it's blocked (ad blocker, network policy,
+// offline) or fails to load in time, window.docx never appears. Checking this up front
+// gives a specific, actionable message instead of a generic "something went wrong" for
+// what's likely the single most common failure mode of the .docx download buttons.
+function docxLibraryReady(){
+  return typeof docx !== 'undefined' && !!docx.Document;
+}
+function docxErrorMessage(e){
+  if(!docxLibraryReady()){
+    return `The Word document library didn't load, so this document couldn't be generated. This is usually a network issue or a browser extension (ad blocker, privacy blocker) blocking the download. Try refreshing the page and downloading again, or temporarily disabling any content blockers for this page.`;
+  }
+  console.error(e);
+  return `Something went wrong generating this document (${e && e.message ? e.message : 'unknown error'}) — please try again. If this keeps happening, note the exact message above so it can be diagnosed.`;
+}
+
 // ── Intake Summary ──────────────────────────────────────────────────────
 // Every Support Needs checkbox is derived directly from fields already captured on
 // Setup — never AI-inferred — per Laura's mapping: Instructional design/Pedagogical
@@ -5743,7 +5762,7 @@ async function downloadIntakeSummary(){
     await downloadDocxFile(doc, `${(s.title||'Shipley-Project').replace(/\s+/g,'_')}_Intake_Summary.docx`);
     statusEl.innerHTML = `<div class="alert alert-green">Intake Summary downloaded — review every field, especially the narrative sections drafted by your guide, before sharing.</div>`;
   }catch(e){
-    statusEl.innerHTML = `<div class="alert alert-amber">Something went wrong generating the Intake Summary — please try again.</div>`;
+    statusEl.innerHTML = `<div class="alert alert-amber">${docxErrorMessage(e)}</div>`;
   }finally{
     setButtonLoading(btn, false);
   }
@@ -5913,7 +5932,7 @@ RED FLAGS — blocking issues that put the timeline at real risk (a critical tas
 YELLOW FLAGS — non-blocking risks worth watching (a task trending late, a dependency that's tight but not yet broken)
 NEXT STEPS — concrete next actions to keep the timeline on track
 
-End your response with a section titled exactly "ACTION ITEMS FOR THE PM:" followed by 0–4 bullet points (each one concise sentence) naming concrete follow-ups to raise with the faculty lead — or a single bullet "None identified." if there's nothing actionable.`;
+End your response with a section titled exactly "ACTION ITEMS FOR THE PM:" followed by 0–4 bullet points (each under ~15 words — a PM needs to scan this in a few seconds) naming concrete follow-ups to raise with the faculty lead — or a single bullet "None identified." if there's nothing actionable.`;
   try{
     const r = await callGuide(prompt);
     renderAIResponse(out, r);
@@ -6004,7 +6023,7 @@ RED FLAGS — critical issues (a clearly under-budgeted line item, a required co
 YELLOW FLAGS — non-blocking issues worth double-checking with the faculty lead
 NEXT STEPS — concrete next actions on the budget
 
-End your response with a section titled exactly "ACTION ITEMS FOR THE PM:" followed by 0–4 bullet points (each one concise sentence) naming concrete follow-ups to raise with the faculty lead — or a single bullet "None identified." if there's nothing actionable.`;
+End your response with a section titled exactly "ACTION ITEMS FOR THE PM:" followed by 0–4 bullet points (each under ~15 words — a PM needs to scan this in a few seconds) naming concrete follow-ups to raise with the faculty lead — or a single bullet "None identified." if there's nothing actionable.`;
   try{
     const r = await callGuide(prompt);
     budgetHistory.push({role:'user',content:prompt});
@@ -6053,7 +6072,7 @@ RED FLAGS — sections that need real work before this report is ready (missing,
 YELLOW FLAGS — sections that are usable but worth tightening up
 NEXT STEPS — concrete next actions to finish the report
 
-End your response with a section titled exactly "ACTION ITEMS FOR THE PM:" followed by 0–4 bullet points (each one concise sentence) naming concrete follow-ups to raise with the faculty lead — or a single bullet "None identified." if there's nothing actionable.`;
+End your response with a section titled exactly "ACTION ITEMS FOR THE PM:" followed by 0–4 bullet points (each under ~15 words — a PM needs to scan this in a few seconds) naming concrete follow-ups to raise with the faculty lead — or a single bullet "None identified." if there's nothing actionable.`;
   try{
     const r = await callGuide(prompt);
     renderAIResponse(out, r);
@@ -6114,7 +6133,9 @@ function textToDocxParagraphs(text){
 
 async function downloadReportDocx(mode){
   const btn = document.getElementById(mode==='snapshot' ? 'rdocx-snapshot-btn' : 'rdocx-final-btn');
+  const statusEl = document.getElementById(mode==='snapshot' ? 'rdocx-snapshot-status' : 'rdocx-final-status');
   if(btn) setButtonLoading(btn, true);
+  if(statusEl) statusEl.innerHTML = '';
   try{
     const data = loadAll();
     const s = data.setup||{};
@@ -6154,6 +6175,8 @@ async function downloadReportDocx(mode){
 
     const doc = new docx.Document({ sections:[{ properties:{}, children }] });
     await downloadDocxFile(doc, `${projectTitle.replace(/\s+/g,'_')}_${mode==='snapshot'?'Milestone_Snapshot':'Final_Report'}.docx`);
+  } catch(e) {
+    if(statusEl) statusEl.innerHTML = `<div class="alert alert-amber">${docxErrorMessage(e)}</div>`;
   } finally {
     if(btn) setButtonLoading(btn, false);
   }
