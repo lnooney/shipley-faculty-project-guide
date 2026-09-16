@@ -78,6 +78,15 @@ Project → Project Report.**
   lines become `<ol><li>`. Fixing formatting for the whole tool only ever requires
   touching this one function — no need to rewrite every prompt's phrasing to get
   consistent headers/bullets everywhere.
+- **Feedback prompt structure convention:** every "big" feedback prompt (Proposal
+  Review, Impact Framework Review, Timeline Feedback, Budget Feedback, Final Report
+  Feedback) now asks for the same shape — short named sections with capped bullets
+  (RED FLAGS / YELLOW FLAGS / NEXT STEPS, or topic-specific equivalents for Proposal
+  Review and Framework Review), ending in "ACTION ITEMS FOR THE PM:" — so a PM can scan
+  any of the five the same way. `formatAIResponse()` (above) only renders whatever
+  structure the AI's raw text already has; getting that structure to exist in the first
+  place is the prompt's job, not the renderer's. If a new feedback surface is ever
+  added, give it this same shape rather than inventing a new one.
 - **Generated Word documents (.docx):** the `docx` JS library (CDN, same no-build-step
   pattern as ExcelJS/PDF.js) builds real, SharePoint-compatible Word files client-side.
   `BU_LOGO_BASE64` is the official Institute logo (extracted directly from Laura's Intake
@@ -102,6 +111,30 @@ Project → Project Report.**
   fields (same yes/maybe/no pattern and proposal-import auto-fill as Media/Data/Workers),
   added specifically to give the Intake Summary's "Support Needs" checkboxes a real,
   non-AI-guessed source — see Intake Summary below.
+- Both upload fields are **drag-and-drop zones** (`#import-pdf-dropzone` /
+  `#import-budget-dropzone`), not plain `<input type="file">` elements — a plain file
+  input just looks like a small "Choose File" button, easy to miss as a drop target.
+  Dropping a file populates the same hidden `<input>` via a synthesized `DataTransfer`
+  and reuses the exact same `handleProposalPdfUpload()`/`handleBudgetSheetUpload()`
+  logic as clicking to browse — only *how* a file arrives changes.
+- A Setup field the proposal import successfully fills gets a **green `.auto-filled`
+  marker**, distinct from the existing amber `.needs-input` marker for fields that came
+  up empty (`markAutoFilled()`, called at every fill site in `applyProposalImport()`) —
+  previously an auto-filled field looked identical to one the PM typed by hand. Both
+  markers clear the instant the PM edits that field (same delegated `input`/`change`
+  listener).
+- **"Import from Proposal" now chains the other three tabs' own tailor/autofill actions**
+  automatically (`chainTabAutofills()`): Budget → Milestones → Impact Framework, right
+  after Setup fields are filled — the PM no longer has to separately visit each tab and
+  click its own button. Safe because all three already independently respect the
+  never-overwrite-a-manual-correction principle. Shows step-by-step progress text (not
+  one spinner) since this turns one click into up to 4 sequential AI calls; if the award
+  tier can't be determined from the proposal, budget tailoring is skipped with a plain
+  explanation in the final summary rather than silently doing nothing. Calling
+  `renderFwAutofillButton()` right before `autofillEntireFramework()` in the chain is
+  required — that button is only ever rendered into the DOM when the PM visits the
+  Impact Framework tab or this function primes it, so without it the framework autofill
+  step would silently no-op on a PM's very first import.
 
 **Intake Summary (Setup tab)**
 - Generates a true `.docx` matching the Institute's official Intake Summary template
@@ -124,6 +157,16 @@ Project → Project Report.**
   Timeline risk factors, Institute support needs) go through one AI call, grounded in
   the proposal text, Impact Framework, and Budget — same literal-JSON-template pattern
   as everywhere else.
+- A **"Notes" section** (not part of the official template — a deliberate addition)
+  pulls Timeline Feasibility, Red Flags, Challenges & Suggestions, and Concerns Raised
+  by the Proposal straight out of the "Feedback on Proposal and Scope" response, via the
+  existing `extractBulletSection()` helper — never re-synthesized by a fresh AI call.
+  This required persisting that response's raw text to `data.proposal_review_text` in
+  `aiScopeReview()` (it was previously only ever rendered to the DOM, never saved) so
+  the Intake Summary generator can read it later, possibly in an entirely different
+  session. If no proposal review has been run yet, each subsection shows a placeholder
+  telling the PM to run "Feedback on Proposal and Scope" first, rather than a misleading
+  "None identified." (which would imply a review ran and found nothing).
 
 **Proposal review rubric (Setup tab)**
 - Backend AI-scored, not a manual UI — 7 weighted criteria plus an eligibility screen
@@ -224,7 +267,10 @@ Project → Project Report.**
   a section with existing content (manual or otherwise) is left untouched, same
   never-overwrite principle as Budget tailoring. Intro copy was reframed around
   reviewing/refining a first draft, now that the PM can see how sections interact,
-  rather than building each one from a blank page.
+  rather than building each one from a blank page. The button itself sits in a
+  prominent highlighted gold callout at the top of the "Your Framework" card, above the
+  Problems section — not tucked below the intro paragraph in the card above it, where it
+  was easy to miss.
 - Each section's guiding sub-questions (previously hidden behind the "Answer questions
   to draft this section" toggle) now render as always-visible subheaders under the
   section header, generated from the same `FW_SUBQUESTIONS` data — the toggle/textarea
@@ -269,12 +315,13 @@ Project → Project Report.**
 **Follow-ups With Your Faculty Team (Setup tab)**
 - Consolidates everything the PM needs to raise with faculty into one place, surfaced on
   the page they land on first: unresolved "ask faculty team" investigate questions
-  (Milestones), undismissed budget flags, and now — as of the most recent batch — action
-  items automatically pulled from AI feedback across Proposal Review, Timeline Feedback,
-  Impact Framework Review, and Budget Feedback (each via `extractBulletSection()` parsing
-  a labeled bullet section from that feedback's response). Each source's items are wholly
-  replaced on every re-run of that feedback (not accumulated/duplicated), and items from
-  other sources are untouched.
+  (Milestones), undismissed budget flags, and action items automatically pulled from AI
+  feedback across all five main feedback surfaces — Proposal Review, Timeline Feedback,
+  Impact Framework Review, Budget Feedback, and (as of the most recent batch) Final
+  Report Feedback too (each via `extractBulletSection()` parsing a labeled bullet
+  section from that feedback's response; `FOLLOWUP_SOURCE_META`'s `report` entry drives
+  its card label/tab link). Each source's items are wholly replaced on every re-run of
+  that feedback (not accumulated/duplicated), and items from other sources are untouched.
 
 **Tab nav / general layout**
 - The tab bar is sticky (`position:sticky;top:0`) with a CSS-only scroll-shadow
@@ -285,92 +332,28 @@ Project → Project Report.**
   `flex-wrap:wrap`, so a header with an inline action button (currently only the "Import
   from Proposal" card's Expand button) wraps the button below the title on narrow
   screens instead of crowding it.
+- The "Milestones" tab's nav label is now **"Timeline"** — a visible-label swap only
+  (`id="tab-btn-milestones"`, `renderMilestones()`, `MILESTONE_TASKS`, and the tab's own
+  card titles like "Project Milestones & Timeline" / "Tailor Milestones to This
+  Proposal" are all unchanged). Every AI-feedback button in the tool follows a
+  consistent **"Feedback on X"** naming convention (5 top-level buttons, one per tab
+  with a main review action, plus 13 per-field buttons on Snapshot/Final Report) —
+  replaced a mix of "Ask guide", "Get X feedback", "Ask the guide for feedback" labels.
 
 ## Open items — not yet done, don't lose these
 
-1. **"Feedback on <Thing>" button relabeling — confirmed, queued, not yet executed.**
-   Every AI-feedback button across the tool gets renamed to a consistent "Feedback on X"
-   pattern. Confirmed exact labels:
-   - Setup tab (`aiScopeReview`, was "Get proposal & scoping feedback ↗"): **"Feedback on
-     Proposal and Scope ↗"** (Laura's explicit wording — not just "Feedback on Proposal")
-   - Impact Framework tab (`reviewFramework`, was "Ask guide to review ↗"): "Feedback on
-     Impact Framework ↗"
-   - Milestones tab (`aiTimelineHelp`, was "Get Timeline Feedback ↗"): "Feedback on
-     Timeline ↗"
-   - Budget tab (`aibudgethelp`, was "Ask guide about this project's budget ↗"):
-     "Feedback on Budget ↗"
-   - Final Report tab (`aiReportHelp`, was "Ask the guide for feedback on this draft ↗"):
-     "Feedback on Final Report ↗"
-   - 13 per-field `askFieldGuide()` buttons on Snapshot/Final Report (currently all say
-     "Ask guide ↗"), one per field: Snapshot → "Feedback on Overview / Goals & Changes /
-     Assessment / Dissemination / Support Needed / Timeline & Next Steps ↗"; Final Report
-     → "Feedback on Team & Roles / Goals & Objectives / Milestones / Impact / Challenges
-     / Lessons Learned / Next Steps ↗"
-   Excludes Tailor Milestones/Budget (they generate/fill data, not feedback on existing
-   content) and the two open-ended chat "Send"/"Ask" buttons. One naming overlap to note:
-   the Snapshot's "Feedback on Timeline & Next Steps" (a report field) vs. the Milestones
-   tab's own "Feedback on Timeline" (schedule feasibility) — different features, same-ish
-   name, though they're on different tabs.
-2. **Rename the "Milestones" tab to "Timeline."** Queued, not yet executed. Scope still
-   to be confirmed with Laura: at minimum the nav tab label itself (`index.html` line
-   ~816, `id="tab-btn-milestones"` — the id/internal function names like
-   `renderMilestones()`/`MILESTONE_TASKS` don't need to change, purely a visible-label
-   swap). Unclear whether she also wants the tab's own card titles relabeled too
-   ("Project Milestones & Timeline", "Tailor Milestones to This Proposal" — the latter
-   specifically names the task-tailoring feature and may read worse as "Tailor Timeline").
-   This pairs naturally with item 1 above: once this tab is called "Timeline," its
-   "Feedback on Timeline" button (item 1) becomes the obviously-correct primary label for
-   that page, the same pattern as "Feedback on Budget" on the Budget tab.
-3. **"Autofill entire framework" button — moved, IMPLEMENTED (uncommitted, held for
-   batch delivery).** Now sits prominently at the top of the "Your Framework" card
-   (above the Problems section) in a highlighted gold callout box, instead of tucked
-   below the intro paragraph in the card above. The blue "How to use this" banner text
-   was updated to match ("...button at the top of the framework below..."). This one
-   piece of code is already written and verified — do not re-implement, just include it
-   when the rest of this batch executes.
-4. **Drag-and-drop for the proposal PDF / budget spreadsheet uploads.** Laura's read:
-   most PMs won't bother clicking a plain `<input type="file">` — it just looks like a
-   small "Choose File" button, not an obvious drop target. Plan: replace both
-   `#import-pdf-file`/`#import-budget-file` inputs with a proper dashed-border drop zone
-   (icon + "Drag and drop here, or click to browse"), wired to drag/drop events that
-   extract the dropped `File` and feed it into the same `handleProposalPdfUpload()` /
-   `handleBudgetSheetUpload()` logic already in place — only the *how a file gets
-   provided* changes, not what happens after.
-5. **Setup tab: stronger visual distinction between auto-filled and needs-filling
-   fields.** Scoped to Setup tab only (Laura's explicit choice, not Impact Framework or
-   Budget/Milestones tailoring). Today, a field the proposal import successfully filled
-   looks identical to one the PM typed by hand — only empty fields get a visual marker
-   (the existing amber `.needs-input` highlight). Add a positive marker (e.g. a subtle
-   green border/badge) for fields import actually filled in, alongside the existing
-   amber treatment for the ones that came up empty.
-6. **Intake Summary: new "Notes" section pulling proposal-review content.** Not part of
-   the original official template (confirmed intentional addition with Laura, styled to
-   match — same pink header). Pulls four labeled sections straight out of the "Feedback
-   on Proposal and Scope" response (`aiScopeReview()`): Timeline Feasibility, Red Flags,
-   Challenges & Suggestions, and What Concerns Does This Proposal Raise. Two build notes:
-   (a) `aiScopeReview()`'s response text isn't currently persisted anywhere — only
-   rendered to the DOM — so it needs to be saved to `data` when that feedback runs, for
-   the Intake Summary generator to read later; (b) reuse the existing `extractBulletSection()`
-   helper (already used for the Follow-ups card) rather than writing a new parser — note
-   that for the Timeline Feasibility section specifically, `extractBulletSection()` will
-   grab the itemized "- Student worker hiring: ..." style bullets but stop before the
-   trailing non-bulleted "Overall: [...]" summary line; decide whether that's acceptable
-   or needs a small tweak when implementing.
-7. **Chain all per-tab autofills into "Import from Proposal."** Laura's rationale:
-   repetitive to make the PM separately visit Impact Framework/Budget/Milestones and
-   click each tab's own tailor/autofill button after importing. Plan: after
-   `applyProposalImport()` finishes filling Setup fields (and auto-selecting the budget
-   tier, which it already does when the AI can determine it), automatically chain
-   `tailorBudgetToProposal()` → `tailorMilestonesToProposal()` → `autofillEntireFramework()`
-   in sequence. Safe to do because all three already independently implement the
-   never-overwrite-a-manual-correction principle. Needs: (a) step-by-step progress
-   messaging in the import UI instead of one spinner, since this turns one click into 4
-   sequential AI calls (~20–40s total); (b) if the award tier can't be determined, budget
-   tailoring can't run (needs a tier selected first) — say so plainly in the final
-   summary rather than silently skipping it.
-
-None of items 3–7 have an explicit execute signal yet — Laura is still building this
-batch and has asked to hold all execution until she's given the full list.
+1. **Budget tab calculator bug report — not yet investigated.** Laura reported the Guide
+   flagged a $2,725 "overage" on a submitted budget that doesn't match the actual
+   submitted materials (proposal pages 7–8) — the faculty lead's submitted budget is
+   compliant and under the cap, so the mismatch is in the tool's tracking/calculation,
+   not the proposal. Her hypothesis: either the Guide is reading from a stale/different
+   budget version, or there's a data-entry/formula error somewhere in the budget tab's
+   tracking fields. **Needs careful diagnosis before touching any code** — trace through
+   `BUDGET_DEFS`, `budgetState`, the fringe-rate math in `aibudgethelp()`'s summary
+   builder (`base`/`fringe` split logic), and `getBudgetCeiling()` to find where a
+   real submitted figure and the tool's calculated figure diverge, rather than guessing.
+   Explicitly requested for "the next batch," not this one — investigate first, do not
+   execute a fix without confirming the root cause with Laura.
 
 ## Future direction (discussed before, details not preserved)
 

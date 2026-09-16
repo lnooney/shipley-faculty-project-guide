@@ -77,6 +77,18 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
 .ietl-logo{
   display:flex;align-items:center;gap:14px;
 }
+.file-drop-zone{
+  border:2px dashed var(--border2);border-radius:var(--radius-lg);
+  padding:20px 14px;text-align:center;cursor:pointer;
+  background:var(--bg);transition:all .15s;
+}
+.file-drop-zone:hover,.file-drop-zone:focus-visible{border-color:var(--navy);background:#fff;outline:none;}
+.file-drop-zone.drag-over{border-color:var(--gold);background:var(--gold-pale);}
+.file-drop-icon{font-size:22px;margin-bottom:6px;}
+.file-drop-text{font-size:13px;color:var(--text2);}
+.file-drop-text strong{color:var(--text);}
+.file-drop-filename{font-size:12px;color:var(--navy);margin-top:6px;font-weight:600;}
+
 .ietl-logo-mark{
   width:30px;height:30px;background:#cc0000;border-radius:3px;
   display:flex;align-items:center;justify-content:center;flex-shrink:0;
@@ -298,6 +310,9 @@ a:hover{color:var(--navy);}
 /* Marks a field the proposal import didn't find anything for, so it's easy to spot what
    still needs manual entry. Cleared the moment the PM interacts with the field. */
 .needs-input{background:var(--amber-bg)!important;border-left:3px solid var(--amber)!important;}
+/* Marks a field the proposal import successfully filled in, so it reads as distinct
+   from something the PM typed by hand. Cleared the moment the PM edits the field. */
+.auto-filled{background:var(--green-bg)!important;border-left:3px solid var(--green)!important;}
 .alert strong{font-weight:600;}
 
 /* ── IMPACT FRAMEWORK ── */
@@ -813,7 +828,7 @@ a:hover{color:var(--navy);}
 <nav class="tabs" role="tablist" aria-label="Project sections">
   <button class="tab active" role="tab" aria-selected="true" aria-controls="tab-setup" id="tab-btn-setup" onclick="switchTab('setup',this)">Project Setup</button>
   <button class="tab" role="tab" aria-selected="false" aria-controls="tab-impact" id="tab-btn-impact" onclick="switchTab('impact',this)">Impact Framework <span class="tab-check" aria-hidden="true">✓</span></button>
-  <button class="tab" role="tab" aria-selected="false" aria-controls="tab-milestones" id="tab-btn-milestones" onclick="switchTab('milestones',this)">Milestones <span class="tab-check" aria-hidden="true">✓</span></button>
+  <button class="tab" role="tab" aria-selected="false" aria-controls="tab-milestones" id="tab-btn-milestones" onclick="switchTab('milestones',this)">Timeline <span class="tab-check" aria-hidden="true">✓</span></button>
   <button class="tab" role="tab" aria-selected="false" aria-controls="tab-budget" id="tab-btn-budget" onclick="switchTab('budget',this)">Budget <span class="tab-check" aria-hidden="true">✓</span></button>
   <button class="tab" role="tab" aria-selected="false" aria-controls="tab-guide" id="tab-btn-guide" onclick="switchTab('guide',this)">Ask Guide re: Project</button>
   <button class="tab" role="tab" aria-selected="false" aria-controls="tab-report" id="tab-btn-report" onclick="switchTab('report',this)">Project Report <span class="tab-check" aria-hidden="true">✓</span></button>
@@ -862,12 +877,26 @@ a:hover{color:var(--navy);}
       <div class="grid2" style="margin-bottom:14px;">
         <div class="field">
           <label for="import-pdf-file">Upload proposal PDF (optional)</label>
-          <input type="file" id="import-pdf-file" accept="application/pdf" onchange="handleProposalPdfUpload(this)" style="width:100%;"/>
+          <div class="file-drop-zone" id="import-pdf-dropzone" tabindex="0" role="button" aria-label="Upload proposal PDF — drag and drop or click to browse"
+            onclick="document.getElementById('import-pdf-file').click()"
+            ondragover="fileDropHover(event,this)" ondragleave="fileDropUnhover(event,this)" ondrop="handleFileDrop(event,this,'pdf')"
+            onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();document.getElementById('import-pdf-file').click();}">
+            <div class="file-drop-icon" aria-hidden="true">📄</div>
+            <div class="file-drop-text"><strong>Drag and drop a PDF here</strong>, or click to browse</div>
+          </div>
+          <input type="file" id="import-pdf-file" accept="application/pdf" onchange="handleProposalPdfUpload(this)" style="display:none;"/>
           <div id="import-pdf-status" style="margin-top:6px;font-size:12.5px;line-height:1.5;"></div>
         </div>
         <div class="field">
           <label for="import-budget-file">Upload budget spreadsheet (optional)</label>
-          <input type="file" id="import-budget-file" accept=".xlsx,.xls,.xlsm" onchange="handleBudgetSheetUpload(this)" style="width:100%;"/>
+          <div class="file-drop-zone" id="import-budget-dropzone" tabindex="0" role="button" aria-label="Upload budget spreadsheet — drag and drop or click to browse"
+            onclick="document.getElementById('import-budget-file').click()"
+            ondragover="fileDropHover(event,this)" ondragleave="fileDropUnhover(event,this)" ondrop="handleFileDrop(event,this,'budget')"
+            onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();document.getElementById('import-budget-file').click();}">
+            <div class="file-drop-icon" aria-hidden="true">📊</div>
+            <div class="file-drop-text"><strong>Drag and drop a spreadsheet here</strong>, or click to browse</div>
+          </div>
+          <input type="file" id="import-budget-file" accept=".xlsx,.xls,.xlsm" onchange="handleBudgetSheetUpload(this)" style="display:none;"/>
           <div id="import-budget-status" style="margin-top:6px;font-size:12.5px;line-height:1.5;"></div>
         </div>
       </div>
@@ -1171,7 +1200,7 @@ a:hover{color:var(--navy);}
 
   <div style="display:flex;gap:10px;justify-content:flex-end;">
     <button onclick="saveSetup()" class="btn-primary">Save project setup</button>
-    <button onclick="aiScopeReview()" class="btn-gold" id="btn-scope-feedback">Get proposal &amp; scoping feedback ↗</button>
+    <button onclick="aiScopeReview()" class="btn-gold" id="btn-scope-feedback">Feedback on Proposal and Scope ↗</button>
   </div>
   <div id="scope-output" style="margin-top:16px;"></div>
 
@@ -1195,9 +1224,8 @@ a:hover{color:var(--navy);}
       This framework is the backbone of this project's impact measurement. Work through each section from top to bottom — each one builds on the last. Use the guided conversation below to think through responses before filling in the framework. This can be revisited and refined as the project evolves.
     </p>
     <div class="alert alert-blue">
-      <strong>How to use this:</strong> If you've imported the proposal, click <strong>"Autofill entire framework ↗"</strong> below for a first draft of all six sections at once. From there, your job is to review, adjust, and refine as a team — now that you can see how each section drives the next (a Measure only matters if it traces back to a stated Impact; a weak Data Collection plan undermines Analysis downstream). You can also work through any section manually using the guiding questions shown under each header. Entries are saved automatically and will inform the project's survey design, data collection plan, and final report.
+      <strong>How to use this:</strong> If you've imported the proposal, use the <strong>"Autofill entire framework ↗"</strong> button at the top of the framework below to get a first draft of all six sections at once. From there, your job is to review, adjust, and refine as a team — now that you can see how each section drives the next (a Measure only matters if it traces back to a stated Impact; a weak Data Collection plan undermines Analysis downstream). You can also work through any section manually using the guiding questions shown under each header. Entries are saved automatically and will inform the project's survey design, data collection plan, and final report.
     </div>
-    <div id="fw-autofill-row"></div>
   </div>
 
   <!-- The Framework Stack -->
@@ -1206,6 +1234,8 @@ a:hover{color:var(--navy);}
       <div class="card-icon">🗂️</div>
       <div><div class="card-title">Your Framework</div><div class="card-sub">Fill in each section from top to bottom — save often</div></div>
     </div>
+
+    <div id="fw-autofill-row"></div>
 
     <div class="fw-stack">
 
@@ -1363,7 +1393,7 @@ a:hover{color:var(--navy);}
     <div style="display:flex;gap:10px;margin-top:16px;justify-content:flex-end;">
       <button onclick="saveFramework()" class="btn-primary">Save framework</button>
       <button onclick="downloadFrameworkExcel()" class="btn-primary">⬇ Download Framework (.xlsx)</button>
-      <button onclick="reviewFramework()" class="btn-gold">Ask guide to review ↗</button>
+      <button onclick="reviewFramework()" class="btn-gold">Feedback on Impact Framework ↗</button>
     </div>
     <div id="framework-review" style="margin-top:14px;"></div>
   </div>
@@ -1558,7 +1588,7 @@ a:hover{color:var(--navy);}
 
   <!-- FIX 14: Replace timeline guide with Get Timeline Feedback button -->
   <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:8px;">
-    <button class="btn-gold" onclick="aiTimelineHelp(this)">Get Timeline Feedback ↗</button>
+    <button class="btn-gold" onclick="aiTimelineHelp(this)">Feedback on Timeline ↗</button>
   </div>
   <div id="timeline-output" style="margin-top:16px;"></div>
 
@@ -1636,7 +1666,7 @@ a:hover{color:var(--navy);}
             onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();aiBudgetChat();}"></textarea>
           <button class="btn-gold" onclick="aiBudgetChat()" style="white-space:nowrap;">Send ↗</button>
         </div>
-        <button class="btn-gold" onclick="aibudgethelp()" style="margin-top:8px;">Ask guide about this project's budget ↗</button>
+        <button class="btn-gold" onclick="aibudgethelp()" style="margin-top:8px;">Feedback on Budget ↗</button>
       </div>
     </div>
   </div>
@@ -1678,7 +1708,7 @@ a:hover{color:var(--navy);}
       <div class="prompt">Provide a brief overview of what has been accomplished to date, including any preliminary evidence of impact.</div>
       <textarea id="rs-overview" placeholder="Summarize progress so far. This will pre-populate from milestone reflections already entered." style="width:100%;min-height:90px;" oninput="saveSnapshot()"></textarea>
       <div class="field-guide-btn" id="fgb-rs-overview">
-        <button class="btn-sm btn-gold" onclick="askFieldGuide('rs-overview','Overview of project progress to date')">Ask guide ↗</button>
+        <button class="btn-sm btn-gold" onclick="askFieldGuide('rs-overview','Overview of project progress to date')">Feedback on Overview ↗</button>
         <div class="field-output" id="fout-rs-overview"></div>
       </div>
     </div>
@@ -1689,7 +1719,7 @@ a:hover{color:var(--navy);}
       <textarea id="rs-goals" placeholder="This will pre-populate from the project setup. Describe progress and any changes from the original goals." style="width:100%;min-height:90px;" oninput="saveSnapshot()"></textarea>
       <div class="prefill-note" id="pfn-rs-goals">This was pre-filled from the project setup. Please describe progress and note any changes from the original goals.</div>
       <div class="field-guide-btn" id="fgb-rs-goals">
-        <button class="btn-sm btn-gold" onclick="askFieldGuide('rs-goals','Goals and changes from original project plan')">Ask guide ↗</button>
+        <button class="btn-sm btn-gold" onclick="askFieldGuide('rs-goals','Goals and changes from original project plan')">Feedback on Goals & Changes ↗</button>
         <div class="field-output" id="fout-rs-goals"></div>
       </div>
     </div>
@@ -1700,7 +1730,7 @@ a:hover{color:var(--navy);}
       <textarea id="rs-assessment" placeholder="Assessment progress will pre-populate from the Impact Evaluation Framework. Please also describe the plan for sustaining the innovations beyond the project period." style="width:100%;min-height:90px;" oninput="saveSnapshot()"></textarea>
       <div class="prefill-note" id="pfn-rs-assessment">Assessment information has been pre-filled from the Impact Evaluation Framework. Please add the plan for sustaining the innovations beyond the project period.</div>
       <div class="field-guide-btn" id="fgb-rs-assessment">
-        <button class="btn-sm btn-gold" onclick="askFieldGuide('rs-assessment','Assessment progress and sustainability plan')">Ask guide ↗</button>
+        <button class="btn-sm btn-gold" onclick="askFieldGuide('rs-assessment','Assessment progress and sustainability plan')">Feedback on Assessment ↗</button>
         <div class="field-output" id="fout-rs-assessment"></div>
       </div>
     </div>
@@ -1710,7 +1740,7 @@ a:hover{color:var(--navy);}
       <div class="prompt">Has the faculty team presented this project or shared findings inside or outside of BU? Describe any current or future dissemination efforts.</div>
       <textarea id="rs-dissemination" placeholder="e.g. Presented work-in-progress at the Institute Showcase. Planning to submit to ISSOTL 2027…" style="width:100%;min-height:80px;" oninput="saveSnapshot()"></textarea>
       <div class="field-guide-btn" id="fgb-rs-dissemination">
-        <button class="btn-sm btn-gold" onclick="askFieldGuide('rs-dissemination','Dissemination of project findings')">Ask guide ↗</button>
+        <button class="btn-sm btn-gold" onclick="askFieldGuide('rs-dissemination','Dissemination of project findings')">Feedback on Dissemination ↗</button>
         <div class="field-output" id="fout-rs-dissemination"></div>
       </div>
     </div>
@@ -1720,7 +1750,7 @@ a:hover{color:var(--navy);}
       <div class="prompt">What support can the Institute provide to help accomplish this project's goals? (e.g., course design resources, educational technology consultation, teaching strategies)</div>
       <textarea id="rs-support" placeholder="e.g. Would benefit from a consultation on survey instrument design and guidance on statistical analysis options…" style="width:100%;min-height:80px;" oninput="saveSnapshot()"></textarea>
       <div class="field-guide-btn" id="fgb-rs-support">
-        <button class="btn-sm btn-gold" onclick="askFieldGuide('rs-support','Support needed from the Institute')">Ask guide ↗</button>
+        <button class="btn-sm btn-gold" onclick="askFieldGuide('rs-support','Support needed from the Institute')">Feedback on Support Needed ↗</button>
         <div class="field-output" id="fout-rs-support"></div>
       </div>
     </div>
@@ -1731,7 +1761,7 @@ a:hover{color:var(--navy);}
       <textarea id="rs-timeline" placeholder="This will pre-populate from the project dates and milestone task progress." style="width:100%;min-height:120px;" oninput="saveSnapshot()"></textarea>
       <div class="prefill-note" id="pfn-rs-timeline">This was pre-filled from the project setup and milestone progress. Please review and add any context about changes from the original timeline.</div>
       <div class="field-guide-btn" id="fgb-rs-timeline">
-        <button class="btn-sm btn-gold" onclick="askFieldGuide('rs-timeline','Remaining timeline and next steps')">Ask guide ↗</button>
+        <button class="btn-sm btn-gold" onclick="askFieldGuide('rs-timeline','Remaining timeline and next steps')">Feedback on Timeline & Next Steps ↗</button>
         <div class="field-output" id="fout-rs-timeline"></div>
       </div>
     </div>
@@ -1754,7 +1784,7 @@ a:hover{color:var(--navy);}
       <textarea id="r-team" placeholder="This will pre-populate from Project Setup." style="width:100%;min-height:80px;" oninput="saveReport();checkPrefillNote('r-team','pfn-r-team');checkFieldGuideBtn('r-team','fgb-r-team')"></textarea>
       <div class="prefill-note" id="pfn-r-team">This was pre-filled from the project setup. Review and edit as needed.</div>
       <div class="field-guide-btn" id="fgb-r-team">
-        <button class="btn-sm btn-gold" onclick="askFieldGuide('r-team','Project team and roles')">Ask guide ↗</button>
+        <button class="btn-sm btn-gold" onclick="askFieldGuide('r-team','Project team and roles')">Feedback on Team & Roles ↗</button>
         <div class="field-output" id="fout-r-team"></div>
       </div>
     </div>
@@ -1765,7 +1795,7 @@ a:hover{color:var(--navy);}
       <textarea id="r-goals" placeholder="This will pre-populate from Project Setup." style="width:100%;min-height:90px;" oninput="saveReport();checkPrefillNote('r-goals','pfn-r-goals');checkFieldGuideBtn('r-goals','fgb-r-goals')"></textarea>
       <div class="prefill-note" id="pfn-r-goals">This was pre-filled from the project setup. Please describe the need actually addressed and how the intervention led to improved learning for students.</div>
       <div class="field-guide-btn" id="fgb-r-goals">
-        <button class="btn-sm btn-gold" onclick="askFieldGuide('r-goals','Project goals and objectives — actual outcomes')">Ask guide ↗</button>
+        <button class="btn-sm btn-gold" onclick="askFieldGuide('r-goals','Project goals and objectives — actual outcomes')">Feedback on Goals & Objectives ↗</button>
         <div class="field-output" id="fout-r-goals"></div>
       </div>
     </div>
@@ -1776,7 +1806,7 @@ a:hover{color:var(--navy);}
       <textarea id="r-milestones" placeholder="This will pre-populate from reflections you've entered in the Milestones tab." style="width:100%;min-height:100px;" oninput="saveReport();checkPrefillNote('r-milestones','pfn-r-milestones');checkFieldGuideBtn('r-milestones','fgb-r-milestones')"></textarea>
       <div class="prefill-note" id="pfn-r-milestones">This was pre-filled from your milestone reflections. Please expand with a narrative on what was achieved and what changed from your original plan.</div>
       <div class="field-guide-btn" id="fgb-r-milestones">
-        <button class="btn-sm btn-gold" onclick="askFieldGuide('r-milestones','Milestones and outcomes achieved')">Ask guide ↗</button>
+        <button class="btn-sm btn-gold" onclick="askFieldGuide('r-milestones','Milestones and outcomes achieved')">Feedback on Milestones ↗</button>
         <div class="field-output" id="fout-r-milestones"></div>
       </div>
     </div>
@@ -1787,7 +1817,7 @@ a:hover{color:var(--navy);}
       <textarea id="r-impact" placeholder="This will pre-populate from the Impact Evaluation Framework." style="width:100%;min-height:100px;" oninput="saveReport();checkPrefillNote('r-impact','pfn-r-impact');checkFieldGuideBtn('r-impact','fgb-r-impact')"></textarea>
       <div class="prefill-note" id="pfn-r-impact">This was pre-filled from the Impact Evaluation Framework. Please describe the actual impact observed — what changed for students and instructors as a result of this project.</div>
       <div class="field-guide-btn" id="fgb-r-impact">
-        <button class="btn-sm btn-gold" onclick="askFieldGuide('r-impact','Project impact on student learning')">Ask guide ↗</button>
+        <button class="btn-sm btn-gold" onclick="askFieldGuide('r-impact','Project impact on student learning')">Feedback on Impact ↗</button>
         <div class="field-output" id="fout-r-impact"></div>
       </div>
     </div>
@@ -1797,7 +1827,7 @@ a:hover{color:var(--navy);}
       <div class="prompt">What operational or logistical challenges arose? How were they addressed?</div>
       <textarea id="r-challenges" placeholder="e.g. Vendor contract negotiations took longer than anticipated, delaying technology implementation by 6 weeks. The team addressed this by…" style="width:100%;min-height:90px;" oninput="saveReport();checkFieldGuideBtn('r-challenges','fgb-r-challenges')"></textarea>
       <div class="field-guide-btn" id="fgb-r-challenges">
-        <button class="btn-sm btn-gold" onclick="askFieldGuide('r-challenges','Challenges and how they were addressed')">Ask guide ↗</button>
+        <button class="btn-sm btn-gold" onclick="askFieldGuide('r-challenges','Challenges and how they were addressed')">Feedback on Challenges ↗</button>
         <div class="field-output" id="fout-r-challenges"></div>
       </div>
     </div>
@@ -1807,7 +1837,7 @@ a:hover{color:var(--navy);}
       <div class="prompt">What pedagogical insights emerged from this project? What worked or didn't work in the classroom? What would the faculty lead do differently in course design? What are the best practices for teaching with this innovation?</div>
       <textarea id="r-lessons" placeholder="e.g. Students engaged more deeply with the AI simulation tool when given structured reflection prompts before and after. Pairing the technology with explicit metacognitive activities significantly improved…" style="width:100%;min-height:90px;" oninput="saveReport();checkFieldGuideBtn('r-lessons','fgb-r-lessons')"></textarea>
       <div class="field-guide-btn" id="fgb-r-lessons">
-        <button class="btn-sm btn-gold" onclick="askFieldGuide('r-lessons','Pedagogical lessons learned')">Ask guide ↗</button>
+        <button class="btn-sm btn-gold" onclick="askFieldGuide('r-lessons','Pedagogical lessons learned')">Feedback on Lessons Learned ↗</button>
         <div class="field-output" id="fout-r-lessons"></div>
       </div>
     </div>
@@ -1818,7 +1848,7 @@ a:hover{color:var(--navy);}
       <textarea id="r-next" placeholder="This will pre-populate from dissemination notes if available. Describe how this project's impact will continue beyond its funding period." style="width:100%;min-height:90px;" oninput="saveReport();checkPrefillNote('r-next','pfn-r-next');checkFieldGuideBtn('r-next','fgb-r-next')"></textarea>
       <div class="prefill-note" id="pfn-r-next">This was pre-filled from dissemination notes. Please expand on how the impact of this project will continue — through scaling, adaptation, publication, or integration into ongoing practice.</div>
       <div class="field-guide-btn" id="fgb-r-next">
-        <button class="btn-sm btn-gold" onclick="askFieldGuide('r-next','Next steps and future plans beyond the project')">Ask guide ↗</button>
+        <button class="btn-sm btn-gold" onclick="askFieldGuide('r-next','Next steps and future plans beyond the project')">Feedback on Next Steps ↗</button>
         <div class="field-output" id="fout-r-next"></div>
       </div>
     </div>
@@ -1826,7 +1856,7 @@ a:hover{color:var(--navy);}
     <div style="display:flex;gap:10px;margin-top:8px;flex-wrap:wrap;">
       <button onclick="saveReport()" class="btn-primary">Save report</button>
       <button onclick="downloadReportDocx('final')" id="rdocx-final-btn" class="btn-sm">⬇ Download as Word (.docx)</button>
-      <button onclick="aiReportHelp()" class="btn-gold">Ask the guide for feedback on this draft ↗</button>
+      <button onclick="aiReportHelp()" class="btn-gold">Feedback on Final Report ↗</button>
       <button onclick="prefillReport()">Pre-fill from project data</button>
     </div>
     <div id="report-output" style="margin-top:14px;"></div>
@@ -1976,6 +2006,33 @@ function toggleImportCard(){
   body.style.display = collapsed ? 'block' : 'none';
   btn.textContent = collapsed ? 'Collapse ▲' : 'Expand ▼';
   btn.setAttribute('aria-expanded', collapsed ? 'true' : 'false');
+}
+
+// Drag-and-drop for the proposal PDF / budget spreadsheet drop zones — a plain
+// <input type="file"> looks like a small "Choose File" button, easy to miss as
+// something you can drop onto, so most PMs would never discover it. Dropping a file
+// just populates the same hidden <input> (via a synthesized DataTransfer) and reuses
+// the exact same upload handlers as clicking-to-browse — only how the file arrives changes.
+function fileDropHover(e, el){
+  e.preventDefault();
+  el.classList.add('drag-over');
+}
+function fileDropUnhover(e, el){
+  e.preventDefault();
+  el.classList.remove('drag-over');
+}
+function handleFileDrop(e, el, kind){
+  e.preventDefault();
+  el.classList.remove('drag-over');
+  const file = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
+  if(!file) return;
+  const inputId = kind==='pdf' ? 'import-pdf-file' : 'import-budget-file';
+  const input = document.getElementById(inputId);
+  const dt = new DataTransfer();
+  dt.items.add(file);
+  input.files = dt.files;
+  if(kind==='pdf') handleProposalPdfUpload(input);
+  else handleBudgetSheetUpload(input);
 }
 
 // Proposals arrive as PDFs — extract the embedded text client-side (via PDF.js) straight
@@ -2267,19 +2324,64 @@ ${text}`;
     const jsonMatch = raw.match(/\{[\s\S]*\}/);
     if(!jsonMatch) throw new Error('No JSON');
     const data = JSON.parse(jsonMatch[0]);
-    applyProposalImport(data, out);
+    const {filledCount, budgetTemplateSet} = applyProposalImport(data);
+    await chainTabAutofills(out, filledCount, budgetTemplateSet);
   }catch(e){
     out.innerHTML=`<div class="alert alert-amber"><strong>Heads up:</strong> The guide had trouble parsing the proposal automatically. Try pasting just the narrative sections (not tables or headers), or fill in the fields below manually.</div>`;
   }
 }
 
-function applyProposalImport(data, out){
+// Chains the per-tab tailoring/autofill actions right after Setup import, so the PM
+// doesn't have to separately visit Budget/Timeline/Impact Framework and click each
+// tab's own button — all three already independently respect the never-overwrite-a-
+// manual-correction principle, so it's safe to run them automatically here.
+async function chainTabAutofills(out, filledCount, budgetTemplateSet){
+  const fieldWord = `${filledCount} field${filledCount!==1?'s':''}`;
+  const step = (msg) => { out.innerHTML = `<div class="alert alert-blue">Setup fields imported (${fieldWord}) — ${msg}</div>`; };
+
+  let budgetRan = false, milestonesRan = false, frameworkRan = false;
+
+  if(budgetTemplateSet){
+    step('tailoring the budget…');
+    try{ await tailorBudgetToProposal(); budgetRan = true; }catch(e){ /* reported in summary below */ }
+  }
+
+  step('tailoring milestones…');
+  try{ await tailorMilestonesToProposal(); milestonesRan = true; }catch(e){ /* reported in summary below */ }
+
+  step('drafting the Impact Framework…');
+  renderFwAutofillButton(); // ensures #fw-autofill-btn exists even if the PM hasn't visited that tab yet
+  try{ await autofillEntireFramework(); frameworkRan = true; }catch(e){ /* reported in summary below */ }
+
+  const lines = [`<strong>Import complete —</strong> ${fieldWord} pre-filled from the proposal.`];
+  if(!budgetTemplateSet){
+    lines.push('⚠️ Budget tailoring was skipped because the award tier could not be determined from the proposal — select a tier on the Budget tab, then click "Tailor budget to this proposal."');
+  } else {
+    lines.push(budgetRan ? '💰 Budget was also tailored to this proposal — review the flags on the Budget tab.' : '⚠️ Budget tailoring did not complete — try "Tailor budget to this proposal" on the Budget tab.');
+  }
+  lines.push(milestonesRan ? '📅 Milestones were tailored to this proposal — review the Timeline tab.' : '⚠️ Milestone tailoring did not complete — try "Tailor milestones to this proposal" on the Timeline tab.');
+  lines.push(frameworkRan ? '🗂️ The Impact Framework was drafted from this proposal — review the Impact Framework tab.' : '⚠️ Impact Framework autofill did not complete — try "Autofill entire framework from proposal" on the Impact Framework tab.');
+  lines.push('Fields highlighted in green were auto-filled — please review them. Fields highlighted in amber found nothing and need manual entry.');
+
+  out.innerHTML = `<div class="alert alert-green">${lines.join('<br/>')}</div>`;
+}
+
+// Marks a field the proposal import actually wrote a value into, distinct from the
+// amber .needs-input treatment for fields that came up empty — a PM's own edit clears
+// it immediately (see the delegated input/change listener below).
+function markAutoFilled(el){
+  if(!el) return;
+  el.classList.remove('needs-input');
+  el.classList.add('auto-filled');
+}
+
+function applyProposalImport(data){
   const fields = ['title','lead','dept','team','start','end','grant','challenge','vision','audience','prior'];
   let filled=[];
   fields.forEach(f=>{
     if(data[f]!=null && data[f]!==''){
       const el=document.getElementById('s-'+f);
-      if(el){el.value=data[f];filled.push(f);}
+      if(el){el.value=data[f];filled.push(f);markAutoFilled(el);}
     }
   });
 
@@ -2305,7 +2407,7 @@ function applyProposalImport(data, out){
   // Project Support Needs & Capacity — media, data & analytics, student workers, tech tools
   if(data.media){
     const el = document.getElementById('s-media');
-    if(el){ el.value = data.media; filled.push('media'); showMediaNote(); }
+    if(el){ el.value = data.media; filled.push('media'); showMediaNote(); markAutoFilled(el); }
   }
   if(data.media_cost!=null){
     const el = document.getElementById('s-media-cost');
@@ -2315,7 +2417,7 @@ function applyProposalImport(data, out){
 
   if(data.data_needs){
     const el = document.getElementById('s-data');
-    if(el){ el.value = data.data_needs; filled.push('data_needs'); showDataNote(); }
+    if(el){ el.value = data.data_needs; filled.push('data_needs'); showDataNote(); markAutoFilled(el); }
   }
   if(data.data_cost!=null){
     const el = document.getElementById('s-data-cost');
@@ -2325,16 +2427,16 @@ function applyProposalImport(data, out){
 
   if(data.workers){
     const el = document.getElementById('s-workers');
-    if(el){ el.value = data.workers; filled.push('workers'); showWorkerNote(); syncWorkersToProjectPlan(); }
+    if(el){ el.value = data.workers; filled.push('workers'); showWorkerNote(); syncWorkersToProjectPlan(); markAutoFilled(el); }
   }
 
   if(data.instr_design){
     const el = document.getElementById('s-instr-design');
-    if(el){ el.value = data.instr_design; filled.push('instr_design'); }
+    if(el){ el.value = data.instr_design; filled.push('instr_design'); markAutoFilled(el); }
   }
   if(data.ped_support){
     const el = document.getElementById('s-ped-support');
-    if(el){ el.value = data.ped_support; filled.push('ped_support'); }
+    if(el){ el.value = data.ped_support; filled.push('ped_support'); markAutoFilled(el); }
   }
 
   if(Array.isArray(data.tech_tools) && data.tech_tools.length){
@@ -2352,13 +2454,7 @@ function applyProposalImport(data, out){
   saveSetup();
   updateBudgetLineGuard();
   highlightUnfilledFields();
-  const count=filled.length;
-  out.innerHTML=`<div class="alert alert-green">
-    <strong>Import complete —</strong> ${count} field${count!==1?'s':''} pre-filled from the proposal.
-    Review each field below, then check the <strong>Budget tab</strong> if budget figures were found.
-    ${data.budget_template?'<br/>💰 Budget figures were detected and pre-filled.':''}
-    <br/>Fields highlighted in amber below found nothing in the proposal — fill those in manually.
-  </div>`;
+  return { filledCount: filled.length, budgetTemplateSet: !!(data.budget_template && BUDGET_DEFS[data.budget_template]) };
 }
 
 // Marks every field the proposal import attempts to fill but came up empty, so it's easy
@@ -2375,7 +2471,9 @@ function highlightUnfilledFields(){
 }
 ['input','change'].forEach(evt=>{
   document.addEventListener(evt, e=>{
-    if(e.target && e.target.classList && e.target.classList.contains('needs-input')) e.target.classList.remove('needs-input');
+    if(!e.target || !e.target.classList) return;
+    e.target.classList.remove('needs-input');
+    e.target.classList.remove('auto-filled');
   });
 });
 
@@ -2893,8 +2991,11 @@ function renderFwAutofillButton(){
   if(!row) return;
   const hasProposal = !!loadAll().proposalText;
   row.innerHTML = hasProposal
-    ? `<button class="btn-sm btn-gold" onclick="autofillEntireFramework()" id="fw-autofill-btn" style="margin-top:12px;">Autofill entire framework from proposal ↗</button>
-       <div class="prefill-note hidden" id="fw-autofill-note" style="margin-top:8px;"></div>`
+    ? `<div style="background:var(--gold-pale);border:1.5px solid var(--gold);border-radius:var(--radius-lg);padding:18px 20px;margin-bottom:20px;">
+         <div style="font-size:14px;color:var(--text);line-height:1.6;margin-bottom:12px;">Get a first draft of all six sections at once, grounded in the imported proposal — then review and refine as a team.</div>
+         <button class="btn-gold" onclick="autofillEntireFramework()" id="fw-autofill-btn">Autofill entire framework from proposal ↗</button>
+         <div class="prefill-note hidden" id="fw-autofill-note" style="margin-top:10px;"></div>
+       </div>`
     : '';
 }
 
@@ -4069,9 +4170,10 @@ function extractBulletSection(text, sectionHeader){
 // questions and budget flags in the same consolidated card.
 const FOLLOWUP_SOURCE_META = {
   proposal: {label:'From Proposal Review'},
-  timeline: {label:'From Timeline Feedback', tab:'milestones', tabLabel:'Milestones'},
+  timeline: {label:'From Timeline Feedback', tab:'milestones', tabLabel:'Timeline'},
   framework: {label:'From Impact Framework Review', tab:'impact', tabLabel:'Impact Framework'},
   budget: {label:'From Budget Feedback', tab:'budget', tabLabel:'Budget'},
+  report: {label:'From Final Report Feedback', tab:'report', tabLabel:'Project Report'},
 };
 
 // Replaces only this source's prior batch of items — so re-running one feedback function
@@ -5106,6 +5208,11 @@ WHAT IMPACT WILL THIS PROJECT HAVE IF SELECTED
       ...extractBulletSection(r, 'CHALLENGES & SUGGESTIONS'),
     ];
     setFollowUpItems('proposal', items);
+    // Persisted (not just rendered) so the Intake Summary's Notes section can pull
+    // Timeline Feasibility / Red Flags / Challenges & Suggestions / Concerns later.
+    const persistData = loadAll();
+    persistData.proposal_review_text = r;
+    saveAll(persistData);
   }catch(e){
     out.innerHTML=`<div class="ai-response" style="border-left-color:var(--red);">Something went wrong — please try again.</div>`;
   }finally{ setButtonLoading(btn, false); }
@@ -5482,6 +5589,24 @@ function docxNextStepsTable(){
   ]);
 }
 
+// Not part of the official template — an intentional addition pulling proposal-review
+// content forward into the intake form, so it doesn't have to be re-derived from
+// scratch. Each subsection's bullets come straight out of the "Feedback on Proposal
+// and Scope" response via extractBulletSection(), never re-synthesized by a fresh AI call.
+function docxNotesTable(sections, placeholderText){
+  const rows = [docxHeaderRow('Notes')];
+  sections.forEach(sec=>{
+    const bulletParas = sec.bullets.length
+      ? sec.bullets.map(b=>new docx.Paragraph({bullet:{level:0}, spacing:{after:40}, children:[new docx.TextRun({text:b})]}))
+      : [new docx.Paragraph({children:[new docx.TextRun({text:placeholderText, italics:true, color:'999999'})]})];
+    rows.push(new docx.TableRow({children:[
+      docxLabelCell(sec.label, {width:{size:35,type:docx.WidthType.PERCENTAGE}}),
+      new docx.TableCell({width:{size:65,type:docx.WidthType.PERCENTAGE}, children:bulletParas})
+    ]}));
+  });
+  return docxFullWidthTable(rows);
+}
+
 async function synthesizeIntakeNarrative(){
   const data = loadAll();
   const s = data.setup || {};
@@ -5538,6 +5663,17 @@ async function downloadIntakeSummary(){
     const irbText = [irbLabels[data.irb_status]||'', s.irb_notes||''].filter(Boolean).join(' ');
     const fw = data.framework || {};
     const evalStrategies = [fw.measures, fw.collection].filter(Boolean).join(' ');
+
+    const reviewText = data.proposal_review_text || '';
+    const notesPlaceholder = reviewText
+      ? 'None identified.'
+      : 'Run "Feedback on Proposal and Scope" on the Setup tab to populate this section.';
+    const notesSections = [
+      {label:'Timeline Feasibility', bullets: extractBulletSection(reviewText, 'TIMELINE FEASIBILITY')},
+      {label:'Red Flags', bullets: extractBulletSection(reviewText, 'RED FLAGS')},
+      {label:'Challenges & Suggestions', bullets: extractBulletSection(reviewText, 'CHALLENGES & SUGGESTIONS')},
+      {label:'Concerns Raised by the Proposal', bullets: extractBulletSection(reviewText, 'WHAT CONCERNS DOES THIS PROPOSAL RAISE')},
+    ];
 
     const fields = {
       title: s.title || '[Project Name]',
@@ -5597,6 +5733,8 @@ async function downloadIntakeSummary(){
         docxFieldRow('IRB needed? If so, plan for submission', fields.irb),
         docxFieldRow('Institute support needs', fields.instituteSupport),
       ]),
+      docxSpacerParagraph(),
+      docxNotesTable(notesSections, notesPlaceholder),
       docxSpacerParagraph(),
       docxNextStepsTable(),
     ];
@@ -5764,7 +5902,18 @@ async function aiTimelineHelp(btn){
     if(inProgList.length) milestoneBreakdown += `\n  In progress: ${inProgList.join('; ')}`;
     if(notes[m]) milestoneBreakdown += `\n  Notes: ${notes[m]}`;
   });
-  const prompt = `You are a helpful guide for Institute for Excellence in Teaching & Learning staff supporting a faculty-led Shipley Academic Innovation Fund award at Boston University. An Institute staff member wants feedback on this project's timeline.\n\nTimeline status (already calculated — state this as given fact, do not recalculate or second-guess it): ${dateRange}\n\nTask status by milestone:${milestoneBreakdown}\n\nGive specific, practical feedback on timeline progress. Reference specific completed and in-progress tasks by name where relevant. Note any sequencing risks and concrete next steps. Do not reference the BU grants office or university policy. If something raises a concern that needs follow-up, flag it clearly for follow-up with the faculty lead.\n\nEnd your response with a section titled exactly "ACTION ITEMS FOR THE PM:" followed by 0–4 bullet points (each one concise sentence) naming concrete follow-ups to raise with the faculty lead — or a single bullet "None identified." if there's nothing actionable.`;
+  const prompt = `You are a helpful guide for Institute for Excellence in Teaching & Learning staff supporting a faculty-led Shipley Academic Innovation Fund award at Boston University. An Institute staff member wants feedback on this project's timeline. Do not reference the BU grants office or university policy.
+
+Timeline status (already calculated — state this as given fact, do not recalculate or second-guess it): ${dateRange}
+
+Task status by milestone:${milestoneBreakdown}
+
+Be concise — this is a working review for a busy PM, not a full narrative. Reference specific completed and in-progress tasks by name where relevant. Format your response as three short labeled sections, each with 0–3 concise one-sentence bullet points — omit a section entirely if there's nothing to flag in it, do not pad with "no concerns" bullets:
+RED FLAGS — blocking issues that put the timeline at real risk (a critical task badly behind schedule, an impossible sequencing conflict)
+YELLOW FLAGS — non-blocking risks worth watching (a task trending late, a dependency that's tight but not yet broken)
+NEXT STEPS — concrete next actions to keep the timeline on track
+
+End your response with a section titled exactly "ACTION ITEMS FOR THE PM:" followed by 0–4 bullet points (each one concise sentence) naming concrete follow-ups to raise with the faculty lead — or a single bullet "None identified." if there's nothing actionable.`;
   try{
     const r = await callGuide(prompt);
     renderAIResponse(out, r);
@@ -5844,7 +5993,18 @@ async function aibudgethelp(){
   const rem=ceiling-grand;
   summary+=`\nSalaries subtotal: $${salTotal.toFixed(2)}\nFringe benefits (tool-calculated): $${fringeTotal.toFixed(2)}\nOperating subtotal: $${opTotal.toFixed(2)}\nGrand total: $${grand.toFixed(2)}\nRemaining: $${rem.toFixed(2)}`;
 
-  const prompt=`You are a helpful guide for Institute for Excellence in Teaching & Learning staff supporting a faculty-led Shipley Academic Innovation Fund award at Boston University.\n\n${projectContext?'Project context:\n'+projectContext+'\n':''}${summary}\n\nPlease review this budget and give specific, practical feedback based on what has been entered. Only comment on what is actually present — do not flag missing items as problems unless they seem critically inconsistent with what is entered. Do not reference fringe rates as errors — they are automatically calculated by the tool using fixed institutional rates. These line item names (e.g., "Faculty Stipend," "Overbase") are BU's own standardized central-finance budget categories — do not flag or question the fact that a cost was mapped into one of these categories, even if the proposal itself used different wording for the same cost; that mapping is expected and correct. Do not reference the BU grants office or university policy. If something raises a concern that needs follow-up, flag it clearly for follow-up with the faculty lead.\n\nEnd your response with a section titled exactly "ACTION ITEMS FOR THE PM:" followed by 0–4 bullet points (each one concise sentence) naming concrete follow-ups to raise with the faculty lead — or a single bullet "None identified." if there's nothing actionable.`;
+  const prompt=`You are a helpful guide for Institute for Excellence in Teaching & Learning staff supporting a faculty-led Shipley Academic Innovation Fund award at Boston University. Do not reference the BU grants office or university policy.
+
+${projectContext?'Project context:\n'+projectContext+'\n':''}${summary}
+
+Review this budget based on what has been entered. Only comment on what is actually present — do not flag missing items as problems unless they seem critically inconsistent with what is entered. Do not reference fringe rates as errors — they are automatically calculated by the tool using fixed institutional rates. These line item names (e.g., "Faculty Stipend," "Overbase") are BU's own standardized central-finance budget categories — do not flag or question the fact that a cost was mapped into one of these categories, even if the proposal itself used different wording for the same cost; that mapping is expected and correct.
+
+Be concise — this is a working review for a busy PM, not a full narrative. Format your response as three short labeled sections, each with 0–3 concise one-sentence bullet points — omit a section entirely if there's nothing to flag in it, do not pad with "no concerns" bullets:
+RED FLAGS — critical issues (a clearly under-budgeted line item, a required cost that's missing entirely)
+YELLOW FLAGS — non-blocking issues worth double-checking with the faculty lead
+NEXT STEPS — concrete next actions on the budget
+
+End your response with a section titled exactly "ACTION ITEMS FOR THE PM:" followed by 0–4 bullet points (each one concise sentence) naming concrete follow-ups to raise with the faculty lead — or a single bullet "None identified." if there's nothing actionable.`;
   try{
     const r = await callGuide(prompt);
     budgetHistory.push({role:'user',content:prompt});
@@ -5884,10 +6044,20 @@ async function aiReportHelp(){
     out.innerHTML=`<div class="ai-response"><strong>Nothing to review yet</strong> — fill in some report fields first.</div>`;
     return;
   }
-  const prompt = `You are a helpful guide for Institute for Excellence in Teaching & Learning staff supporting a faculty-led Shipley Academic Innovation Fund award at Boston University. Review the draft project report sections below and give specific, constructive feedback on what has been written — do not comment on sections that haven't been started. Do not reference the BU grants office or university policy. If something raises a concern, flag it clearly for follow-up with the faculty lead.\n\n${goalsNote ? goalsNote+'\n\n' : ''}${filledReport.join('\n\n')}`;
+  const prompt = `You are a helpful guide for Institute for Excellence in Teaching & Learning staff supporting a faculty-led Shipley Academic Innovation Fund award at Boston University. Review the draft project report sections below — do not comment on sections that haven't been started. Do not reference the BU grants office or university policy.
+
+${goalsNote ? goalsNote+'\n\n' : ''}${filledReport.join('\n\n')}
+
+Be concise — this is a working review for a busy PM, not a full narrative. Format your response as three short labeled sections, each with 0–3 concise one-sentence bullet points — omit a section entirely if there's nothing to flag in it, do not pad with "no concerns" bullets:
+RED FLAGS — sections that need real work before this report is ready (missing, contradictory, or unsupported claims)
+YELLOW FLAGS — sections that are usable but worth tightening up
+NEXT STEPS — concrete next actions to finish the report
+
+End your response with a section titled exactly "ACTION ITEMS FOR THE PM:" followed by 0–4 bullet points (each one concise sentence) naming concrete follow-ups to raise with the faculty lead — or a single bullet "None identified." if there's nothing actionable.`;
   try{
     const r = await callGuide(prompt);
     renderAIResponse(out, r);
+    setFollowUpItems('report', extractBulletSection(r, 'ACTION ITEMS FOR THE PM:'));
   }catch(e){
     out.innerHTML=`<div class="ai-response" style="border-left-color:var(--red);">Something went wrong.</div>`;
   }
