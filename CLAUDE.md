@@ -78,6 +78,22 @@ Project → Project Report.**
   lines become `<ol><li>`. Fixing formatting for the whole tool only ever requires
   touching this one function — no need to rewrite every prompt's phrasing to get
   consistent headers/bullets everywhere.
+- **`inlineFormatAI()` auto-bolds a bullet's lead-in label**, not just literal `**bold**`
+  markdown from the AI — the short span before the first colon or em dash on a line
+  (e.g. "Budget alignment: the budget looks incomplete" → "**Budget alignment**: ...")
+  gets wrapped in `<strong>` automatically, since this function is the one shared choke
+  point every feedback surface already renders through. Skipped when the line already
+  has explicit `**bold**` (avoids double-processing), and the leading span is capped
+  short so a colon or dash appearing later in a long sentence never bolds half of it —
+  a real risk this ships mitigated for, not a hypothetical.
+- **Nested bullets (a sub-list under one bullet) were explicitly NOT added.** Laura
+  asked whether it was possible; the honest answer is it would require the AI to
+  reliably indent sub-bullets in its raw text output, which is exactly the class of
+  free-text formatting instruction this tool's own experience has shown the AI doesn't
+  follow consistently — it would render correctly only sometimes. The real example she
+  gave (a Timeline Feasibility bullet crammed with a duration, an attribution, and a
+  question) turned out to need something different: splitting one run-on bullet into
+  multiple flat bullets, not nesting — see Proposal Review rubric below.
 - **Feedback prompt structure convention:** every "big" feedback prompt (Proposal
   Review, Impact Framework Review, Timeline Feedback, Budget Feedback, Final Report
   Feedback) now asks for the same shape — short named sections with capped bullets
@@ -226,7 +242,20 @@ Project → Project Report.**
 - ELIGIBILITY SCREEN is a dedicated top section of the reply, added because auto-fail
   eligibility issues were being generated as AI context but had no guaranteed spot in the
   actual reply — they could get buried in prose and never reach the PM.
-
+- **TIMELINE FEASIBILITY's per-component bullet template was tightened** after a real
+  example bullet came back as a run-on wall of text — a duration estimate, a phase
+  breakdown with two sub-date-ranges, an attribution of who does what, and a
+  confirm-with-faculty question, all crammed into one bullet for "Technology
+  development/customization/integration." The template's `[duration estimate] — [note
+  or question]` shape had no cap on what could go into the second slot. Now each bullet
+  must hold exactly one distinct point (duration as a single figure, never a phase
+  breakdown; the second slot one short clause, never both a note and a question), with
+  an explicit escape hatch to split a genuinely multi-phase component into a second
+  bullet instead of one long one — capped at 2 bullets per component, never combining
+  two different components into the same bullet. Same principle as the tool's other
+  exact-caps-over-vague-adjectives fixes (Follow-ups word caps, etc.) — a template shape
+  with an unbounded slot will get filled with whatever fits, so the slot itself needs
+  the cap, not just a general request to "be concise."
 **Budget tab**
 - Awards are paid as a single lump sum, not by term — the whole tab was flattened from
   per-term columns to single amounts for this reason.
@@ -245,17 +274,21 @@ Project → Project Report.**
   Proposal" as a second source alongside the proposal text. When the spreadsheet and the
   proposal narrative disagree on an amount for the same row, the spreadsheet wins — it's
   the authoritative working budget document, prose isn't.
-- The Setup tab's own "Extract from proposal" line-item button (in the "Proposed Budget
-  Line Items" card) now sources from the uploaded budget spreadsheet instead of the
-  proposal narrative whenever one's uploaded — button label, card subtitle, and hint text
-  (`updateBudgetLineExtractSource()`) all switch to say "budget spreadsheet" so it's clear
-  which document staff are confirming lines against, and revert automatically if the
-  spreadsheet is later removed. This exists because, with both a spreadsheet and
-  proposal-derived Setup line items in play, Tailor Budget was treating both as
-  "confirmed" sources that could describe the same payment differently — a plausible
-  contributor to a reported false budget-overage discrepancy. Sourcing the Setup
-  extraction from whichever single document is authoritative removes that two-source
-  conflict at the root, rather than just resolving it downstream in the tailoring prompt.
+- **The Setup tab's "Proposed Budget Line Items" card has been removed entirely** — its
+  own extraction/manual-entry staging area (`budgetLineEntries`, `data.setup.budget_lines`,
+  `extractBudgetLinesFromProposal()`, etc.) was a *third* "confirmed" source Tailor Budget
+  drew from alongside the proposal narrative and the spreadsheet. Two earlier attempts to
+  fix a reported budget-overage discrepancy — spreadsheet-priority-over-narrative, then
+  sourcing this card's extraction from the spreadsheet too — narrowed the redundancy but
+  didn't eliminate it, and Laura reported the issue was still occurring. Removing the
+  card removes the redundancy at its root instead of resolving it downstream in the
+  tailoring prompt: budget line items now exist in exactly one place, the Budget tab
+  itself. `tailorBudgetToProposal()`/`updateBudgetTailorGuard()` now read only
+  `data.proposalText` and `data.budgetSheetText` — no third source, no way for the same
+  payment to be represented two different ways going into that AI call. Two copy
+  references elsewhere (the Technology tools note, the worker hire-date hint) that used
+  to point PMs at "Proposed Budget Line Items above" were updated to point at the
+  Budget tab instead.
 - Tailor Budget only ever writes a dollar amount into the budget when it's copying a
   figure actually stated somewhere (confirmed proposal line item or proposal text
   verbatim) — never an AI estimate. Anything inferred becomes a "Suggested amount" flag
@@ -382,11 +415,13 @@ Project → Project Report.**
   exact-caps-over-vague-adjectives principle used throughout this tool.
 
 **Tab nav / general layout**
-- Tab order is now **Project Setup → Impact Framework → Timeline → Budget → Project
-  Reports → Ask Guide re: Project** (Project Report(s) moved to sit right after Budget,
-  was last). Only the `<nav class="tabs">` button order changed — `switchTab()`
-  shows/hides panels by `id`, not DOM position, so the panel `<div>`s themselves didn't
-  need to move.
+- Tab order is now **Project Setup → Timeline → Budget → Impact Framework → Project
+  Reports → Ask Guide re: Project**. Project Reports moved to sit right after Budget
+  first (was last); Impact Framework then moved from 2nd position to sit right after
+  Budget too, ahead of Project Reports (both Laura's explicit requests, two separate
+  batches). Only the `<nav class="tabs">` button order changed each time —
+  `switchTab()` shows/hides panels by `id`, not DOM position, so the panel `<div>`s
+  themselves never needed to move.
 - The tab's nav label is now **"Project Reports"** (was "Project Report") — a
   visible-label-only swap, same pattern as the Milestones → Timeline rename: `id="tab-
   btn-report"`, the panel's own card title ("Project Report"), `switchReportMode()`, and

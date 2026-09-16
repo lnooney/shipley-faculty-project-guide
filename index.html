@@ -827,9 +827,9 @@ a:hover{color:var(--navy);}
 <!-- TABS -->
 <nav class="tabs" role="tablist" aria-label="Project sections">
   <button class="tab active" role="tab" aria-selected="true" aria-controls="tab-setup" id="tab-btn-setup" onclick="switchTab('setup',this)">Project Setup</button>
-  <button class="tab" role="tab" aria-selected="false" aria-controls="tab-impact" id="tab-btn-impact" onclick="switchTab('impact',this)">Impact Framework <span class="tab-check" aria-hidden="true">✓</span></button>
   <button class="tab" role="tab" aria-selected="false" aria-controls="tab-milestones" id="tab-btn-milestones" onclick="switchTab('milestones',this)">Timeline <span class="tab-check" aria-hidden="true">✓</span></button>
   <button class="tab" role="tab" aria-selected="false" aria-controls="tab-budget" id="tab-btn-budget" onclick="switchTab('budget',this)">Budget <span class="tab-check" aria-hidden="true">✓</span></button>
+  <button class="tab" role="tab" aria-selected="false" aria-controls="tab-impact" id="tab-btn-impact" onclick="switchTab('impact',this)">Impact Framework <span class="tab-check" aria-hidden="true">✓</span></button>
   <button class="tab" role="tab" aria-selected="false" aria-controls="tab-report" id="tab-btn-report" onclick="switchTab('report',this)">Project Reports <span class="tab-check" aria-hidden="true">✓</span></button>
   <button class="tab" role="tab" aria-selected="false" aria-controls="tab-guide" id="tab-btn-guide" onclick="switchTab('guide',this)">Ask Guide re: Project</button>
 </nav>
@@ -972,22 +972,6 @@ a:hover{color:var(--navy);}
       </div>
       <div class="hint">This selects the project's budget template.</div>
     </div>
-  </div>
-
-  <!-- Proposed Budget Line Items -->
-  <div class="card">
-    <div class="card-header">
-      <div class="card-icon">🧾</div>
-      <div>
-        <div class="card-title">Proposed Budget Line Items</div>
-        <div class="card-sub" id="budget-lines-card-sub">List what the proposal itself asked for — this feeds the Budget tab's tailoring</div>
-      </div>
-    </div>
-    <div class="hint" style="margin-bottom:10px;" id="budget-lines-hint">Enter each budget line item as the proposal states it. On the Budget tab, the guide will compare this list against the official template and flag anything that looks missing or under-budgeted.</div>
-    <div id="budget-line-guard"></div>
-    <button class="btn-sm btn-gold" onclick="extractBudgetLinesFromProposal()" id="btn-extract-budget-lines" style="margin-bottom:10px;">Extract from proposal ↗</button>
-    <div id="budget-line-entries"></div>
-    <button class="btn-sm" onclick="addBudgetLineEntry()" style="margin-top:4px;">+ Add line item</button>
   </div>
 
   <!-- Vision & Goals -->
@@ -1135,7 +1119,7 @@ a:hover{color:var(--navy);}
 
     <div class="section-label" style="margin-top:14px;">Technology <a href="#" class="service-link" aria-label="Learn more about technology support (link coming soon)" onclick="return false;" title="Link coming soon">Learn more ↗</a></div>
 
-    <div class="alert alert-navy" style="margin-bottom:8px;">Each tool will appear as its own set of considerations below. If the proposal includes a cost for it, add that as a line item in Proposed Budget Line Items above.</div>
+    <div class="alert alert-navy" style="margin-bottom:8px;">Each tool will appear as its own set of considerations below. If the proposal includes a cost for it, add that amount on the Budget tab.</div>
     <div id="tech-tool-entries"></div>
     <button class="btn-sm" onclick="addTechToolEntry()" style="margin-bottom:12px;">+ Add tool</button>
 
@@ -1172,7 +1156,7 @@ a:hover{color:var(--navy);}
         <label>Target hire date</label>
         <input type="date" id="s-worker-date" style="width:100%;"
           onchange="syncWorkersToProjectPlan()"/>
-        <div class="hint">Adds a hiring task to Milestone 1 with this deadline. If the proposal includes a cost for this position, add it as a line item in Proposed Budget Line Items above.</div>
+        <div class="hint">Adds a hiring task to Milestone 1 with this deadline. If the proposal includes a cost for this position, add that amount on the Budget tab.</div>
       </div>
     </div>
 
@@ -2117,7 +2101,6 @@ async function handleBudgetSheetUpload(input){
     saveAll(data);
     renderBudgetSheetStatus();
     updateBudgetTailorGuard();
-    updateBudgetLineGuard();
   }catch(e){
     statusEl.innerHTML = `<span style="color:var(--red);">Couldn't read that spreadsheet — please check the file and try again.</span>`;
   }
@@ -2143,7 +2126,6 @@ function clearBudgetSheetUpload(){
   if(fileInput) fileInput.value = '';
   renderBudgetSheetStatus();
   updateBudgetTailorGuard();
-  updateBudgetLineGuard();
 }
 
 // ═══════════════════════════════════════════════════════
@@ -2462,7 +2444,6 @@ function applyProposalImport(data){
   updateProjectName();
   setupImportCompleted = true;
   saveSetup();
-  updateBudgetLineGuard();
   applyFieldMarkers();
   return { filledCount: filled.length, budgetTemplateSet: !!(data.budget_template && BUDGET_DEFS[data.budget_template]) };
 }
@@ -2683,118 +2664,6 @@ function removeAvailabilityEntry(i){
 
 function getAvailabilityEntries(){ return availabilityEntries; }
 
-// ── Proposed budget line items ────────────────────────────────────────
-let budgetLineEntries = [];
-
-function renderBudgetLineEntries(){
-  const container = document.getElementById('budget-line-entries');
-  if(!container) return;
-  if(budgetLineEntries.length===0) budgetLineEntries.push({description:'',amount:'',category:''});
-  container.innerHTML = budgetLineEntries.map((e,i)=>`
-    <div class="entry-row">
-      <input type="text" placeholder="Line item description" value="${(e.description||'').replace(/"/g,'&quot;')}"
-        oninput="budgetLineEntries[${i}].description=this.value;saveSetup();" style="flex:2;"/>
-      <input type="number" min="0" step="50" placeholder="$ amount" value="${e.amount!==''&&e.amount!=null?e.amount:''}"
-        oninput="budgetLineEntries[${i}].amount=this.value;saveSetup();" style="flex:1;min-width:110px;"/>
-      <select onchange="budgetLineEntries[${i}].category=this.value;saveSetup();" style="flex:1;min-width:150px;">
-        <option value="" ${!e.category?'selected':''}>Category…</option>
-        <option value="salary" ${e.category==='salary'?'selected':''}>Salary / Personnel</option>
-        <option value="operating" ${e.category==='operating'?'selected':''}>Operating</option>
-      </select>
-      <button class="remove-btn" onclick="removeBudgetLineEntry(${i})" aria-label="Remove">✕</button>
-    </div>`).join('');
-}
-
-function addBudgetLineEntry(){
-  budgetLineEntries.push({description:'',amount:'',category:''});
-  renderBudgetLineEntries();
-}
-
-function removeBudgetLineEntry(i){
-  budgetLineEntries.splice(i,1);
-  if(budgetLineEntries.length===0) budgetLineEntries.push({description:'',amount:'',category:''});
-  renderBudgetLineEntries();
-  saveSetup();
-}
-
-function getBudgetLineEntries(){ return budgetLineEntries; }
-
-// Which document "Extract from proposal" reads from: the budget spreadsheet when one's
-// uploaded (the authoritative working budget document, same priority as Tailor Budget
-// gives it), otherwise the proposal narrative. Keeps the button/labels honest about
-// which source staff are about to confirm line items against.
-function updateBudgetLineExtractSource(){
-  const data = loadAll();
-  const hasSheet = !!data.budgetSheetText;
-  const btn = document.getElementById('btn-extract-budget-lines');
-  const sub = document.getElementById('budget-lines-card-sub');
-  const hint = document.getElementById('budget-lines-hint');
-  if(btn) btn.textContent = hasSheet ? 'Extract from budget spreadsheet ↗' : 'Extract from proposal ↗';
-  if(sub) sub.textContent = hasSheet
-    ? "List what the uploaded budget spreadsheet states — this feeds the Budget tab's tailoring"
-    : "List what the proposal itself asked for — this feeds the Budget tab's tailoring";
-  if(hint) hint.textContent = hasSheet
-    ? 'Enter each budget line item as the uploaded spreadsheet states it. On the Budget tab, the guide will compare this list against the official template and flag anything that looks missing or under-budgeted.'
-    : 'Enter each budget line item as the proposal states it. On the Budget tab, the guide will compare this list against the official template and flag anything that looks missing or under-budgeted.';
-}
-
-function updateBudgetLineGuard(){
-  const data = loadAll();
-  const guard = document.getElementById('budget-line-guard');
-  updateBudgetLineExtractSource();
-  if(!guard) return;
-  const ready = data.budgetSheetText ? true : !!data.proposalText;
-  guard.innerHTML = ready ? '' : `<div class="alert alert-navy" style="margin-bottom:10px;">Import a proposal above to enable "Extract from proposal" — or add line items manually below.</div>`;
-}
-
-async function extractBudgetLinesFromProposal(){
-  const btn = document.getElementById('btn-extract-budget-lines');
-  const guard = document.getElementById('budget-line-guard');
-  const data = loadAll();
-  const hasSheet = !!data.budgetSheetText;
-  const sourceText = hasSheet ? data.budgetSheetText : data.proposalText;
-  if(!sourceText){
-    updateBudgetLineGuard();
-    return;
-  }
-  setButtonLoading(btn, true);
-  const sourceLabel = hasSheet ? 'budget spreadsheet' : 'proposal';
-  guard.innerHTML = `<div class="alert alert-blue" style="margin-bottom:10px;">Your guide is reading the ${sourceLabel} for budget line items…</div>`;
-
-  const officialLabels = [...new Set([...BUDGET_DEFS['10k'].salaryRows, ...BUDGET_DEFS['25k'].salaryRows, ...BUDGET_DEFS['10k'].opRows, ...BUDGET_DEFS['25k'].opRows].map(r=>r.name))];
-
-  const prompt = `An Institute staff member needs every budget line item mentioned in the ${sourceLabel} text below.
-
-${hasSheet ? 'Budget spreadsheet text (extracted cell-by-cell, one sheet at a time)' : 'Proposal text'}:
-${sourceText}
-
-The official Shipley budget template uses these exact line item labels: "${officialLabels.join('", "')}". Where a line item you find clearly matches one of these official labels, use that exact official label as the description instead of paraphrasing the ${sourceLabel}'s own wording. If nothing matches, describe it briefly in your own words as the ${sourceLabel} states it.
-
-Always list graduate student support and undergraduate student support as separate line items — never combine them into a single "student" or "undergrad/grad" line, even if the ${sourceLabel} describes them together in one sentence or row. Use "Graduate Student" for any graduate compensation, salaried or hourly, and "Undergraduate Student (Hourly)" for undergraduate hourly work, matching each item to the correct student level.
-
-Return ONLY a valid JSON object with no other text, explanation, or markdown: {"lines": [{"description": "...", "amount": number_or_null, "category": "salary"|"operating"|null}]}. Include every distinct budget line item you can find — do not invent line items that aren't in the text. Use "salary" for personnel/stipend/compensation items, "operating" for everything else (software, supplies, travel, services), and null for category if you can't tell. Use null for amount if no dollar figure is given for that specific item.`;
-
-  try{
-    const raw = await callGuide(prompt, {skipCtx:true, maxTokens:1500});
-    const jsonMatch = raw.match(/\{[\s\S]*\}/);
-    if(!jsonMatch) throw new Error('No JSON');
-    const parsed = JSON.parse(jsonMatch[0]);
-    const lines = Array.isArray(parsed.lines) ? parsed.lines : [];
-    if(lines.length){
-      budgetLineEntries = lines.map(l=>({description:l.description||'', amount:(l.amount!=null?l.amount:''), category:l.category||''}));
-      renderBudgetLineEntries();
-      saveSetup();
-      guard.innerHTML = `<div class="alert alert-green" style="margin-bottom:10px;">${lines.length} line item${lines.length!==1?'s':''} extracted from the ${sourceLabel} — review each one below, then add or edit as needed.</div>`;
-    } else {
-      guard.innerHTML = `<div class="alert alert-amber" style="margin-bottom:10px;">No budget line items found in the ${sourceLabel} text — add them manually below.</div>`;
-    }
-  }catch(e){
-    guard.innerHTML = `<div class="alert alert-amber" style="margin-bottom:10px;">Something went wrong extracting line items — please try again or add them manually.</div>`;
-  }finally{
-    setButtonLoading(btn, false);
-  }
-}
-
 function saveSetup(){
   const data = loadAll();
   data.touched = data.touched||{};
@@ -2820,7 +2689,6 @@ function saveSetup(){
     instr_design: document.getElementById('s-instr-design')?.value || '',
     ped_support: document.getElementById('s-ped-support')?.value || '',
     availability: getAvailabilityEntries(),
-    budget_lines: getBudgetLineEntries(),
     irb_notes: document.getElementById('s-irb-notes').value,
     auto_filled_fields: Array.from(autoFilledFieldIds),
     import_completed: setupImportCompleted,
@@ -2865,10 +2733,6 @@ function loadSetup(){
   if(Array.isArray(s.availability) && s.availability.length) availabilityEntries = s.availability;
   else availabilityEntries = [{name:'',start:'',end:''}];
   renderAvailabilityEntries();
-  if(Array.isArray(s.budget_lines) && s.budget_lines.length) budgetLineEntries = s.budget_lines;
-  else budgetLineEntries = [{description:'',amount:'',category:''}];
-  renderBudgetLineEntries();
-  updateBudgetLineGuard();
   updateProjectName();
   autoFilledFieldIds = new Set(Array.isArray(s.auto_filled_fields) ? s.auto_filled_fields : []);
   setupImportCompleted = !!s.import_completed;
@@ -4032,10 +3896,8 @@ function updateBudgetTailorGuard(){
   const guard = document.getElementById('budget-tailor-guard');
   const btn = document.getElementById('btn-tailor-budget');
   if(!guard || !btn) return;
-  const lines = (data.setup && data.setup.budget_lines) || [];
-  const hasLines = lines.some(l=>l.description && l.description.trim());
-  if(!data.proposalText && !hasLines && !data.budgetSheetText){
-    guard.innerHTML = `<div class="alert alert-navy" style="margin-bottom:10px;">Import a proposal, upload a budget spreadsheet, or add budget line items on the Project Setup tab first — tailoring needs at least one of these to work from.</div>`;
+  if(!data.proposalText && !data.budgetSheetText){
+    guard.innerHTML = `<div class="alert alert-navy" style="margin-bottom:10px;">Import a proposal or upload a budget spreadsheet on the Project Setup tab first — tailoring needs at least one of these to work from.</div>`;
     btn.disabled = true; btn.style.opacity = '0.5'; btn.style.cursor = 'not-allowed';
   } else {
     guard.innerHTML = '';
@@ -4048,22 +3910,16 @@ function updateBudgetTailorGuard(){
 async function tailorBudgetToProposal(){
   const btn = document.getElementById('btn-tailor-budget');
   const data = loadAll();
-  const lines = (data.setup && data.setup.budget_lines) || [];
-  const hasLines = lines.some(l=>l.description && l.description.trim());
-  if((!data.proposalText && !hasLines && !data.budgetSheetText) || !budgetState.template || !btn) return;
+  if((!data.proposalText && !data.budgetSheetText) || !budgetState.template || !btn) return;
   const def = BUDGET_DEFS[budgetState.template];
   const ceiling = getBudgetCeiling(def);
   setButtonLoading(btn, true);
   const guard = document.getElementById('budget-tailor-guard');
   guard.innerHTML = `<div class="alert alert-blue" style="margin-bottom:10px;">Your guide is comparing the entered budget against the official template…</div>`;
 
-  const linesText = hasLines
-    ? lines.filter(l=>l.description && l.description.trim())
-        .map(l=>`- ${l.description}${l.amount?` — $${l.amount}`:' (no amount given)'}${l.category?` [${l.category}]`:''}`).join('\n')
-    : '(none entered by staff — rely on the full proposal text below)';
   const proposalSection = data.proposalText
     ? `Full proposal text:\n${data.proposalText}\n\n`
-    : '(No full proposal text was provided — rely on the budget line items and spreadsheet below.)\n\n';
+    : '(No full proposal text was provided — rely on the budget spreadsheet below.)\n\n';
   const budgetSheetSection = data.budgetSheetText
     ? `Uploaded budget spreadsheet (extracted cell-by-cell — this is the actual working budget document, so if it disagrees with the proposal text on an amount for the same row, trust the spreadsheet over the proposal narrative):\n${data.budgetSheetText}\n\n`
     : '';
@@ -4074,15 +3930,12 @@ async function tailorBudgetToProposal(){
 
   const prompt = `You are helping an Institute for Excellence in Teaching & Learning staff member reconcile a faculty proposal's budget with the official Shipley budget template (${budgetState.template} tier, $${ceiling.toLocaleString()} for this award, awarded as a single lump sum up front — not disbursed by term).
 
-${proposalSection}${budgetSheetSection}Budget line items the staff member confirmed:
-${linesText}
-
-Official template rows (every row must be addressed):
+${proposalSection}${budgetSheetSection}Official template rows (every row must be addressed):
 ${rowsText}
 
 For each official template row:
 1. If a line item clearly maps to it AND an explicit dollar amount was stated for it, include it in "mappings" with that EXACT amount — but only if the amount comes from a source you're allowed to treat as confirmed for this proposal:
-   - ${data.budgetSheetText ? 'A budget spreadsheet WAS uploaded for this proposal. In this case, ONLY an amount from the confirmed budget line items above or from the uploaded spreadsheet counts as confirmed. An amount that appears ONLY in the proposal\'s own narrative text — with no matching or corroborating figure in the spreadsheet — is NOT a confirmed mapping, even if clearly and unambiguously stated; treat it as unconfirmed per rule 2 below ("estimates") instead. The spreadsheet is the actual working budget document and proposal narratives frequently go stale or diverge from it — never let a narrative-only figure become a mapping when a spreadsheet is present.' : 'No budget spreadsheet was uploaded for this proposal. In this case, an explicit amount stated in the confirmed budget line items above or directly in the full proposal text is confirmed and may be used as a mapping.'}
+   - ${data.budgetSheetText ? 'A budget spreadsheet WAS uploaded for this proposal. In this case, ONLY an amount from the uploaded spreadsheet counts as confirmed. An amount that appears ONLY in the proposal\'s own narrative text — with no matching or corroborating figure in the spreadsheet — is NOT a confirmed mapping, even if clearly and unambiguously stated; treat it as unconfirmed per rule 2 below ("estimates") instead. The spreadsheet is the actual working budget document and proposal narratives frequently go stale or diverge from it — never let a narrative-only figure become a mapping when a spreadsheet is present.' : 'No budget spreadsheet was uploaded for this proposal. In this case, an explicit amount stated directly in the full proposal text is confirmed and may be used as a mapping.'}
    Copy the confirmed amount precisely; never adjust, round, or re-estimate a dollar figure that was actually stated somewhere. If the same row has different amounts in the budget spreadsheet and the proposal text, use the budget spreadsheet's amount — it is the authoritative working budget document.
 2. If a line item clearly maps to it but no dollar amount from an allowed source (per rule 1 above) is available for it, include it in "estimates" with your best-estimate TOTAL amount for that row across the whole award. This will never be entered directly into the budget — it will only be shown to the staff member as a suggested figure to confirm with the faculty lead, so estimate confidently. This includes any amount that was disqualified from "mappings" by rule 1 above (e.g., a proposal-narrative-only figure when a spreadsheet is present) — use it as the basis for your estimate rather than ignoring it.
 3. If nothing addresses this row, but it is a commonly needed cost for a Shipley project of this scope, add a flag with type "missing" and a short question the staff member should raise with the faculty lead — one short sentence, under ~15 words.
@@ -5067,7 +4920,18 @@ function escapeHtml(s){
   return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
 function inlineFormatAI(s){
-  return s.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+  let out = s.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+  // Auto-bold a short lead-in label before the first colon or em dash (e.g. "Budget
+  // alignment: the budget looks incomplete" -> "**Budget alignment**: ..."), so the
+  // brief description of each bullet stands out without requiring every prompt to add
+  // its own markdown. Skipped when the line is already explicitly bolded, and capped to
+  // a short leading span so a colon or dash later in a long sentence never bolds half of
+  // it by mistake.
+  if(!/<strong>/.test(out)){
+    const m = out.match(/^([^:—\n]{2,60}?)\s*(:|—)\s*(.+)$/s);
+    if(m) out = `<strong>${m[1]}</strong>${m[2]==='—'?' —':':'} ${m[3]}`;
+  }
+  return out;
 }
 function isAIHeaderLine(t){
   if(/^[-•]\s/.test(t) || /^\d+[\.\)]\s/.test(t)) return false;
@@ -5232,8 +5096,8 @@ TOTAL: [total]/28 — [Competitive / Conditionally Competitive — HOLD / Not Co
 (If you could not score all 7 criteria, replace the line above with: TOTAL: Not calculable — [one sentence on what's missing].)
 
 TIMELINE FEASIBILITY (12-month window — must complete before Fall 2027)
-[Include one bullet for each of these work components that applies to this project, in this order, skipping any that clearly don't apply. Never exceed 4 bullets.]
-- Student worker hiring: [your best-estimate duration, e.g. "4-6 weeks"] — [one-sentence feasibility note; if the proposal doesn't give enough detail to estimate confidently, replace this with a specific question the staff member should ask the faculty lead]
+[Include bullets for each of these work components that applies to this project, in this order, skipping any that clearly don't apply. Each bullet must follow this exact shape: "Component: [duration estimate — a single figure or range, e.g. "4-6 weeks", never a phase-by-phase breakdown] — [ONE short clause: either a feasibility note or a specific question for the faculty lead, never both, and never more than one distinct point]." If a component genuinely has multiple distinct sub-phases (e.g., separate development and integration phases handled by different people) or more than one issue worth flagging, split it into a second bullet for that same component rather than combining everything into one long bullet — but never more than 2 bullets for any single component, and never combine two different components into the same bullet.]
+- Student worker hiring: [duration estimate] — [note or question]
 - IRB approval: [duration estimate] — [note or question]
 - Technology development/customization/integration: [duration estimate] — [note or question]
 - Assignment/assessment development: [duration estimate] — [note or question]
@@ -6532,7 +6396,6 @@ window.addEventListener('DOMContentLoaded',()=>{
   cleanupDeprecatedTasks();
   updateHeaderLabel();
   renderAvailabilityEntries();
-  renderBudgetLineEntries();
   renderTechToolEntries();
   loadSetup();
   loadTechConsiderations();
