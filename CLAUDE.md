@@ -69,8 +69,27 @@ Project → Project Report.**
   milestone is usually safe without touching IDs.
 - **`task_meta[id].start`/`.due`** is the single source of truth for all task dates —
   used by Milestones rendering, due/overdue flags, Excel export, and the Gantt chart.
+- **AI feedback rendering:** every feedback surface (Proposal Review, Impact Framework
+  Review, Budget Feedback, Timeline Feedback, Report feedback, per-field guidance, Ask
+  Guide chat) shares one render path, `renderAIResponse()` → `formatAIResponse()`. That
+  function HTML-escapes the AI's raw text, then converts it to real markup: markdown
+  `#`/`##`/`**bold**`, ALL-CAPS lines (tolerating a trailing parenthetical), or short
+  lines ending in `:` all become `<h4>` headers; `-`/`•` lines become `<ul><li>`; numbered
+  lines become `<ol><li>`. Fixing formatting for the whole tool only ever requires
+  touching this one function — no need to rewrite every prompt's phrasing to get
+  consistent headers/bullets everywhere.
 
 ## Design decisions and why (by area)
+
+**Proposal Import (Setup tab)**
+- Proposals always arrive as PDFs, so the Import card accepts a PDF upload alongside the
+  paste box — PDF.js (CDN, same pattern as ExcelJS) extracts embedded text client-side
+  straight into the existing `#import-text` textarea, so nothing downstream needed to
+  change. The paste box stays as a fallback/manual-edit option, not a replacement — some
+  PDFs are scanned images with no text layer, and extraction that comes back too short
+  tells the PM to paste manually instead of quietly feeding near-empty text into the AI
+  extraction call. Extraction fills the box but does not auto-run "Import from
+  proposal" — the PM still reviews the extracted text and clicks it themselves.
 
 **Proposal review rubric (Setup tab)**
 - Backend AI-scored, not a manual UI — 7 weighted criteria plus an eligibility screen
@@ -101,11 +120,21 @@ Project → Project Report.**
 **Budget tab**
 - Awards are paid as a single lump sum, not by term — the whole tab was flattened from
   per-term columns to single amounts for this reason.
-- Fringe rates are **fixed institutional rates hardcoded in `BUDGET_DEFS`** — currently
-  31% (faculty/postdoc/temp-exempt/course-release/stipend/overbase), 12.5% (grad
-  student), 0% (hourly), 31.4% (temp non-exempt). **⚠️ Laura flagged these may not match
-  BU's actual current rates and said she'd need to check with someone — see Open Items
-  below. Do not "fix" these without her giving the actual correct numbers.**
+- Fringe rates are **fixed institutional rates hardcoded in `BUDGET_DEFS`**, corrected to
+  BU's actual current rates (Laura read these off BU's own budget spreadsheets): 31.20%
+  (faculty/postdoc/temp-exempt/course-release/stipend/overbase), 11.60% (grad student),
+  0% (hourly), 33.20% (temp non-exempt). If these ever need correcting again, treat it
+  with the same care as last time — confirm exact values and exactly which rows each
+  value applies to, never assume a rate carries over to a row that wasn't named
+  explicitly.
+- **Budget spreadsheet upload**: the Setup tab's Import card also accepts the actual
+  budget Excel file (faculty proposals' budgets always arrive as spreadsheets). Layouts
+  aren't standardized across departments, so rather than a fixed-schema parse, every
+  non-empty cell across every sheet is read via ExcelJS (the same library already used
+  for the Excel *export*) and flattened into text, fed to "Tailor Budget to This
+  Proposal" as a second source alongside the proposal text. When the spreadsheet and the
+  proposal narrative disagree on an amount for the same row, the spreadsheet wins — it's
+  the authoritative working budget document, prose isn't.
 - Tailor Budget only ever writes a dollar amount into the budget when it's copying a
   figure actually stated somewhere (confirmed proposal line item or proposal text
   verbatim) — never an AI estimate. Anything inferred becomes a "Suggested amount" flag
@@ -155,6 +184,27 @@ Project → Project Report.**
   proposal ↗" button, which fills the *guided sub-question answers* (not the final
   section text) with a note to confirm with the faculty team — deliberately not
   auto-writing the final section, so the human-review checkpoint stays intact.
+- **"Autofill entire framework from proposal ↗"** drafts all six sections in one AI call
+  (answers + final section content together, in one JSON response) instead of the
+  per-section 3-click flow above — but only ever fills sections that are still empty;
+  a section with existing content (manual or otherwise) is left untouched, same
+  never-overwrite principle as Budget tailoring. Intro copy was reframed around
+  reviewing/refining a first draft, now that the PM can see how sections interact,
+  rather than building each one from a blank page.
+- Each section's guiding sub-questions (previously hidden behind the "Answer questions
+  to draft this section" toggle) now render as always-visible subheaders under the
+  section header, generated from the same `FW_SUBQUESTIONS` data — the toggle/textarea
+  flow still exists underneath for manually redrafting a single section.
+- `reviewFramework()`'s feedback prompt was narrowed to three named things — cross-section
+  misalignment, measurement realism (e.g. too many objectives/measures for the likely
+  scope), and measurement relevance (measuring only what matters) — each capped at 0–3
+  bullets, after feedback was reported as too long and running past the token limit
+  mid-response.
+- A standalone "Download Framework (.xlsx)" export exists on this tab (via the same
+  ExcelJS already used for the project-plan export) — a self-contained artifact for the
+  PM to hand off, separate from the full project-plan download.
+- Data Collection frequency options include "Automatic collection," for trace data or
+  AI chat logs that don't fit the other fixed cadences.
 
 **Ask Guide re: Project tab** (renamed from "Proposal and Project Queries")
 - Seeded question chips are reworded to be unambiguously the PM's own voice, and no
@@ -197,12 +247,8 @@ Project → Project Report.**
 
 ## Open items — not yet done, don't lose these
 
-1. **BU fringe rate correction.** Laura believes the hardcoded fringe rates in
-   `BUDGET_DEFS` (31% / 12.5% / 0% / 31.4%, see above) may not match BU's actual current
-   official rates. She needs to confirm with someone at BU and hasn't provided the real
-   numbers yet. **Do not change these rates without her giving explicit correct values.**
-   Once she has them, update every occurrence in `BUDGET_DEFS` (all three tiers) plus the
-   fringe-rate legend text on the Budget tab.
+None currently. See "Design decisions and why," below, for what was most recently
+completed (fringe rate correction, PDF/Excel uploads, AI feedback formatting).
 
 ## Future direction (discussed before, details not preserved)
 

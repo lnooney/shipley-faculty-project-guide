@@ -6,6 +6,7 @@
 <title>Shipley Academic Innovation Project Guide</title>
 <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
 <script src="https://cdn.jsdelivr.net/npm/exceljs@4.3.0/dist/exceljs.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 
@@ -258,9 +259,21 @@ a:hover{color:var(--navy);}
 .ai-response{
   background:var(--gold-pale);border-radius:var(--radius-lg);
   padding:1.25rem 1.5rem;margin-bottom:14px;
-  font-size:14px;line-height:1.75;white-space:pre-wrap;
+  font-size:14px;line-height:1.75;
   border-left:3px solid var(--gold);color:var(--text);
 }
+.ai-response p{margin:0 0 10px;}
+.ai-response p:last-child{margin-bottom:0;}
+.ai-response h4{
+  font-size:11.5px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;
+  color:var(--navy);margin:18px 0 6px;
+}
+.ai-response h4:first-child{margin-top:0;}
+.ai-response ul,.ai-response ol{margin:0 0 12px;padding-left:20px;}
+.ai-response ul:last-child,.ai-response ol:last-child{margin-bottom:0;}
+.ai-response li{margin-bottom:4px;}
+.ai-response li:last-child{margin-bottom:0;}
+.ai-response strong{color:var(--navy);}
 .thinking{
   display:flex;align-items:center;gap:12px;
   font-size:14px;font-weight:500;color:var(--navy);padding:14px 18px;
@@ -845,8 +858,21 @@ a:hover{color:var(--navy);}
         The guide will extract project details from the pasted proposal, filling in fields throughout the tool. Be sure to review every field for accuracy.
       </div>
 
+      <div class="grid2" style="margin-bottom:14px;">
+        <div class="field">
+          <label for="import-pdf-file">Upload proposal PDF (optional)</label>
+          <input type="file" id="import-pdf-file" accept="application/pdf" onchange="handleProposalPdfUpload(this)" style="width:100%;"/>
+          <div id="import-pdf-status" style="margin-top:6px;font-size:12.5px;line-height:1.5;"></div>
+        </div>
+        <div class="field">
+          <label for="import-budget-file">Upload budget spreadsheet (optional)</label>
+          <input type="file" id="import-budget-file" accept=".xlsx,.xls,.xlsm" onchange="handleBudgetSheetUpload(this)" style="width:100%;"/>
+          <div id="import-budget-status" style="margin-top:6px;font-size:12.5px;line-height:1.5;"></div>
+        </div>
+      </div>
+
       <div class="field">
-        <label for="import-text">Paste proposal text</label>
+        <label for="import-text">Paste proposal text (or upload a PDF above)</label>
         <textarea id="import-text" placeholder="Paste the full proposal text here…" style="width:100%;min-height:160px;"
           oninput="const btn=document.getElementById('import-btn');const has=this.value.trim().length>0;btn.disabled=!has;btn.style.opacity=has?'1':'0.5';btn.style.cursor=has?'pointer':'not-allowed';"></textarea>
       </div>
@@ -1557,10 +1583,10 @@ a:hover{color:var(--navy);}
       </div>
       <div class="budget-fringe-ref">
         <strong>Fringe Rate Reference:</strong>&ensp;
-        Faculty / PostDoc / Temp Exempt: <strong>31.0%</strong> &nbsp;·&nbsp;
-        Graduate Student: <strong>12.5%</strong> &nbsp;·&nbsp;
+        Faculty / PostDoc / Temp Exempt: <strong>31.20%</strong> &nbsp;·&nbsp;
+        Graduate Student: <strong>11.60%</strong> &nbsp;·&nbsp;
         Undergraduate Student (Hourly): <strong>0%</strong> &nbsp;·&nbsp;
-        Temporary Employee, Non-Exempt: <strong>31.4%</strong>
+        Temporary Employee, Non-Exempt: <strong>33.20%</strong>
       </div>
       <div id="budget-table-container" style="overflow-x:auto;"></div>
       <div style="margin-top:16px;">
@@ -1908,6 +1934,113 @@ function toggleImportCard(){
   btn.setAttribute('aria-expanded', collapsed ? 'true' : 'false');
 }
 
+// Proposals arrive as PDFs — extract the embedded text client-side (via PDF.js) straight
+// into the existing paste box, so nothing downstream needs to know the source changed.
+async function handleProposalPdfUpload(input){
+  const file = input.files && input.files[0];
+  const statusEl = document.getElementById('import-pdf-status');
+  if(!file || !statusEl) return;
+  statusEl.innerHTML = 'Reading PDF…';
+  try{
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js';
+    const buf = await file.arrayBuffer();
+    const pdf = await pdfjsLib.getDocument({data: buf}).promise;
+    let text = '';
+    for(let p=1; p<=pdf.numPages; p++){
+      const page = await pdf.getPage(p);
+      const content = await page.getTextContent();
+      text += content.items.map(it=>it.str).join(' ') + '\n\n';
+    }
+    text = text.trim();
+    if(text.length < 200){
+      statusEl.innerHTML = `<span style="color:var(--red);">This PDF doesn't appear to contain selectable text (it may be a scanned image) — please paste the proposal text manually below instead.</span>`;
+      return;
+    }
+    const ta = document.getElementById('import-text');
+    ta.value = text;
+    ta.dispatchEvent(new Event('input'));
+    statusEl.innerHTML = `<span style="color:var(--green);">Extracted text from "${escapeHtml(file.name)}" — review it below, then click "Import from proposal."</span>`;
+  }catch(e){
+    statusEl.innerHTML = `<span style="color:var(--red);">Couldn't read that PDF — please paste the proposal text manually below instead.</span>`;
+  }
+}
+
+// Reads every non-empty cell across every sheet of an uploaded budget workbook into flat
+// text (layouts aren't standardized across departments, so this is fed to the AI as text
+// rather than parsed against a fixed schema) — see tailorBudgetToProposal().
+function excelCellText(cell){
+  let v = cell.value;
+  if(v==null) return '';
+  if(v instanceof Date) return v.toISOString().slice(0,10);
+  if(typeof v === 'object'){
+    if(Array.isArray(v.richText)) return v.richText.map(rt=>rt.text).join('');
+    if(v.result!=null) return String(v.result);
+    if(v.text!=null) return String(v.text);
+    return '';
+  }
+  return String(v).trim();
+}
+
+async function handleBudgetSheetUpload(input){
+  const file = input.files && input.files[0];
+  const statusEl = document.getElementById('import-budget-status');
+  if(!file || !statusEl) return;
+  statusEl.innerHTML = 'Reading spreadsheet…';
+  try{
+    const buf = await file.arrayBuffer();
+    const wb = new ExcelJS.Workbook();
+    await wb.xlsx.load(buf);
+    const lines = [];
+    wb.eachSheet(sheet=>{
+      const sheetLines = [];
+      sheet.eachRow(row=>{
+        const cells = [];
+        row.eachCell({includeEmpty:false}, cell=>{
+          const t = excelCellText(cell);
+          if(t) cells.push(t);
+        });
+        if(cells.length) sheetLines.push(cells.join(' | '));
+      });
+      if(sheetLines.length) lines.push(`--- Sheet: ${sheet.name} ---`, ...sheetLines);
+    });
+    const text = lines.join('\n').trim();
+    if(!text){
+      statusEl.innerHTML = `<span style="color:var(--red);">Couldn't find any data in that spreadsheet — please check the file.</span>`;
+      return;
+    }
+    const data = loadAll();
+    data.budgetSheetText = text;
+    data.budgetSheetName = file.name;
+    saveAll(data);
+    renderBudgetSheetStatus();
+    updateBudgetTailorGuard();
+  }catch(e){
+    statusEl.innerHTML = `<span style="color:var(--red);">Couldn't read that spreadsheet — please check the file and try again.</span>`;
+  }
+}
+
+function renderBudgetSheetStatus(){
+  const statusEl = document.getElementById('import-budget-status');
+  if(!statusEl) return;
+  const data = loadAll();
+  if(data.budgetSheetText){
+    statusEl.innerHTML = `<span style="color:var(--green);">Using "${escapeHtml(data.budgetSheetName||'uploaded spreadsheet')}" alongside the proposal for budget tailoring.</span> <button class="btn-sm" onclick="clearBudgetSheetUpload()" style="margin-left:6px;">Remove</button>`;
+  } else {
+    statusEl.innerHTML = '';
+  }
+}
+
+function clearBudgetSheetUpload(){
+  const data = loadAll();
+  delete data.budgetSheetText;
+  delete data.budgetSheetName;
+  saveAll(data);
+  const fileInput = document.getElementById('import-budget-file');
+  if(fileInput) fileInput.value = '';
+  renderBudgetSheetStatus();
+  updateBudgetTailorGuard();
+}
+
 // ═══════════════════════════════════════════════════════
 // PROPOSAL REVIEW RUBRIC — Health Education Innovation Grants, AY 2026–27
 // ═══════════════════════════════════════════════════════
@@ -2019,6 +2152,10 @@ function clearImportFile(){
   document.getElementById('import-output').innerHTML = '';
   const btn = document.getElementById('import-btn');
   btn.disabled = true; btn.style.opacity='0.5'; btn.style.cursor='not-allowed';
+  const pdfInput = document.getElementById('import-pdf-file');
+  if(pdfInput) pdfInput.value = '';
+  const pdfStatus = document.getElementById('import-pdf-status');
+  if(pdfStatus) pdfStatus.innerHTML = '';
 }
 
 async function runProposalImport(){
@@ -3592,9 +3729,9 @@ const BUDGET_DEFS = {
   '5k': {
     max: 5000,
     salaryRows: [
-      {name:'Summer Stipend', fringeRate:0.31},
-      {name:'Course Release', fringeRate:0.31},
-      {name:'Other Faculty (describe)', fringeRate:0.31, hasDesc:true},
+      {name:'Summer Stipend', fringeRate:0.312},
+      {name:'Course Release', fringeRate:0.312},
+      {name:'Other Faculty (describe)', fringeRate:0.312, hasDesc:true},
       {name:'Research Assistant (Hourly)', fringeRate:0},
     ],
     opRows: [
@@ -3607,9 +3744,9 @@ const BUDGET_DEFS = {
   '10k': {
     max: 10000,
     salaryRows: [
-      {name:'Summer Stipend (shared between PIs)', fringeRate:0.31},
-      {name:'Course Release', fringeRate:0.31},
-      {name:'Other Faculty (describe)', fringeRate:0.31, hasDesc:true},
+      {name:'Summer Stipend (shared between PIs)', fringeRate:0.312},
+      {name:'Course Release', fringeRate:0.312},
+      {name:'Other Faculty (describe)', fringeRate:0.312, hasDesc:true},
       {name:'Research Assistant (Hourly)', fringeRate:0},
     ],
     opRows: [
@@ -3622,15 +3759,15 @@ const BUDGET_DEFS = {
   '25k': {
     max: 25000,
     salaryRows: [
-      {name:'Course Release', fringeRate:0.31},
-      {name:'Faculty Stipend', fringeRate:0.31},
-      {name:'Overbase', fringeRate:0.31},
-      {name:'Other Faculty (describe)', fringeRate:0.31, hasDesc:true},
-      {name:'PostDoc', fringeRate:0.31},
-      {name:'Graduate Student', fringeRate:0.125},
+      {name:'Course Release', fringeRate:0.312},
+      {name:'Faculty Stipend', fringeRate:0.312},
+      {name:'Overbase', fringeRate:0.312},
+      {name:'Other Faculty (describe)', fringeRate:0.312, hasDesc:true},
+      {name:'PostDoc', fringeRate:0.312},
+      {name:'Graduate Student', fringeRate:0.116},
       {name:'Undergraduate Student (Hourly)', fringeRate:0},
-      {name:'Temporary Employee, Exempt', fringeRate:0.31},
-      {name:'Temporary Employee, Non-Exempt', fringeRate:0.314},
+      {name:'Temporary Employee, Exempt', fringeRate:0.312},
+      {name:'Temporary Employee, Non-Exempt', fringeRate:0.332},
     ],
     opRows: [
       {name:'AI Tools & Software Licenses'},
@@ -3678,8 +3815,8 @@ function updateBudgetTailorGuard(){
   if(!guard || !btn) return;
   const lines = (data.setup && data.setup.budget_lines) || [];
   const hasLines = lines.some(l=>l.description && l.description.trim());
-  if(!data.proposalText && !hasLines){
-    guard.innerHTML = `<div class="alert alert-navy" style="margin-bottom:10px;">Import a proposal or add budget line items on the Project Setup tab first — tailoring needs at least one of these to work from.</div>`;
+  if(!data.proposalText && !hasLines && !data.budgetSheetText){
+    guard.innerHTML = `<div class="alert alert-navy" style="margin-bottom:10px;">Import a proposal, upload a budget spreadsheet, or add budget line items on the Project Setup tab first — tailoring needs at least one of these to work from.</div>`;
     btn.disabled = true; btn.style.opacity = '0.5'; btn.style.cursor = 'not-allowed';
   } else {
     guard.innerHTML = '';
@@ -3694,7 +3831,7 @@ async function tailorBudgetToProposal(){
   const data = loadAll();
   const lines = (data.setup && data.setup.budget_lines) || [];
   const hasLines = lines.some(l=>l.description && l.description.trim());
-  if((!data.proposalText && !hasLines) || !budgetState.template || !btn) return;
+  if((!data.proposalText && !hasLines && !data.budgetSheetText) || !budgetState.template || !btn) return;
   const def = BUDGET_DEFS[budgetState.template];
   const ceiling = getBudgetCeiling(def);
   setButtonLoading(btn, true);
@@ -3707,7 +3844,10 @@ async function tailorBudgetToProposal(){
     : '(none entered by staff — rely on the full proposal text below)';
   const proposalSection = data.proposalText
     ? `Full proposal text:\n${data.proposalText}\n\n`
-    : '(No full proposal text was provided — rely on the budget line items below.)\n\n';
+    : '(No full proposal text was provided — rely on the budget line items and spreadsheet below.)\n\n';
+  const budgetSheetSection = data.budgetSheetText
+    ? `Uploaded budget spreadsheet (extracted cell-by-cell — this is the actual working budget document, so if it disagrees with the proposal text on an amount for the same row, trust the spreadsheet over the proposal narrative):\n${data.budgetSheetText}\n\n`
+    : '';
   const rowsText = [
     ...def.salaryRows.map(r=>`SALARY: ${r.name}`),
     ...def.opRows.map(r=>`OPERATING: ${r.name}`),
@@ -3715,14 +3855,14 @@ async function tailorBudgetToProposal(){
 
   const prompt = `You are helping an Institute for Excellence in Teaching & Learning staff member reconcile a faculty proposal's budget with the official Shipley budget template (${budgetState.template} tier, $${ceiling.toLocaleString()} for this award, awarded as a single lump sum up front — not disbursed by term).
 
-${proposalSection}Budget line items the staff member confirmed:
+${proposalSection}${budgetSheetSection}Budget line items the staff member confirmed:
 ${linesText}
 
 Official template rows (every row must be addressed):
 ${rowsText}
 
 For each official template row:
-1. If a line item clearly maps to it AND an explicit dollar amount was stated for it — either in the confirmed budget line items above, or directly in the full proposal text — include it in "mappings" with that EXACT amount. Copy it precisely; never adjust, round, or re-estimate a dollar figure that was actually stated somewhere.
+1. If a line item clearly maps to it AND an explicit dollar amount was stated for it — either in the confirmed budget line items above, the uploaded budget spreadsheet, or directly in the full proposal text — include it in "mappings" with that EXACT amount. Copy it precisely; never adjust, round, or re-estimate a dollar figure that was actually stated somewhere. If the same row has different amounts in the budget spreadsheet and the proposal text, use the budget spreadsheet's amount — it is the authoritative working budget document.
 2. If a line item clearly maps to it but no explicit dollar amount is stated anywhere for it, include it in "estimates" with your best-estimate TOTAL amount for that row across the whole award. This will never be entered directly into the budget — it will only be shown to the staff member as a suggested figure to confirm with the faculty lead, so estimate confidently.
 3. If nothing addresses this row, but it is a commonly needed cost for a Shipley project of this scope, add a flag with type "missing" and a short question the staff member should raise with the faculty lead.
 4. If a line item does map to this row with an explicit stated amount (item 1) but the dollar amount looks too low for what is actually needed to accomplish what's described, add a flag with type "under_budgeted" (in addition to the mapping) — no explanation needed, just the rowName and type; the message is standardized and added automatically.
@@ -4698,10 +4838,83 @@ function setButtonLoading(btn, loading){
   else{btn.disabled=false;btn.textContent=btn.dataset.origText||btn.textContent;btn.style.opacity='1';}
 }
 
+// ── AI response formatting: turns the AI's plain text into scannable HTML ──
+// (real headers, bullet/numbered lists, bold) without requiring every prompt
+// to be rewritten — this is the one shared render path for all AI feedback.
+function escapeHtml(s){
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+function inlineFormatAI(s){
+  return s.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+}
+function isAIHeaderLine(t){
+  if(/^[-•]\s/.test(t) || /^\d+[\.\)]\s/.test(t)) return false;
+  if(/^#{1,4}\s+/.test(t)) return true;
+  if(/^\*\*(.+?)\*\*:?$/.test(t)) return true;
+  if(t.length<=100 && /:$/.test(t)) return true;
+  // ALL-CAPS check, ignoring a trailing parenthetical (e.g. "TIMELINE FEASIBILITY (12-month window…)")
+  const core = t.replace(/\s*\([^)]*\)\s*$/, '');
+  if(core.length>=3 && core.length<=90 && core===core.toUpperCase() && /[A-Z]/.test(core)) return true;
+  return false;
+}
+function aiHeaderText(t){
+  if(/^#{1,4}\s+/.test(t)) return t.replace(/^#{1,4}\s+/, '');
+  const boldMatch = t.match(/^\*\*(.+?)\*\*:?$/);
+  if(boldMatch) return boldMatch[1];
+  return t;
+}
+function formatAIResponse(text){
+  if(!text) return '';
+  const rawLines = String(text).replace(/\r\n/g,'\n').split('\n');
+  const html = [];
+  let paraBuf = [];
+  function flushPara(){
+    if(paraBuf.length){
+      html.push('<p>' + paraBuf.map(l=>inlineFormatAI(escapeHtml(l))).join('<br>') + '</p>');
+      paraBuf = [];
+    }
+  }
+  let i = 0;
+  while(i < rawLines.length){
+    const trimmed = rawLines[i].trim();
+    if(!trimmed){ flushPara(); i++; continue; }
+    if(/^[-•]\s+/.test(trimmed)){
+      flushPara();
+      const items = [];
+      while(i < rawLines.length && /^[-•]\s+/.test(rawLines[i].trim())){
+        items.push(rawLines[i].trim().replace(/^[-•]\s+/, ''));
+        i++;
+      }
+      html.push('<ul>' + items.map(it=>`<li>${inlineFormatAI(escapeHtml(it))}</li>`).join('') + '</ul>');
+      continue;
+    }
+    if(/^\d+[\.\)]\s+/.test(trimmed)){
+      flushPara();
+      const items = [];
+      while(i < rawLines.length && /^\d+[\.\)]\s+/.test(rawLines[i].trim())){
+        items.push(rawLines[i].trim().replace(/^\d+[\.\)]\s+/, ''));
+        i++;
+      }
+      html.push('<ol>' + items.map(it=>`<li>${inlineFormatAI(escapeHtml(it))}</li>`).join('') + '</ol>');
+      continue;
+    }
+    if(isAIHeaderLine(trimmed)){
+      flushPara();
+      html.push(`<h4>${inlineFormatAI(escapeHtml(aiHeaderText(trimmed)))}</h4>`);
+      i++;
+      continue;
+    }
+    paraBuf.push(rawLines[i]);
+    i++;
+  }
+  flushPara();
+  return html.join('');
+}
+
 function renderAIResponse(container, text){
   const id='ai-r-'+Date.now();
   const wrapperId='ai-w-'+Date.now();
-  container.innerHTML=`<div id="${wrapperId}"><div class="ai-response" id="${id}">${text}</div><div class="ai-actions"><button class="btn-sm" onclick="copyAIResponse('${id}')">📋 Copy</button><button class="btn-sm" onclick="saveAIResponseAsPDF('${id}')">⬇ Save as PDF</button><button class="btn-sm" onclick="document.getElementById('${wrapperId}').innerHTML=''">✕ Close</button></div></div>`;
+  container.innerHTML=`<div id="${wrapperId}"><div class="ai-response" id="${id}">${formatAIResponse(text)}</div><div class="ai-actions"><button class="btn-sm" onclick="copyAIResponse('${id}')">📋 Copy</button><button class="btn-sm" onclick="saveAIResponseAsPDF('${id}')">⬇ Save as PDF</button><button class="btn-sm" onclick="document.getElementById('${wrapperId}').innerHTML=''">✕ Close</button></div></div>`;
 }
 function copyAIResponse(id){
   const el=document.getElementById(id);if(!el)return;
@@ -5722,6 +5935,7 @@ window.addEventListener('DOMContentLoaded',()=>{
   renderTechToolEntries();
   loadSetup();
   loadTechConsiderations();
+  renderBudgetSheetStatus();
   loadFramework();
   loadFrameworkAnswers();
   renderMeasuresTable();
