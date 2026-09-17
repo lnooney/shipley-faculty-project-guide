@@ -2125,6 +2125,12 @@ function excelCellText(cell){
   return String(v).trim();
 }
 
+// Matches a cell marking its row as an aggregate of other rows (subtotal, grand total, sum)
+// rather than its own distinct payment — e.g. "Personnel Subtotal", "TOTAL", "Grand Total
+// Budget Request", "Sub-Total Operating". Checked against every cell in the row, not just
+// the first, since budget spreadsheet column order isn't standardized across departments.
+const BUDGET_TOTAL_ROW_PATTERN = /\b(sub-?\s?totals?|grand\s*totals?|totals?|sums?)\b/i;
+
 async function handleBudgetSheetUpload(input){
   const file = input.files && input.files[0];
   const statusEl = document.getElementById('import-budget-status');
@@ -2143,7 +2149,14 @@ async function handleBudgetSheetUpload(input){
           const t = excelCellText(cell);
           if(t) cells.push(t);
         });
-        if(cells.length) sheetLines.push(cells.join(' | '));
+        if(!cells.length) return;
+        // Subtotal/total/sum rows aggregate other rows in the sheet rather than describing a
+        // distinct payment — left in as plain text, they were indistinguishable from a real line
+        // item to the Guide, which could map the aggregate amount to a budget row on top of the
+        // individual rows it already summed, inflating the total. Skip them at extraction time
+        // rather than relying on the AI to recognize them from unstructured text alone.
+        if(cells.some(c=>BUDGET_TOTAL_ROW_PATTERN.test(c))) return;
+        sheetLines.push(cells.join(' | '));
       });
       if(sheetLines.length) lines.push(`--- Sheet: ${sheet.name} ---`, ...sheetLines);
     });
@@ -3993,7 +4006,7 @@ async function tailorBudgetToProposal(){
     ? `Full proposal text:\n${data.proposalText}\n\n`
     : '(No full proposal text was provided — rely on the budget spreadsheet below.)\n\n';
   const budgetSheetSection = data.budgetSheetText
-    ? `Uploaded budget spreadsheet (extracted cell-by-cell — this is the actual working budget document, so if it disagrees with the proposal text on an amount for the same row, trust the spreadsheet over the proposal narrative):\n${data.budgetSheetText}\n\n`
+    ? `Uploaded budget spreadsheet (extracted cell-by-cell — this is the actual working budget document, so if it disagrees with the proposal text on an amount for the same row, trust the spreadsheet over the proposal narrative; rows clearly labeled as a subtotal/total/grand total have already been filtered out of this extraction, so treat every row below as its own distinct payment — but if anything resembling a subtotal, total, or sum of other rows still appears, never map it to a budget row on its own, since it isn't a separate payment):\n${data.budgetSheetText}\n\n`
     : '';
   const rowsText = [
     ...def.salaryRows.map(r=>`SALARY: ${r.name}`),
@@ -5813,7 +5826,12 @@ function intakeSupportNeedsBlock(rows){
 
 function intakeNextStepsBlock(){
   const row = () => `<tr><td contenteditable="true"></td><td contenteditable="true"></td></tr>`;
-  return `<div class="intake-section-title">Next Steps</div><table class="intake-table"><thead><tr><th>What</th><th>Who</th></tr></thead><tbody>${row()}${row()}</tbody></table>`;
+  return `<div class="intake-section-title">Next Steps</div><table class="intake-table" id="intake-nextsteps-table"><thead><tr><th>What</th><th>Who</th></tr></thead><tbody>${row()}${row()}</tbody></table><button class="btn-sm no-print" style="margin-top:6px;" onclick="addIntakeNextStepRow()">+ Add row</button>`;
+}
+function addIntakeNextStepRow(){
+  const tbody = document.querySelector('#intake-nextsteps-table tbody');
+  if(!tbody) return;
+  tbody.insertAdjacentHTML('beforeend', '<tr><td contenteditable="true"></td><td contenteditable="true"></td></tr>');
 }
 
 // Not part of the official template — an intentional addition pulling proposal-review

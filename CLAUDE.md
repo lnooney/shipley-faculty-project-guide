@@ -296,6 +296,16 @@ Project → Project Report.**
   Timeline risk factors, Institute support needs) go through one AI call, grounded in
   the proposal text, Impact Framework, and Budget — same literal-JSON-template pattern
   as everywhere else.
+- **The Next Steps table can grow past its original 2 rows** (`intakeNextStepsBlock()`)
+  — a "+ Add row" button below the table (`addIntakeNextStepRow()`) appends another
+  blank `What`/`Who` row, since 2 was a fixed starting point, not a real cap, and Laura
+  needed more room. The button carries the same `.no-print` class already used for the
+  modal's other editing-only controls (Print/Close buttons, the instructional banner),
+  so it's hidden from the printed/PDF output via the existing `@media print` rule while
+  the table itself — including any rows added — prints normally; verified with
+  Playwright's print-media emulation (`emulateMedia({media:'print'})` +
+  `locator.isVisible()`), not just checking the element's presence in the DOM, since a
+  `.no-print` element is still present in `#intake-print-clone`, just hidden by CSS.
 - A **"Notes" section** (not part of the official template — a deliberate addition)
   pulls Timeline Feasibility, Red Flags, Challenges & Suggestions, and Concerns Raised
   by the Proposal straight out of the "Feedback on Proposal and Scope" response, via the
@@ -381,6 +391,23 @@ Project → Project Report.**
   Proposal" as a second source alongside the proposal text. When the spreadsheet and the
   proposal narrative disagree on an amount for the same row, the spreadsheet wins — it's
   the authoritative working budget document, prose isn't.
+  - **Subtotal/grand-total/sum rows are filtered out during extraction**
+    (`handleBudgetSheetUpload()`, `BUDGET_TOTAL_ROW_PATTERN`), not left for the AI to
+    sort out from prose. Laura traced a recurring budget-overage bug to this: the old
+    extraction flattened every row of the sheet identically, so a row like "Personnel
+    Subtotal | $18,000" looked no different to the Guide than a real line item, and
+    could get mapped into a budget row as its own payment on top of the individual rows
+    that already summed to it — double-counting and inflating the total. Any row with a
+    cell matching `/\b(sub-?\s?totals?|grand\s*totals?|totals?|sums?)\b/i` (checked
+    against every cell in the row, not just the first, since column order isn't
+    standardized across departments — the label could be in any column) is dropped
+    before the text ever reaches the AI, the same "fix the redundancy at the structural
+    source, don't rely on the AI to reliably follow a prose instruction" principle as
+    the "Proposed Budget Line Items" removal below. The Tailor Budget prompt's
+    spreadsheet section also now says these rows have already been filtered out and
+    explicitly tells the Guide never to map anything resembling a total/subtotal/sum to
+    a budget row on its own, as a backup in case a total row's wording doesn't match
+    the extraction-time pattern (e.g. a total row split oddly across cells).
 - **The Setup tab's "Proposed Budget Line Items" card has been removed entirely** — its
   own extraction/manual-entry staging area (`budgetLineEntries`, `data.setup.budget_lines`,
   `extractBudgetLinesFromProposal()`, etc.) was a *third* "confirmed" source Tailor Budget
