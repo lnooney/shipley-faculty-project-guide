@@ -111,6 +111,27 @@ Project → Project Report.**
   letterhead. Shared builders (`docxHeaderCell`, `docxFieldRow`, `docxFullWidthTable`,
   `textToDocxParagraphs`, etc.) live just above `showGanttModal()` — reuse them for any
   future generated document rather than hand-rolling table/paragraph construction again.
+- **Generated document filenames follow one convention everywhere:**
+  `{Faculty PI last name}_{Doc type}_{MMDDYY}`, built by `buildDocFilename(docType)`
+  (`getFacultyLastName()` + `getFileDateStamp()`, both just above `renderAIResponse()`).
+  Applies to all 7 AI feedback "Save as PDF" surfaces (Proposal Review, Impact Framework
+  Review, Timeline, Budget, Final Report, all 13 per-field guidance buttons, Ask Guide
+  chat — `renderAIResponse()`'s third `filenameBase` argument, threaded through to
+  `saveAIResponseAsPDF()`), the Intake Summary print form (`printIntakeSummary()` swaps
+  `document.title` in just for the print, restored via `afterprint`), and the Milestone
+  Snapshot/Final Report `.docx` downloads. Laura's explicit request, replacing what was
+  previously either a generic shared name (every AI feedback PDF used to say
+  "{Project Title} — Guide Feedback" regardless of surface, so saving two different
+  kinds of feedback for the same project could silently collide) or an undated one
+  (Milestone Snapshot in particular gets downloaded repeatedly over a project's life for
+  periodic check-ins, so needs a date to avoid every download sharing one filename).
+  `getFacultyLastName()` is a lightweight heuristic on the free-text "Lead(s)" field —
+  strips a leading title (Dr./Prof./etc.), takes the first-listed name if multiple leads
+  are given, strips a trailing suffix (Jr./Sr./PhD/etc.), takes the last remaining word.
+  Falls back to "Project" if the field is empty. Not bulletproof for every possible name
+  format, but handles the common cases correctly (verified against "Dr. Jane Smith",
+  "Smith, Jane", "Jane Smith, PhD", "Prof. John A. Doe Jr.", "Jane Smith and Bob Jones",
+  hyphenated last names).
 
 ## Design decisions and why (by area)
 

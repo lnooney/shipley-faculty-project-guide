@@ -1748,7 +1748,7 @@ a:hover{color:var(--navy);}
       <div class="prompt">Provide a brief overview of what has been accomplished to date, including any preliminary evidence of impact.</div>
       <textarea id="rs-overview" placeholder="Summarize progress so far. This will pre-populate from milestone reflections already entered." style="width:100%;min-height:90px;" oninput="saveSnapshot()"></textarea>
       <div class="field-guide-btn" id="fgb-rs-overview">
-        <button class="btn-sm btn-gold" onclick="askFieldGuide('rs-overview','Overview of project progress to date')">Feedback on Overview ↗</button>
+        <button class="btn-sm btn-gold" onclick="askFieldGuide('rs-overview','Overview of project progress to date','Overview')">Feedback on Overview ↗</button>
         <div class="field-output" id="fout-rs-overview"></div>
       </div>
     </div>
@@ -1759,7 +1759,7 @@ a:hover{color:var(--navy);}
       <textarea id="rs-goals" placeholder="This will pre-populate from the project setup. Describe progress and any changes from the original goals." style="width:100%;min-height:90px;" oninput="saveSnapshot()"></textarea>
       <div class="prefill-note" id="pfn-rs-goals">This was pre-filled from the project setup. Please describe progress and note any changes from the original goals.</div>
       <div class="field-guide-btn" id="fgb-rs-goals">
-        <button class="btn-sm btn-gold" onclick="askFieldGuide('rs-goals','Goals and changes from original project plan')">Feedback on Goals & Changes ↗</button>
+        <button class="btn-sm btn-gold" onclick="askFieldGuide('rs-goals','Goals and changes from original project plan','Goals_Changes')">Feedback on Goals & Changes ↗</button>
         <div class="field-output" id="fout-rs-goals"></div>
       </div>
     </div>
@@ -1770,7 +1770,7 @@ a:hover{color:var(--navy);}
       <textarea id="rs-assessment" placeholder="Assessment progress will pre-populate from the Impact Evaluation Framework. Please also describe the plan for sustaining the innovations beyond the project period." style="width:100%;min-height:90px;" oninput="saveSnapshot()"></textarea>
       <div class="prefill-note" id="pfn-rs-assessment">Assessment information has been pre-filled from the Impact Evaluation Framework. Please add the plan for sustaining the innovations beyond the project period.</div>
       <div class="field-guide-btn" id="fgb-rs-assessment">
-        <button class="btn-sm btn-gold" onclick="askFieldGuide('rs-assessment','Assessment progress and sustainability plan')">Feedback on Assessment ↗</button>
+        <button class="btn-sm btn-gold" onclick="askFieldGuide('rs-assessment','Assessment progress and sustainability plan','Assessment')">Feedback on Assessment ↗</button>
         <div class="field-output" id="fout-rs-assessment"></div>
       </div>
     </div>
@@ -1780,7 +1780,7 @@ a:hover{color:var(--navy);}
       <div class="prompt">Has the faculty team presented this project or shared findings inside or outside of BU? Describe any current or future dissemination efforts.</div>
       <textarea id="rs-dissemination" placeholder="e.g. Presented work-in-progress at the Institute Showcase. Planning to submit to ISSOTL 2027…" style="width:100%;min-height:80px;" oninput="saveSnapshot()"></textarea>
       <div class="field-guide-btn" id="fgb-rs-dissemination">
-        <button class="btn-sm btn-gold" onclick="askFieldGuide('rs-dissemination','Dissemination of project findings')">Feedback on Dissemination ↗</button>
+        <button class="btn-sm btn-gold" onclick="askFieldGuide('rs-dissemination','Dissemination of project findings','Dissemination')">Feedback on Dissemination ↗</button>
         <div class="field-output" id="fout-rs-dissemination"></div>
       </div>
     </div>
@@ -1790,7 +1790,7 @@ a:hover{color:var(--navy);}
       <div class="prompt">What support can the Institute provide to help accomplish this project's goals? (e.g., course design resources, educational technology consultation, teaching strategies)</div>
       <textarea id="rs-support" placeholder="e.g. Would benefit from a consultation on survey instrument design and guidance on statistical analysis options…" style="width:100%;min-height:80px;" oninput="saveSnapshot()"></textarea>
       <div class="field-guide-btn" id="fgb-rs-support">
-        <button class="btn-sm btn-gold" onclick="askFieldGuide('rs-support','Support needed from the Institute')">Feedback on Support Needed ↗</button>
+        <button class="btn-sm btn-gold" onclick="askFieldGuide('rs-support','Support needed from the Institute','Support_Needed')">Feedback on Support Needed ↗</button>
         <div class="field-output" id="fout-rs-support"></div>
       </div>
     </div>
@@ -1801,7 +1801,7 @@ a:hover{color:var(--navy);}
       <textarea id="rs-timeline" placeholder="This will pre-populate from the project dates and milestone task progress." style="width:100%;min-height:120px;" oninput="saveSnapshot()"></textarea>
       <div class="prefill-note" id="pfn-rs-timeline">This was pre-filled from the project setup and milestone progress. Please review and add any context about changes from the original timeline.</div>
       <div class="field-guide-btn" id="fgb-rs-timeline">
-        <button class="btn-sm btn-gold" onclick="askFieldGuide('rs-timeline','Remaining timeline and next steps')">Feedback on Timeline & Next Steps ↗</button>
+        <button class="btn-sm btn-gold" onclick="askFieldGuide('rs-timeline','Remaining timeline and next steps','Timeline_Next_Steps')">Feedback on Timeline & Next Steps ↗</button>
         <div class="field-output" id="fout-rs-timeline"></div>
       </div>
     </div>
@@ -1825,7 +1825,7 @@ a:hover{color:var(--navy);}
       <textarea id="r-team" placeholder="This will pre-populate from Project Setup." style="width:100%;min-height:80px;" oninput="saveReport();checkPrefillNote('r-team','pfn-r-team');checkFieldGuideBtn('r-team','fgb-r-team')"></textarea>
       <div class="prefill-note" id="pfn-r-team">This was pre-filled from the project setup. Review and edit as needed.</div>
       <div class="field-guide-btn" id="fgb-r-team">
-        <button class="btn-sm btn-gold" onclick="askFieldGuide('r-team','Project team and roles')">Feedback on Team & Roles ↗</button>
+        <button class="btn-sm btn-gold" onclick="askFieldGuide('r-team','Project team and roles','Team_Roles')">Feedback on Team & Roles ↗</button>
         <div class="field-output" id="fout-r-team"></div>
       </div>
     </div>
@@ -1836,7 +1836,7 @@ a:hover{color:var(--navy);}
       <textarea id="r-goals" placeholder="This will pre-populate from Project Setup." style="width:100%;min-height:90px;" oninput="saveReport();checkPrefillNote('r-goals','pfn-r-goals');checkFieldGuideBtn('r-goals','fgb-r-goals')"></textarea>
       <div class="prefill-note" id="pfn-r-goals">This was pre-filled from the project setup. Please describe the need actually addressed and how the intervention led to improved learning for students.</div>
       <div class="field-guide-btn" id="fgb-r-goals">
-        <button class="btn-sm btn-gold" onclick="askFieldGuide('r-goals','Project goals and objectives — actual outcomes')">Feedback on Goals & Objectives ↗</button>
+        <button class="btn-sm btn-gold" onclick="askFieldGuide('r-goals','Project goals and objectives — actual outcomes','Goals_Objectives')">Feedback on Goals & Objectives ↗</button>
         <div class="field-output" id="fout-r-goals"></div>
       </div>
     </div>
@@ -1847,7 +1847,7 @@ a:hover{color:var(--navy);}
       <textarea id="r-milestones" placeholder="This will pre-populate from reflections you've entered in the Milestones tab." style="width:100%;min-height:100px;" oninput="saveReport();checkPrefillNote('r-milestones','pfn-r-milestones');checkFieldGuideBtn('r-milestones','fgb-r-milestones')"></textarea>
       <div class="prefill-note" id="pfn-r-milestones">This was pre-filled from your milestone reflections. Please expand with a narrative on what was achieved and what changed from your original plan.</div>
       <div class="field-guide-btn" id="fgb-r-milestones">
-        <button class="btn-sm btn-gold" onclick="askFieldGuide('r-milestones','Milestones and outcomes achieved')">Feedback on Milestones ↗</button>
+        <button class="btn-sm btn-gold" onclick="askFieldGuide('r-milestones','Milestones and outcomes achieved','Milestones')">Feedback on Milestones ↗</button>
         <div class="field-output" id="fout-r-milestones"></div>
       </div>
     </div>
@@ -1858,7 +1858,7 @@ a:hover{color:var(--navy);}
       <textarea id="r-impact" placeholder="This will pre-populate from the Impact Evaluation Framework." style="width:100%;min-height:100px;" oninput="saveReport();checkPrefillNote('r-impact','pfn-r-impact');checkFieldGuideBtn('r-impact','fgb-r-impact')"></textarea>
       <div class="prefill-note" id="pfn-r-impact">This was pre-filled from the Impact Evaluation Framework. Please describe the actual impact observed — what changed for students and instructors as a result of this project.</div>
       <div class="field-guide-btn" id="fgb-r-impact">
-        <button class="btn-sm btn-gold" onclick="askFieldGuide('r-impact','Project impact on student learning')">Feedback on Impact ↗</button>
+        <button class="btn-sm btn-gold" onclick="askFieldGuide('r-impact','Project impact on student learning','Impact')">Feedback on Impact ↗</button>
         <div class="field-output" id="fout-r-impact"></div>
       </div>
     </div>
@@ -1868,7 +1868,7 @@ a:hover{color:var(--navy);}
       <div class="prompt">What operational or logistical challenges arose? How were they addressed?</div>
       <textarea id="r-challenges" placeholder="e.g. Vendor contract negotiations took longer than anticipated, delaying technology implementation by 6 weeks. The team addressed this by…" style="width:100%;min-height:90px;" oninput="saveReport();checkFieldGuideBtn('r-challenges','fgb-r-challenges')"></textarea>
       <div class="field-guide-btn" id="fgb-r-challenges">
-        <button class="btn-sm btn-gold" onclick="askFieldGuide('r-challenges','Challenges and how they were addressed')">Feedback on Challenges ↗</button>
+        <button class="btn-sm btn-gold" onclick="askFieldGuide('r-challenges','Challenges and how they were addressed','Challenges')">Feedback on Challenges ↗</button>
         <div class="field-output" id="fout-r-challenges"></div>
       </div>
     </div>
@@ -1878,7 +1878,7 @@ a:hover{color:var(--navy);}
       <div class="prompt">What pedagogical insights emerged from this project? What worked or didn't work in the classroom? What would the faculty lead do differently in course design? What are the best practices for teaching with this innovation?</div>
       <textarea id="r-lessons" placeholder="e.g. Students engaged more deeply with the AI simulation tool when given structured reflection prompts before and after. Pairing the technology with explicit metacognitive activities significantly improved…" style="width:100%;min-height:90px;" oninput="saveReport();checkFieldGuideBtn('r-lessons','fgb-r-lessons')"></textarea>
       <div class="field-guide-btn" id="fgb-r-lessons">
-        <button class="btn-sm btn-gold" onclick="askFieldGuide('r-lessons','Pedagogical lessons learned')">Feedback on Lessons Learned ↗</button>
+        <button class="btn-sm btn-gold" onclick="askFieldGuide('r-lessons','Pedagogical lessons learned','Lessons_Learned')">Feedback on Lessons Learned ↗</button>
         <div class="field-output" id="fout-r-lessons"></div>
       </div>
     </div>
@@ -1889,7 +1889,7 @@ a:hover{color:var(--navy);}
       <textarea id="r-next" placeholder="This will pre-populate from dissemination notes if available. Describe how this project's impact will continue beyond its funding period." style="width:100%;min-height:90px;" oninput="saveReport();checkPrefillNote('r-next','pfn-r-next');checkFieldGuideBtn('r-next','fgb-r-next')"></textarea>
       <div class="prefill-note" id="pfn-r-next">This was pre-filled from dissemination notes. Please expand on how the impact of this project will continue — through scaling, adaptation, publication, or integration into ongoing practice.</div>
       <div class="field-guide-btn" id="fgb-r-next">
-        <button class="btn-sm btn-gold" onclick="askFieldGuide('r-next','Next steps and future plans beyond the project')">Feedback on Next Steps ↗</button>
+        <button class="btn-sm btn-gold" onclick="askFieldGuide('r-next','Next steps and future plans beyond the project','Next_Steps')">Feedback on Next Steps ↗</button>
         <div class="field-output" id="fout-r-next"></div>
       </div>
     </div>
@@ -5068,21 +5068,52 @@ function formatAIResponse(text){
   return html.join('');
 }
 
-function renderAIResponse(container, text){
+// ── Document filename convention: {Faculty PI last name}_{Doc type}_{MMDDYY} ──
+// Applies to every generated document in the tool (AI feedback PDFs, Intake Summary,
+// Milestone Snapshot/Final Report .docx) so a PM's downloads folder sorts and scans
+// predictably across many projects/faculty rather than by generic project titles.
+function getFacultyLastName(){
+  const data = loadAll();
+  let lead = ((data.setup && data.setup.lead) || '').trim();
+  if(!lead) return 'Project';
+  // Multiple leads are sometimes listed together; use the first-listed as primary PI.
+  // This also conveniently handles a "Last, First" entry, since splitting on the comma
+  // leaves just the last name as the first segment.
+  lead = lead.split(/[,;]| and /i)[0].trim();
+  lead = lead.replace(/^(dr|prof|professor|mr|mrs|ms|miss)\.?\s+/i, '');
+  const parts = lead.split(/\s+/).filter(Boolean);
+  if(!parts.length) return 'Project';
+  let last = parts[parts.length-1];
+  if(parts.length > 1 && /^(jr\.?|sr\.?|ii|iii|iv|phd\.?|ph\.d\.?|edd\.?)$/i.test(last)){
+    last = parts[parts.length-2];
+  }
+  return last.replace(/[^a-zA-Z0-9-]/g,'') || 'Project';
+}
+function getFileDateStamp(){
+  const d = new Date();
+  return String(d.getMonth()+1).padStart(2,'0') + String(d.getDate()).padStart(2,'0') + String(d.getFullYear()).slice(-2);
+}
+function buildDocFilename(docType){
+  return `${getFacultyLastName()}_${docType}_${getFileDateStamp()}`;
+}
+
+function renderAIResponse(container, text, filenameBase){
   const id='ai-r-'+Date.now();
   const wrapperId='ai-w-'+Date.now();
-  container.innerHTML=`<div id="${wrapperId}"><div class="ai-response" id="${id}">${formatAIResponse(text)}</div><div class="ai-actions"><button class="btn-sm" onclick="copyAIResponse('${id}')">📋 Copy</button><button class="btn-sm" onclick="saveAIResponseAsPDF('${id}')">⬇ Save as PDF</button><button class="btn-sm" onclick="document.getElementById('${wrapperId}').innerHTML=''">✕ Close</button></div></div>`;
+  const fnBase = filenameBase || buildDocFilename('Guide_Feedback');
+  container.innerHTML=`<div id="${wrapperId}"><div class="ai-response" id="${id}">${formatAIResponse(text)}</div><div class="ai-actions"><button class="btn-sm" onclick="copyAIResponse('${id}')">📋 Copy</button><button class="btn-sm" onclick="saveAIResponseAsPDF('${id}','${fnBase}')">⬇ Save as PDF</button><button class="btn-sm" onclick="document.getElementById('${wrapperId}').innerHTML=''">✕ Close</button></div></div>`;
 }
 function copyAIResponse(id){
   const el=document.getElementById(id);if(!el)return;
   navigator.clipboard.writeText(el.innerText).then(()=>flashSave()).catch(()=>{});
 }
-function saveAIResponseAsPDF(id){
+function saveAIResponseAsPDF(id, filenameBase){
   const el=document.getElementById(id);if(!el)return;
   const data=loadAll();const title=(data.setup&&data.setup.title)||'Shipley Project';
   const date=new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});
+  const fnBase = filenameBase || buildDocFilename('Guide_Feedback');
   const win=window.open('','_blank');
-  win.document.write(`<!DOCTYPE html><html><head><title>${title} — Guide Feedback</title><style>body{font-family:Georgia,serif;max-width:680px;margin:40px auto;color:#222;line-height:1.7;font-size:14px;}h1{font-size:18px;color:#1a2744;margin-bottom:4px;}.meta{font-size:12px;color:#888;margin-bottom:24px;border-bottom:1px solid #eee;padding-bottom:12px;}.content{white-space:pre-wrap;}</style></head><body><h1>${title}</h1><div class="meta">Shipley Project Guide feedback — ${date}</div><div class="content">${el.innerText}</div></body></html>`);
+  win.document.write(`<!DOCTYPE html><html><head><title>${fnBase}</title><style>body{font-family:Georgia,serif;max-width:680px;margin:40px auto;color:#222;line-height:1.7;font-size:14px;}h1{font-size:18px;color:#1a2744;margin-bottom:4px;}.meta{font-size:12px;color:#888;margin-bottom:24px;border-bottom:1px solid #eee;padding-bottom:12px;}.content{white-space:pre-wrap;}</style></head><body><h1>${title}</h1><div class="meta">Shipley Project Guide feedback — ${date}</div><div class="content">${el.innerText}</div></body></html>`);
   win.document.close();setTimeout(()=>win.print(),500);
 }
 
@@ -5197,7 +5228,7 @@ WHAT IMPACT WILL THIS PROJECT HAVE IF SELECTED
 - [short bullet, if there's a third distinct point — otherwise omit]`;
   try{
     const r = await callGuide(prompt, {skipCtx:true, maxTokens:3000});
-    renderAIResponse(out, r);
+    renderAIResponse(out, r, buildDocFilename('Proposal_Review_Feedback'));
     const items = [
       ...extractBulletSection(r, 'ELIGIBILITY SCREEN'),
       ...extractBulletSection(r, 'RED FLAGS'),
@@ -5245,7 +5276,7 @@ Format your response as three short labeled sections — "Misalignment," "Realis
 End your response with a section titled exactly "ACTION ITEMS FOR THE PM:" followed by 0–4 bullet points (each under ~15 words — a PM needs to scan this in a few seconds) naming concrete follow-ups to raise with the faculty lead — or a single bullet "None identified." if there's nothing actionable.`;
   try{
     const r = await callGuide(prompt, {maxTokens:1300});
-    renderAIResponse(out, r);
+    renderAIResponse(out, r, buildDocFilename('Impact_Framework_Review_Feedback'));
     setFollowUpItems('framework', extractBulletSection(r, 'ACTION ITEMS FOR THE PM:'));
   }catch(e){
     out.innerHTML=`<div class="ai-response" style="border-left-color:var(--red);">Something went wrong.</div>`;
@@ -5739,7 +5770,15 @@ function printIntakeSummary(){
   // position:fixed element nested inside an overflow:auto modal can't be reliably
   // paginated across multiple printed pages, but plain top-level document flow can.
   document.getElementById('intake-print-clone').innerHTML = document.getElementById('intake-print-area').innerHTML;
+  // Browsers suggest a "Save as PDF" filename based on document.title at print time —
+  // this page's own title otherwise, so swap it in just for the print and restore
+  // right after (afterprint fires reliably once the print dialog closes).
+  const originalTitle = document.title;
+  document.title = buildDocFilename('Intake_Summary');
+  const restoreTitle = () => { document.title = originalTitle; window.removeEventListener('afterprint', restoreTitle); };
+  window.addEventListener('afterprint', restoreTitle);
   window.print();
+  setTimeout(restoreTitle, 3000);
 }
 
 function showGanttModal(){
@@ -5909,7 +5948,7 @@ NEXT STEPS — concrete next actions to keep the timeline on track
 End your response with a section titled exactly "ACTION ITEMS FOR THE PM:" followed by 0–4 bullet points (each under ~15 words — a PM needs to scan this in a few seconds) naming concrete follow-ups to raise with the faculty lead — or a single bullet "None identified." if there's nothing actionable.`;
   try{
     const r = await callGuide(prompt);
-    renderAIResponse(out, r);
+    renderAIResponse(out, r, buildDocFilename('Timeline_Feedback'));
     setFollowUpItems('timeline', extractBulletSection(r, 'ACTION ITEMS FOR THE PM:'));
   }catch(e){
     out.innerHTML=`<div class="ai-response" style="border-left-color:var(--red);">Something went wrong — please try again.</div>`;
@@ -6002,7 +6041,7 @@ End your response with a section titled exactly "ACTION ITEMS FOR THE PM:" follo
     const r = await callGuide(prompt);
     budgetHistory.push({role:'user',content:prompt});
     budgetHistory.push({role:'assistant',content:r});
-    renderAIResponse(out, r);
+    renderAIResponse(out, r, buildDocFilename('Budget_Feedback'));
     setFollowUpItems('budget', extractBulletSection(r, 'ACTION ITEMS FOR THE PM:'));
   }catch(e){
     out.innerHTML=`<div class="ai-response" style="border-left-color:var(--red);">Something went wrong.</div>`;
@@ -6049,14 +6088,14 @@ NEXT STEPS — concrete next actions to finish the report
 End your response with a section titled exactly "ACTION ITEMS FOR THE PM:" followed by 0–4 bullet points (each under ~15 words — a PM needs to scan this in a few seconds) naming concrete follow-ups to raise with the faculty lead — or a single bullet "None identified." if there's nothing actionable.`;
   try{
     const r = await callGuide(prompt);
-    renderAIResponse(out, r);
+    renderAIResponse(out, r, buildDocFilename('Final_Report_Feedback'));
     setFollowUpItems('report', extractBulletSection(r, 'ACTION ITEMS FOR THE PM:'));
   }catch(e){
     out.innerHTML=`<div class="ai-response" style="border-left-color:var(--red);">Something went wrong.</div>`;
   }
 }
 
-async function askFieldGuide(fieldId, fieldLabel){
+async function askFieldGuide(fieldId, fieldLabel, shortLabel){
   const el = document.getElementById(fieldId);
   const out = document.getElementById('fout-'+fieldId);
   if(!el||!out) return;
@@ -6069,7 +6108,7 @@ async function askFieldGuide(fieldId, fieldLabel){
   const prompt = `You are a helpful guide for Institute for Excellence in Teaching & Learning staff supporting a faculty-led Shipley Academic Innovation Fund award at Boston University. Review the following draft for the "${fieldLabel}" section of this project's report. Give specific, constructive feedback on this section only. Do not reference the BU grants office or university policy. If something raises a concern, flag it clearly for follow-up with the faculty lead.\n\n${ctx}\n${fieldLabel}:\n${content}`;
   try{
     const r = await callGuide(prompt);
-    renderAIResponse(out, r);
+    renderAIResponse(out, r, buildDocFilename((shortLabel||'Field')+'_Feedback'));
   }catch(e){
     out.innerHTML=`<div class="ai-response" style="border-left-color:var(--red);">Something went wrong.</div>`;
   }
@@ -6148,7 +6187,7 @@ async function downloadReportDocx(mode){
     });
 
     const doc = new docx.Document({ sections:[{ properties:{}, children }] });
-    await downloadDocxFile(doc, `${projectTitle.replace(/\s+/g,'_')}_${mode==='snapshot'?'Milestone_Snapshot':'Final_Report'}.docx`);
+    await downloadDocxFile(doc, `${buildDocFilename(mode==='snapshot'?'Milestone_Snapshot':'Final_Report')}.docx`);
   } catch(e) {
     if(statusEl) statusEl.innerHTML = `<div class="alert alert-amber">${docxErrorMessage(e)}</div>`;
   } finally {
@@ -6164,7 +6203,7 @@ async function askGuide(){
   try{
     const guidePrompt = `You are a helpful guide for Institute for Excellence in Teaching & Learning staff supporting a faculty-led Shipley Academic Innovation Fund award at Boston University. Answer the staff member's question below. If the question asks whether something was included in the proposal, or how the team proposes to approach something, answer directly from the full proposal text provided in the project context below — quote or closely paraphrase what it actually says rather than giving generic advice, and say plainly if the proposal doesn't address it. Do not reference the BU grants office or university policy. If the question raises something that needs follow-up, flag it clearly for follow-up with the faculty lead.\n\n${input}`;
     const r = await callGuide(guidePrompt);
-    renderAIResponse(out, r);
+    renderAIResponse(out, r, buildDocFilename('Guide_Chat'));
   }catch(e){
     out.innerHTML=`<div class="ai-response" style="border-left-color:var(--red);">Something went wrong — please try again.</div>`;
   }
