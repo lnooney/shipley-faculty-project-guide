@@ -765,6 +765,30 @@ a:hover{color:var(--navy);}
      modal cannot be reliably paginated across multiple printed pages by the browser. -->
 <div id="intake-print-clone" class="no-print"></div>
 
+<!-- Intake Summary modal — deliberately a direct child of body, NOT nested inside any
+     tab's .panel. Every .panel that isn't the active one has display:none, which hides
+     its entire subtree regardless of this modal's own inline display:block — the
+     button that opens it lives on the Project Reports tab, so this modal previously
+     being nested inside the Timeline tab's panel meant it silently rendered invisible
+     whenever a PM opened it from any tab other than Timeline (confirmed by Laura: the
+     AI narrative call completed successfully, the button's loading state cleared, but
+     nothing ever appeared — same root cause class as the print-clone element above). -->
+<div id="intake-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:9999;overflow:auto;padding:20px;">
+  <div id="intake-modal-box" style="background:#fff;border-radius:12px;max-width:900px;margin:0 auto;padding:24px;position:relative;max-height:90vh;overflow:auto;">
+    <div class="no-print" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+      <h2 style="margin:0;font-size:17px;color:var(--navy);">Intake Summary</h2>
+      <div style="display:flex;gap:10px;">
+        <button class="btn-primary" onclick="printIntakeSummary()">🖨 Print / Save as PDF</button>
+        <button class="btn-sm" onclick="closeIntakeModal()">✕ Close</button>
+      </div>
+    </div>
+    <div class="alert alert-blue no-print" style="margin-bottom:14px;">
+      Review and edit any field below — click directly on the text to change it — then use "Print / Save as PDF" and choose "Save as PDF" as the destination in the print dialog.
+    </div>
+    <div id="intake-print-area"></div>
+  </div>
+</div>
+
 <a href="#main-content" class="skip-link">Skip to main content</a>
 <!-- HEADER -->
 <header class="site-header">
@@ -1583,24 +1607,6 @@ a:hover{color:var(--navy);}
         <span><span style="display:inline-block;width:14px;height:14px;background:#EA9999;border-radius:3px;border:1px solid rgba(0,0,0,0.15);vertical-align:middle;margin-right:4px;"></span>Not Started</span>
       </div>
       <div id="gantt-scroll-area" style="flex:1;overflow-x:scroll;min-height:0;"></div>
-    </div>
-  </div>
-
-  <!-- Intake Summary — editable print/PDF form, replaces .docx generation (unreliable
-       CDN dependency, could not be verified in this sandbox and failed for Laura twice) -->
-  <div id="intake-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:9999;overflow:auto;padding:20px;">
-    <div id="intake-modal-box" style="background:#fff;border-radius:12px;max-width:900px;margin:0 auto;padding:24px;position:relative;max-height:90vh;overflow:auto;">
-      <div class="no-print" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
-        <h2 style="margin:0;font-size:17px;color:var(--navy);">Intake Summary</h2>
-        <div style="display:flex;gap:10px;">
-          <button class="btn-primary" onclick="printIntakeSummary()">🖨 Print / Save as PDF</button>
-          <button class="btn-sm" onclick="closeIntakeModal()">✕ Close</button>
-        </div>
-      </div>
-      <div class="alert alert-blue no-print" style="margin-bottom:14px;">
-        Review and edit any field below — click directly on the text to change it — then use "Print / Save as PDF" and choose "Save as PDF" as the destination in the print dialog.
-      </div>
-      <div id="intake-print-area"></div>
     </div>
   </div>
 

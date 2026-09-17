@@ -197,6 +197,28 @@ Project → Project Report.**
   document flow. Verified by generating a PDF from deliberately long content and reading
   the PDF's own `/Count` (page count) back out — confirmed 3 real pages, not 1 clipped
   page — since a screenshot alone can't be trusted to catch this class of bug.
+- **Confirmed bug, now fixed: the modal never appeared at all for Laura, on the very
+  first real-world use.** `#intake-modal` had been placed nested inside the Timeline
+  tab's `.panel` div (copy-pasted next to the Gantt chart modal, which lives there
+  safely since its own trigger button is also on that tab). Every `.panel` that isn't
+  the active one has `display:none`, which hides its entire subtree regardless of a
+  nested element's own inline `display:block` — but the "Edit & Print Intake Summary"
+  button lives on the Project Reports tab, a different panel, so the modal was reliably
+  invisible any time a PM opened it from a tab other than Timeline (which is to say,
+  essentially always). Symptom matched exactly: the AI narrative call completed and the
+  button's loading state cleared normally, but nothing visibly appeared — Laura herself
+  correctly guessed the actual cause ("didn't specify a space for the intake summary to
+  appear") before it was confirmed. Fixed the same way as the print-clone element above:
+  moved to be a direct child of `<body>`. **Testing-methodology gap this exposed:** every
+  verification of this feature before shipping checked
+  `document.getElementById('intake-modal').style.display === 'block'`, which only
+  confirms the element's own inline style, not whether it's actually rendered once
+  ancestor CSS is considered — completely missing this class of bug. Re-verified after
+  the fix with Playwright's `locator.isVisible()` (which does account for ancestor
+  `display:none`) and a real `boundingBox()` check, specifically repro'ing the real path
+  (open the app on one tab, navigate to Project Reports, click the button there) rather
+  than the shortcut of calling the function directly without changing tabs first. Any
+  future modal should be checked this same way, not just via its own `style.display`.
 - Direct fields (title, lead, team, challenge → Teaching & Learning Challenge, vision →
   Proposed Academic Innovation, audience → Target Learners, Impact Framework's Impacts,
   IRB status/notes, start/end dates) come straight from existing tool data — never
