@@ -699,6 +699,32 @@ a:hover{color:var(--navy);}
   padding:10px 14px;font-size:13px;line-height:1.6;margin-bottom:1rem;
 }
 
+/* ── INTAKE SUMMARY (editable print form, replaces .docx generation) ── */
+#intake-print-area{font-family:var(--sans);color:var(--text);}
+.intake-header{display:flex;align-items:center;gap:14px;margin-bottom:14px;padding-bottom:10px;border-bottom:2px solid var(--navy);}
+.intake-title{font-size:18px;font-weight:700;color:var(--navy);}
+.intake-subtitle{font-size:12px;color:var(--text2);}
+.intake-section-title{font-size:13px;font-weight:700;color:#fff;background:var(--navy);padding:6px 10px;margin:14px 0 6px;border-radius:4px;}
+.intake-row{display:flex;gap:10px;border-bottom:1px solid #eee;padding:7px 2px;font-size:13px;}
+.intake-label{flex:0 0 230px;font-weight:600;color:var(--text2);}
+.intake-value{flex:1;outline:none;min-height:1.4em;line-height:1.5;}
+.intake-value:focus{background:#fffbe6;}
+.intake-value ul{margin:0;padding-left:18px;}
+.intake-checkbox-row{display:flex;align-items:center;gap:10px;padding:5px 2px;font-size:13px;border-bottom:1px solid #f3f3f3;}
+.intake-checkbox-row label{display:flex;align-items:center;gap:6px;flex:0 0 260px;}
+.intake-table{width:100%;border-collapse:collapse;margin-top:6px;font-size:13px;}
+.intake-table th,.intake-table td{border:1px solid #ccc;padding:7px 9px;text-align:left;}
+.intake-table td[contenteditable]{outline:none;min-height:1.4em;}
+.intake-table td[contenteditable]:focus{background:#fffbe6;}
+
+#intake-print-clone{display:none;}
+@media print{
+  body{background:#fff!important;}
+  body > *:not(#intake-print-clone){display:none!important;}
+  #intake-print-clone{display:block!important;padding:24px;background:#fff;}
+  .no-print{display:none!important;}
+}
+
 /* ── SAVE INDICATOR ── */
 .save-bar{
   position:fixed;bottom:20px;right:20px;
@@ -732,6 +758,12 @@ a:hover{color:var(--navy);}
 </style>
 </head>
 <body>
+
+<!-- Direct child of body, deliberately outside the modal's fixed/overflow ancestor
+     chain — printIntakeSummary() clones the modal's live content in here right before
+     window.print(), since a position:fixed element nested inside an overflow:auto
+     modal cannot be reliably paginated across multiple printed pages by the browser. -->
+<div id="intake-print-clone" class="no-print"></div>
 
 <a href="#main-content" class="skip-link">Skip to main content</a>
 <!-- HEADER -->
@@ -1554,6 +1586,24 @@ a:hover{color:var(--navy);}
     </div>
   </div>
 
+  <!-- Intake Summary — editable print/PDF form, replaces .docx generation (unreliable
+       CDN dependency, could not be verified in this sandbox and failed for Laura twice) -->
+  <div id="intake-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:9999;overflow:auto;padding:20px;">
+    <div id="intake-modal-box" style="background:#fff;border-radius:12px;max-width:900px;margin:0 auto;padding:24px;position:relative;max-height:90vh;overflow:auto;">
+      <div class="no-print" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+        <h2 style="margin:0;font-size:17px;color:var(--navy);">Intake Summary</h2>
+        <div style="display:flex;gap:10px;">
+          <button class="btn-primary" onclick="printIntakeSummary()">🖨 Print / Save as PDF</button>
+          <button class="btn-sm" onclick="closeIntakeModal()">✕ Close</button>
+        </div>
+      </div>
+      <div class="alert alert-blue no-print" style="margin-bottom:14px;">
+        Review and edit any field below — click directly on the text to change it — then use "Print / Save as PDF" and choose "Save as PDF" as the destination in the print dialog.
+      </div>
+      <div id="intake-print-area"></div>
+    </div>
+  </div>
+
   <!-- FIX 14: Replace timeline guide with Get Timeline Feedback button -->
   <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:8px;">
     <button class="btn-gold" onclick="aiTimelineHelp(this)">Feedback on Timeline ↗</button>
@@ -1657,9 +1707,9 @@ a:hover{color:var(--navy);}
       </div>
     </div>
     <div class="alert alert-blue" style="margin-bottom:14px;">
-      Produces a real Word (.docx) document matching the Institute's Intake Summary template exactly — review and edit it like any other Word file, then upload it to SharePoint or share it as needed.
+      Opens an editable version of the Institute's Intake Summary, pre-filled from this project — review and edit any field directly, then print or save it as a PDF to upload.
     </div>
-    <button class="btn-primary" onclick="downloadIntakeSummary()" id="intake-summary-btn">⬇ Download Intake Summary (.docx)</button>
+    <button class="btn-primary" onclick="openIntakeSummaryForm()" id="intake-summary-btn">📝 Edit & Print Intake Summary</button>
     <div id="intake-summary-status" style="margin-top:10px;"></div>
   </div>
 
@@ -3289,8 +3339,14 @@ function updateMilestoneTailorGuard(){
     guard.innerHTML = '';
     btn.disabled = false; btn.style.opacity = '1'; btn.style.cursor = 'pointer';
   }
+  // "Import from Proposal" already runs this automatically via chainTabAutofills(), so by
+  // the time a PM would look at this button it's usually already redundant for a first
+  // run — relabel (don't hide) once tailoring has happened, so re-running after a
+  // revised proposal stays a clearly available, deliberate action.
+  const alreadyTailored = !!(data.task_relevance || data.investigate_questions);
+  btn.textContent = alreadyTailored ? 'Re-tailor milestones to this proposal ↗' : 'Tailor milestones to this proposal ↗';
   const resetBtn = document.getElementById('btn-reset-tailoring');
-  if(resetBtn) resetBtn.style.display = (data.task_relevance || data.investigate_questions) ? 'inline-flex' : 'none';
+  if(resetBtn) resetBtn.style.display = alreadyTailored ? 'inline-flex' : 'none';
 }
 
 const IRB_STATUS_TEXT = {yes:'Yes — this project will collect data from human subjects', maybe:'Unsure whether this project will collect data from human subjects', no:'No — this project will not collect data from human subjects'};
@@ -3903,6 +3959,15 @@ function updateBudgetTailorGuard(){
     guard.innerHTML = '';
     btn.disabled = false; btn.style.opacity = '1'; btn.style.cursor = 'pointer';
   }
+  // "Import from Proposal" already runs this automatically via chainTabAutofills(), so by
+  // the time a PM would look at this button it's usually already redundant for a first
+  // run — relabel (don't hide) once tailoring has happened, so re-running after a revised
+  // proposal or spreadsheet stays a clearly available, deliberate action. Array.isArray
+  // (not .length) is the right check here — data.budget_flags is always set to an array,
+  // even an empty one, on every successful run, unlike the Reset button which only cares
+  // whether there are visible flags left to clear.
+  const alreadyTailored = Array.isArray(data.budget_flags);
+  btn.textContent = alreadyTailored ? 'Re-tailor budget to this proposal ↗' : 'Tailor budget to this proposal ↗';
   const resetBtn = document.getElementById('btn-reset-budget-tailoring');
   if(resetBtn) resetBtn.style.display = (data.budget_flags && data.budget_flags.length) ? 'inline-flex' : 'none';
 }
@@ -5501,50 +5566,32 @@ function getIntakeSupportNeeds(setup){
   ];
 }
 
-function docxSupportNeedsTable(rows){
-  const headerRow = new docx.TableRow({children:[
-    docxHeaderCell('Support Needs (check all that apply)', {span:2, width:{size:60,type:docx.WidthType.PERCENTAGE}}),
-    docxHeaderCell('Details', {width:{size:40,type:docx.WidthType.PERCENTAGE}})
-  ]});
-  const bodyRows = rows.map(r => new docx.TableRow({children:[
-    docxLabelCell(r.checked ? '☒' : '☐', {width:{size:8,type:docx.WidthType.PERCENTAGE}}),
-    docxLabelCell(r.label, {width:{size:52,type:docx.WidthType.PERCENTAGE}}),
-    docxValueCell(r.details||'', {width:{size:40,type:docx.WidthType.PERCENTAGE}})
-  ]}));
-  return docxFullWidthTable([headerRow, ...bodyRows]);
+// ── Intake Summary print-form builders (HTML, not docx — see openIntakeSummaryForm()) ──
+function intakeFieldRow(label, value){
+  return `<div class="intake-row"><div class="intake-label">${escapeHtml(label)}</div><div class="intake-value" contenteditable="true">${escapeHtml(value||'')}</div></div>`;
 }
 
-function docxNextStepsTable(){
-  const blank = ()=> new docx.TableRow({children:[
-    docxValueCell('', {width:{size:50,type:docx.WidthType.PERCENTAGE}}),
-    docxValueCell('', {width:{size:50,type:docx.WidthType.PERCENTAGE}})
-  ]});
-  return docxFullWidthTable([
-    docxHeaderRow('Next Steps'),
-    new docx.TableRow({children:[
-      docxHeaderCell('What', {width:{size:50,type:docx.WidthType.PERCENTAGE}}),
-      docxHeaderCell('Who', {width:{size:50,type:docx.WidthType.PERCENTAGE}})
-    ]}),
-    blank(), blank()
-  ]);
+function intakeSupportNeedsBlock(rows){
+  return `<div class="intake-section-title">Support Needs (check all that apply)</div>` +
+    rows.map(r=>`<div class="intake-checkbox-row"><label><input type="checkbox" ${r.checked?'checked':''}/> ${escapeHtml(r.label)}</label><div class="intake-value" contenteditable="true">${escapeHtml(r.details||'')}</div></div>`).join('');
+}
+
+function intakeNextStepsBlock(){
+  const row = () => `<tr><td contenteditable="true"></td><td contenteditable="true"></td></tr>`;
+  return `<div class="intake-section-title">Next Steps</div><table class="intake-table"><thead><tr><th>What</th><th>Who</th></tr></thead><tbody>${row()}${row()}</tbody></table>`;
 }
 
 // Not part of the official template — an intentional addition pulling proposal-review
 // content forward into the intake form, so it doesn't have to be re-derived from
 // scratch. Each subsection's bullets come straight out of the "Feedback on Proposal
 // and Scope" response via extractBulletSection(), never re-synthesized by a fresh AI call.
-function docxNotesTable(sections, placeholderText){
-  const rows = [docxHeaderRow('Notes')];
-  sections.forEach(sec=>{
-    const bulletParas = sec.bullets.length
-      ? sec.bullets.map(b=>new docx.Paragraph({bullet:{level:0}, spacing:{after:40}, children:[new docx.TextRun({text:b})]}))
-      : [new docx.Paragraph({children:[new docx.TextRun({text:placeholderText, italics:true, color:'999999'})]})];
-    rows.push(new docx.TableRow({children:[
-      docxLabelCell(sec.label, {width:{size:35,type:docx.WidthType.PERCENTAGE}}),
-      new docx.TableCell({width:{size:65,type:docx.WidthType.PERCENTAGE}, children:bulletParas})
-    ]}));
-  });
-  return docxFullWidthTable(rows);
+function intakeNotesBlock(sections, placeholderText){
+  return `<div class="intake-section-title">Notes</div>` + sections.map(sec=>{
+    const content = sec.bullets.length
+      ? '<ul>' + sec.bullets.map(b=>`<li>${escapeHtml(b)}</li>`).join('') + '</ul>'
+      : `<span style="color:#999;font-style:italic;">${escapeHtml(placeholderText)}</span>`;
+    return `<div class="intake-row"><div class="intake-label">${escapeHtml(sec.label)}</div><div class="intake-value" contenteditable="true">${content}</div></div>`;
+  }).join('');
 }
 
 async function synthesizeIntakeNarrative(){
@@ -5576,7 +5623,7 @@ Return ONLY a valid JSON object with no other text, explanation, or markdown, in
   return JSON.parse(jsonMatch[0]);
 }
 
-async function downloadIntakeSummary(){
+async function openIntakeSummaryForm(){
   const btn = document.getElementById('intake-summary-btn');
   const statusEl = document.getElementById('intake-summary-status');
   if(!btn || !statusEl) return;
@@ -5636,57 +5683,57 @@ async function downloadIntakeSummary(){
       instituteSupport: narrative.institute_support || '',
     };
 
-    const children = [
-      docxLogoParagraph(),
-      docxTitle([fields.title, 'Intake Summary']),
-      docxFullWidthTable([ new docx.TableRow({children:[ docxHeaderCell(`Intake date: ${fields.intakeDate}`, {width:{size:100,type:docx.WidthType.PERCENTAGE}}) ]}) ]),
-      docxSpacerParagraph(),
-      docxFullWidthTable([
-        docxHeaderRow('Project Team'),
-        docxFieldRow('Lead(s)', fields.leads),
-        docxFieldRow('Other team members', fields.team),
-      ]),
-      docxSpacerParagraph(),
-      docxFullWidthTable([
-        docxHeaderRow('Project Summary'),
-        docxFieldRow('Teaching & Learning Challenge/Opportunity', fields.challenge),
-        docxFieldRow('Proposed Academic Innovation', fields.innovation),
-        docxFieldRow('Budget Rationale', fields.budgetRationale),
-        docxFieldRow('Target Learners', fields.targetLearners),
-        docxFieldRow('Anticipated Impact', fields.impact),
-        docxFieldRow('Scaling/Dissemination', fields.dissemination),
-        docxFieldRow('Anticipated concerns/risks', fields.risks),
-      ]),
-      docxSpacerParagraph(),
-      docxSupportNeedsTable(fields.supportNeeds),
-      docxSpacerParagraph(),
-      docxFullWidthTable([
-        docxHeaderRow('Timeline'),
-        docxFieldRow('Anticipated project timeline', fields.timeline),
-        docxFieldRow('Timeline flexibility', fields.timelineFlex),
-        docxFieldRow('Timeline risk factors (anticipated)', fields.timelineRisk),
-      ]),
-      docxSpacerParagraph(),
-      docxFullWidthTable([
-        docxHeaderRow('Assessment/Evaluation Plan'),
-        docxFieldRow('Proposed evaluation strategies', fields.evalStrategies),
-        docxFieldRow('IRB needed? If so, plan for submission', fields.irb),
-        docxFieldRow('Institute support needs', fields.instituteSupport),
-      ]),
-      docxSpacerParagraph(),
-      docxNotesTable(notesSections, notesPlaceholder),
-      docxSpacerParagraph(),
-      docxNextStepsTable(),
-    ];
-
-    const doc = new docx.Document({ sections:[{ properties:{}, children }] });
-    await downloadDocxFile(doc, `${(s.title||'Shipley-Project').replace(/\s+/g,'_')}_Intake_Summary.docx`);
-    statusEl.innerHTML = `<div class="alert alert-green">Intake Summary downloaded — review every field, especially the narrative sections drafted by your guide, before sharing.</div>`;
+    const html = `
+      <div class="intake-header">
+        <img src="data:image/png;base64,${BU_LOGO_BASE64}" style="height:46px;" alt="BU logo"/>
+        <div>
+          <div class="intake-title">${escapeHtml(fields.title)} — Intake Summary</div>
+          <div class="intake-subtitle">Intake date: ${escapeHtml(fields.intakeDate)}</div>
+        </div>
+      </div>
+      <div class="intake-section-title">Project Team</div>
+      ${intakeFieldRow('Lead(s)', fields.leads)}
+      ${intakeFieldRow('Other team members', fields.team)}
+      <div class="intake-section-title">Project Summary</div>
+      ${intakeFieldRow('Teaching & Learning Challenge/Opportunity', fields.challenge)}
+      ${intakeFieldRow('Proposed Academic Innovation', fields.innovation)}
+      ${intakeFieldRow('Budget Rationale', fields.budgetRationale)}
+      ${intakeFieldRow('Target Learners', fields.targetLearners)}
+      ${intakeFieldRow('Anticipated Impact', fields.impact)}
+      ${intakeFieldRow('Scaling/Dissemination', fields.dissemination)}
+      ${intakeFieldRow('Anticipated concerns/risks', fields.risks)}
+      ${intakeSupportNeedsBlock(fields.supportNeeds)}
+      <div class="intake-section-title">Timeline</div>
+      ${intakeFieldRow('Anticipated project timeline', fields.timeline)}
+      ${intakeFieldRow('Timeline flexibility', fields.timelineFlex)}
+      ${intakeFieldRow('Timeline risk factors (anticipated)', fields.timelineRisk)}
+      <div class="intake-section-title">Assessment/Evaluation Plan</div>
+      ${intakeFieldRow('Proposed evaluation strategies', fields.evalStrategies)}
+      ${intakeFieldRow('IRB needed? If so, plan for submission', fields.irb)}
+      ${intakeFieldRow('Institute support needs', fields.instituteSupport)}
+      ${intakeNotesBlock(notesSections, notesPlaceholder)}
+      ${intakeNextStepsBlock()}
+    `;
+    document.getElementById('intake-print-area').innerHTML = html;
+    document.getElementById('intake-modal').style.display = 'block';
+    statusEl.innerHTML = '';
   }catch(e){
-    statusEl.innerHTML = `<div class="alert alert-amber">${docxErrorMessage(e)}</div>`;
+    statusEl.innerHTML = `<div class="alert alert-amber">Something went wrong preparing the Intake Summary — please try again. ${e && e.message ? `(${escapeHtml(e.message)})` : ''}</div>`;
   }finally{
     setButtonLoading(btn, false);
   }
+}
+
+function closeIntakeModal(){
+  document.getElementById('intake-modal').style.display = 'none';
+}
+function printIntakeSummary(){
+  // Clone the modal's current (possibly PM-edited) content into a plain element that's
+  // a direct child of body, outside the modal's fixed/overflow ancestor chain — a
+  // position:fixed element nested inside an overflow:auto modal can't be reliably
+  // paginated across multiple printed pages, but plain top-level document flow can.
+  document.getElementById('intake-print-clone').innerHTML = document.getElementById('intake-print-area').innerHTML;
+  window.print();
 }
 
 function showGanttModal(){

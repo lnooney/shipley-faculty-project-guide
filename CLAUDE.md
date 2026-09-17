@@ -170,13 +170,33 @@ Project → Project Report.**
   itself (also Laura's explicit request, moved up from originally sitting just above the
   mode toggle), since it's a standalone document independent of which report mode is
   selected and she wanted it to be the first thing a PM sees on the tab.
-  `downloadIntakeSummary()` reads entirely from `loadAll()` saved data, not live
-  Setup-tab DOM state, so the move was a pure HTML relocation with no logic change.
-- Generates a true `.docx` matching the Institute's official Intake Summary template
-  exactly (pink `F4CCCC` shaded table headers, same fields, same BU logo) — Laura wanted
-  it SharePoint-uploadable and further editable in Word, which ruled out a styled-HTML/
-  print approach; only a real generated `.docx` behaves like a native Word file in
-  SharePoint (previews, co-authoring, version history).
+- **No longer generates a `.docx` — replaced with an editable print/PDF form** after the
+  `.docx` download failed twice with the identical unresolved error even with a CDN
+  fallback in place (see the old entry below, kept for the postmortem). This sandbox can
+  never test the real `docx` library (its CDN is blocked here), so continuing to guess
+  at fixes for a feature that could never actually be verified stopped being a
+  responsible path. `openIntakeSummaryForm()` (replaces `downloadIntakeSummary()`) does
+  the same data-gathering and AI narrative synthesis as before, but renders it into a
+  modal (`#intake-modal`) as plain HTML with every field `contenteditable="true"` (and
+  real `<input type="checkbox">`s for Support Needs) instead of building `docx.Document`
+  objects — a PM edits directly in place, then "Print / Save as PDF"
+  (`printIntakeSummary()`, plain `window.print()`) to finish. Zero external dependency,
+  and fully testable in this sandbox for the first time.
+- **Printing a modal reliably across multiple pages took real care.** A
+  `position:fixed` element nested inside the modal's own `overflow:auto` box can't be
+  paginated correctly by the browser's print engine — an early version of this rendered
+  as an essentially blank PDF (confirmed empirically: a `page.pdf()` byte-count sanity
+  check, not just a screenshot, since `fullPage` screenshots don't represent real print
+  pagination either for `position:fixed` content). Fixed by giving the page a dedicated
+  `#intake-print-clone` element that's a direct child of `<body>`, deliberately outside
+  the modal's fixed/overflow ancestor chain; `printIntakeSummary()` clones the modal's
+  live (PM-edited) `#intake-print-area` HTML into it right before calling
+  `window.print()`, and the print stylesheet hides everything else on the page via
+  `display:none` (not `visibility:hidden` — that still reserves layout space and would
+  push real content down the page) so the clone prints in plain, normally-paginating
+  document flow. Verified by generating a PDF from deliberately long content and reading
+  the PDF's own `/Count` (page count) back out — confirmed 3 real pages, not 1 clipped
+  page — since a screenshot alone can't be trusted to catch this class of bug.
 - Direct fields (title, lead, team, challenge → Teaching & Learning Challenge, vision →
   Proposed Academic Innovation, audience → Target Learners, Impact Framework's Impacts,
   IRB status/notes, start/end dates) come straight from existing tool data — never
@@ -202,20 +222,17 @@ Project → Project Report.**
   session. If no proposal review has been run yet, each subsection shows a placeholder
   telling the PM to run "Feedback on Proposal and Scope" first, rather than a misleading
   "None identified." (which would imply a review ran and found nothing).
-- **Download bug — still unresolved after two fix attempts, see "Open items" below.**
-  Laura's exact error text confirmed `window.docx` was undefined when the button was
-  clicked — the `docx` library itself never loaded (not an API-usage bug in the
-  generation code, which the earlier diagnostic-message work correctly surfaced). Added
-  an `onerror` handler on the `docx` `<script>` tag that retries from a second CDN host
-  (unpkg) if the primary (cdn.jsdelivr.net) fails to load. Laura then hit the download
-  again and got the **exact same generic error text** — meaning either both CDN hosts
-  are failing for her, or (more likely, since `onerror` only fires on an actual load
-  failure) the script is loading successfully but not exposing `window.docx` the way
-  the code expects, which a load-failure fallback can never catch. Not yet fixed —
-  needs real diagnostic data (see "Open items") before attempting another change here.
-  `docxLibraryReady()`/`docxErrorMessage()` (used by both `downloadIntakeSummary()` and
-  `downloadReportDocx()`) still correctly distinguish "library didn't load" from other
-  errors — that part of the earlier work holds up.
+- **Postmortem on the abandoned `.docx` approach:** Laura's exact error text confirmed
+  `window.docx` was undefined when the button was clicked. A CDN fallback (jsdelivr →
+  unpkg) didn't change the outcome — she got the identical generic error again, which
+  (since that fallback only triggers on an actual load failure) was the signal that the
+  real problem likely wasn't a blocked/failed request at all, and that further CDN-level
+  patches weren't going to reliably fix something this sandbox could never test in the
+  first place. That's what motivated dropping `.docx` for this document entirely rather
+  than attempting a third blind fix — see above. `docxLibraryReady()`/`docxErrorMessage()`
+  still exist and are used by `downloadReportDocx()` (Milestone Snapshot/Final Report
+  still generate real `.docx` files, unaffected by this change — no reported issues
+  there) — untouched, only the Intake Summary's own usage of them was removed.
 
 **Proposal review rubric (Setup tab)**
 - Backend AI-scored, not a manual UI — 7 weighted criteria plus an eligibility screen
@@ -257,6 +274,12 @@ Project → Project Report.**
   with an unbounded slot will get filled with whatever fits, so the slot itself needs
   the cap, not just a general request to "be concise."
 **Budget tab**
+- **"Tailor budget to this proposal" relabels to "Re-tailor budget to this proposal"
+  once tailoring has run at least once** — same treatment and reasoning as the
+  Milestones button above, keyed off `Array.isArray(data.budget_flags)` (that field is
+  always set, even to an empty array, on every successful run — deliberately not the
+  same `.length` check the Reset button uses, since that one specifically means "there
+  are visible flags left to clear," a different question).
 - Awards are paid as a single lump sum, not by term — the whole tab was flattened from
   per-term columns to single amounts for this reason.
 - Fringe rates are **fixed institutional rates hardcoded in `BUDGET_DEFS`**, corrected to
@@ -319,6 +342,14 @@ Project → Project Report.**
   plain reminder text pointing at those buttons.
 
 **Milestones tab**
+- **"Tailor milestones to this proposal" relabels to "Re-tailor milestones to this
+  proposal" once tailoring has run at least once** (`updateMilestoneTailorGuard()`,
+  keyed off the same `data.task_relevance`/`data.investigate_questions` presence check
+  already used to show/hide the Reset button). This button is usually already redundant
+  the moment a PM finishes an import, since `chainTabAutofills()` runs the identical
+  function automatically — deliberately relabeled rather than hidden, since a PM may
+  legitimately want to re-run it after a revised proposal, and the tool already treats
+  re-tailoring as a normal, expected action via the existing Reset-button precedent.
 - Tailor Milestones hides irrelevant default tasks (`task_relevance`), asks the PM
   directly for genuinely ambiguous ones, and estimates start/due dates within the award
   window — grounded in effort required (not just sequence position), a predecessor
@@ -445,20 +476,9 @@ Project → Project Report.**
 
 ## Open items — not yet done, don't lose these
 
-1. **Intake Summary (.docx) download — still failing after two fix attempts.** Laura's
-   exact error text ("The Word document library didn't load...") was identical both
-   before and after adding a CDN fallback (jsdelivr → unpkg) for the `docx` library —
-   meaning the fallback didn't change the outcome. Since that fallback only triggers on
-   an actual script load failure, the same recurring message is a strong signal the real
-   cause might not be a blocked/failed request at all, but the script loading
-   successfully without exposing `window.docx` the way the generation code expects
-   (would explain why a second CDN host made no difference). Can't be tested locally —
-   both cdn.jsdelivr.net and unpkg.com are blocked from this sandbox's network policy, so
-   this feature has only ever run against a hand-built mock of the library, never the
-   real one. **Asked Laura** to open browser DevTools → Network tab, retry the download,
-   and report the actual status of the request to
-   `cdn.jsdelivr.net/npm/docx@8/build/index.js` (200 / 404 / blocked / etc.) — that's
-   needed before attempting another fix here, rather than guessing a third time.
+None currently. The Intake Summary `.docx` download issue (previously the sole open
+item) was resolved by replacing `.docx` generation for that document with an editable
+print/PDF form — see "Intake Summary" above.
 
 ## Future direction (discussed before, details not preserved)
 
