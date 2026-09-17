@@ -111,6 +111,29 @@ Project → Project Report.**
   letterhead. Shared builders (`docxHeaderCell`, `docxFieldRow`, `docxFullWidthTable`,
   `textToDocxParagraphs`, etc.) live just above `showGanttModal()` — reuse them for any
   future generated document rather than hand-rolling table/paragraph construction again.
+- **The embedded logo follows BU's actual brand guidelines** (checked against the real
+  guidelines doc Laura provided, not assumed). Two things confirmed there:
+  - **Which variant is correct**: the current logo (red "BU" brick + "Institute for
+    Excellence in Teaching & Learning" wordmark, in one combined image) is BU's
+    "Signature with department" — explicitly the variant for internal-to-BU use where a
+    department needs to be identified. Confirmed with Laura that all three generated
+    documents stay within BU (just outside the Institute team), which is exactly the
+    internal-audience case this variant is for — BU's guidelines separately require a
+    different, "Boston University"-spelled-out variant for external audiences, which
+    would NOT apply here. Don't second-guess this without checking with Laura first if
+    document distribution ever changes to include non-BU recipients.
+  - **Required clear space**: BU's rule is that clear space around the mark must equal
+    the height of the red brick, which (confirmed by measuring the actual embedded PNG)
+    spans the logo's full image height — 28px at the 380px render width used everywhere.
+    Applied as the minimum space above/left of the logo and to its right before any
+    adjacent text, in both the Intake Summary (`.intake-header` flex gap,
+    `#intake-modal-box`/`#intake-print-clone` padding) and the two `.docx` documents
+    (`docxLogoParagraph()`'s spacing, computed from the same logo-height measurement
+    rather than hardcoded, so it stays correct if the logo's render size ever changes).
+    This is a minimum, not an exact value — the Intake Summary's actual rendered space
+    above the logo ends up larger than 28px because the logo sits in a flex row next to
+    a taller two-line title block and gets vertically centered within that row, which is
+    still fully compliant (more than the minimum is fine; only *less* would violate it).
 - **Generated document filenames follow one convention everywhere:**
   `{Faculty PI last name}_{Doc type}_{MMDDYY}`, built by `buildDocFilename(docType)`
   (`getFacultyLastName()` + `getFileDateStamp()`, both just above `renderAIResponse()`).

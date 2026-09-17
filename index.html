@@ -701,7 +701,7 @@ a:hover{color:var(--navy);}
 
 /* ── INTAKE SUMMARY (editable print form, replaces .docx generation) ── */
 #intake-print-area{font-family:var(--sans);color:var(--text);}
-.intake-header{display:flex;align-items:center;gap:14px;margin-bottom:14px;padding-bottom:10px;border-bottom:2px solid var(--navy);}
+.intake-header{display:flex;align-items:center;gap:28px;margin-bottom:14px;padding-bottom:10px;border-bottom:2px solid var(--navy);}
 .intake-title{font-size:18px;font-weight:700;color:var(--navy);}
 .intake-subtitle{font-size:12px;color:var(--text2);}
 .intake-section-title{font-size:13px;font-weight:700;color:#fff;background:var(--navy);padding:6px 10px;margin:14px 0 6px;border-radius:4px;}
@@ -721,7 +721,7 @@ a:hover{color:var(--navy);}
 @media print{
   body{background:#fff!important;}
   body > *:not(#intake-print-clone){display:none!important;}
-  #intake-print-clone{display:block!important;padding:24px;background:#fff;}
+  #intake-print-clone{display:block!important;padding:28px;background:#fff;}
   .no-print{display:none!important;}
 }
 
@@ -774,7 +774,7 @@ a:hover{color:var(--navy);}
      AI narrative call completed successfully, the button's loading state cleared, but
      nothing ever appeared — same root cause class as the print-clone element above). -->
 <div id="intake-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:9999;overflow:auto;padding:20px;">
-  <div id="intake-modal-box" style="background:#fff;border-radius:12px;max-width:900px;margin:0 auto;padding:24px;position:relative;max-height:90vh;overflow:auto;">
+  <div id="intake-modal-box" style="background:#fff;border-radius:12px;max-width:900px;margin:0 auto;padding:28px;position:relative;max-height:90vh;overflow:auto;">
     <div class="no-print" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
       <h2 style="margin:0;font-size:17px;color:var(--navy);">Intake Summary</h2>
       <div style="display:flex;gap:10px;">
@@ -5507,8 +5507,13 @@ function base64ToUint8Array(b64){
 function docxLogoParagraph(){
   const width = 380;
   const height = Math.round(width * BU_LOGO_ASPECT);
+  // BU brand guidelines: required clear space around the mark equals the height of the
+  // red "BU" brick, which spans the logo's full image height — so the same measurement
+  // (in pixels) applies here as the minimum space below the logo before the next
+  // element, converted from pixels (96dpi) to twips (docx spacing unit, 20 per point).
+  const clearSpaceTwips = Math.round(height * (72/96) * 20);
   return new docx.Paragraph({
-    spacing:{after:200},
+    spacing:{after: clearSpaceTwips},
     children:[ new docx.ImageRun({ type:'png', data: base64ToUint8Array(BU_LOGO_BASE64), transformation:{width, height} }) ]
   });
 }
@@ -5604,8 +5609,31 @@ function getIntakeSupportNeeds(setup){
 }
 
 // ── Intake Summary print-form builders (HTML, not docx — see openIntakeSummaryForm()) ──
+// Renders a field's value as real bullets when it actually lists multiple distinct
+// items (semicolon-separated, e.g. "Proposed evaluation strategies," already
+// newline-bulleted "- " lines, or em-dash-separated) — a single plain sentence with
+// none of these stays as-is rather than becoming a pointless one-item list. Em dash
+// specifically requires at least 2 of them (3+ items) before treating it as a list —
+// a single em dash is usually just a "label — detail" pairing within one sentence
+// (common throughout this tool's own AI-generated text), not an enumeration.
+function formatIntakeValue(value){
+  const v = (value||'').trim();
+  if(!v) return '';
+  let parts;
+  if(/^-\s+/m.test(v)){
+    parts = v.split(/\n+/).map(s=>s.replace(/^-\s+/,'').trim()).filter(Boolean);
+  } else if(v.includes(';')){
+    parts = v.split(';').map(s=>s.trim()).filter(Boolean);
+  } else if((v.match(/—/g)||[]).length >= 2){
+    parts = v.split(/—/).map(s=>s.trim()).filter(Boolean);
+  } else {
+    parts = [v];
+  }
+  if(parts.length <= 1) return escapeHtml(v);
+  return '<ul>' + parts.map(p=>`<li>${escapeHtml(p)}</li>`).join('') + '</ul>';
+}
 function intakeFieldRow(label, value){
-  return `<div class="intake-row"><div class="intake-label">${escapeHtml(label)}</div><div class="intake-value" contenteditable="true">${escapeHtml(value||'')}</div></div>`;
+  return `<div class="intake-row"><div class="intake-label">${escapeHtml(label)}</div><div class="intake-value" contenteditable="true">${formatIntakeValue(value)}</div></div>`;
 }
 
 function intakeSupportNeedsBlock(rows){
@@ -5722,7 +5750,7 @@ async function openIntakeSummaryForm(){
 
     const html = `
       <div class="intake-header">
-        <img src="data:image/png;base64,${BU_LOGO_BASE64}" style="height:46px;" alt="BU logo"/>
+        <img src="data:image/png;base64,${BU_LOGO_BASE64}" style="width:380px;" alt="BU logo"/>
         <div>
           <div class="intake-title">${escapeHtml(fields.title)} — Intake Summary</div>
           <div class="intake-subtitle">Intake date: ${escapeHtml(fields.intakeDate)}</div>
