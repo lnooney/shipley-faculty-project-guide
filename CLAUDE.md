@@ -134,6 +134,26 @@ Project → Project Report.**
     above the logo ends up larger than 28px because the logo sits in a flex row next to
     a taller two-line title block and gets vertically centered within that row, which is
     still fully compliant (more than the minimum is fine; only *less* would violate it).
+  - **The tool's own on-page header used a fabricated look-alike, not the real logo** —
+    a plain red CSS square (`.ietl-logo-mark`, `background:#cc0000` with a hardcoded
+    "BU" `<span>`) next to a separately-styled text label, rather than BU's actual
+    artwork. Laura caught this: the brand-compliance pass above had only ever covered
+    the three *generated documents* (Intake Summary, Milestone Snapshot, Final Report),
+    never the live app page itself, so the header had been silently exempt from every
+    earlier compliance fix. Fixed by replacing that whole fabricated construction with
+    an `<img id="header-bu-logo">` using the same `BU_LOGO_BASE64` asset as everywhere
+    else — one official source for the mark now, not two different representations of
+    it. The base64 data itself stays defined once, at `BU_LOGO_BASE64`'s existing
+    declaration; the header `<img>` starts with no `src` in the static HTML and gets it
+    set via one line right after that declaration (`headerLogoImg.src = 'data:image/
+    png;base64,' + BU_LOGO_BASE64`), so the (large) base64 string isn't duplicated a
+    second time in the file. Rendered at the same 380px width already established as
+    compliant elsewhere on desktop, 260px on the existing `max-width:700px` mobile
+    breakpoint (small enough to avoid horizontal overflow on a narrow phone viewport,
+    confirmed via Playwright — no `scrollWidth > clientWidth`). Laura confirmed the
+    header's existing padding/spacing around the mark didn't need adjusting ("the
+    spacing looks ok, just eyeballed") — only the graphic itself was wrong, so
+    `.header-row1`'s padding was left untouched.
 - **Generated document filenames follow one convention everywhere:**
   `{Faculty PI last name}_{Doc type}_{MMDDYY}`, built by `buildDocFilename(docType)`
   (`getFacultyLastName()` + `getFileDateStamp()`, both just above `renderAIResponse()`).
