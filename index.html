@@ -1416,9 +1416,10 @@ a:hover{color:var(--navy);}
 
     <div style="display:flex;gap:10px;margin-top:16px;justify-content:flex-end;">
       <button onclick="saveFramework()" class="btn-primary">Save framework</button>
-      <button onclick="downloadFrameworkExcel()" class="btn-primary">⬇ Download Framework (.xlsx)</button>
+      <button onclick="downloadFrameworkExcel(this)" class="btn-primary">⬇ Download Framework (.xlsx)</button>
       <button onclick="reviewFramework()" class="btn-gold">Feedback on Impact Framework ↗</button>
     </div>
+    <div id="fw-excel-status"></div>
     <div id="framework-review" style="margin-top:14px;"></div>
   </div>
 
@@ -3284,36 +3285,36 @@ const MILESTONE_TASKS = {
     {name:'Develop data collection instruments (surveys, rubrics, observation protocols)', lead:'Full team', blocker:null, group:'Learning Analytics'},
   ],
   m2: [
-    {name:'Implement pedagogical intervention in course(s)', lead:'Piloting instructors', blocker:null},
-    {name:'Administer pre-intervention surveys and baseline measures', lead:'Project team', blocker:'Do not collect data until IRB approval is confirmed.'},
-    {name:'Collect ongoing data per the data collection plan', lead:'Project team', blocker:null},
-    {name:'Administer post-intervention surveys', lead:'Project team', blocker:null},
-    {name:'Collect teaching materials and artifacts for analysis', lead:'Project team', blocker:null},
+    {name:'Implement pedagogical intervention in course(s)', lead:'Piloting instructors', blocker:null, group:'Implementation'},
+    {name:'Administer pre-intervention surveys and baseline measures', lead:'Project team', blocker:'Do not collect data until IRB approval is confirmed.', group:'Data Collection'},
+    {name:'Collect ongoing data per the data collection plan', lead:'Project team', blocker:null, group:'Data Collection'},
+    {name:'Administer post-intervention surveys', lead:'Project team', blocker:null, group:'Data Collection'},
+    {name:'Collect teaching materials and artifacts for analysis', lead:'Project team', blocker:null, group:'Data Collection'},
   ],
   m3: [
-    {name:'Analyze quantitative data (surveys, grades, LMS data)', lead:'Project team', blocker:null},
-    {name:'Analyze qualitative data (artifacts, interviews, open-ended responses)', lead:'Project team', blocker:null},
-    {name:'Analyze second iteration data', lead:'Project team', blocker:null},
-    {name:'Synthesize findings and draft impact narrative', lead:'Faculty lead', blocker:null},
-    {name:'Share findings with the broader BU community', lead:'Project team', blocker:null},
-    {name:'Present findings to program and department colleagues', lead:'Faculty lead', blocker:null},
-    {name:'Identify and pursue publication or conference dissemination', lead:'Faculty lead', blocker:null},
-    {name:'Present at Institute event', lead:'Faculty lead', blocker:null},
+    {name:'Analyze quantitative data (surveys, grades, LMS data)', lead:'Project team', blocker:null, group:'Analysis'},
+    {name:'Analyze qualitative data (artifacts, interviews, open-ended responses)', lead:'Project team', blocker:null, group:'Analysis'},
+    {name:'Analyze second iteration data', lead:'Project team', blocker:null, group:'Analysis'},
+    {name:'Synthesize findings and draft impact narrative', lead:'Faculty lead', blocker:null, group:'Analysis'},
+    {name:'Share findings with the broader BU community', lead:'Project team', blocker:null, group:'Dissemination'},
+    {name:'Present findings to program and department colleagues', lead:'Faculty lead', blocker:null, group:'Dissemination'},
+    {name:'Identify and pursue publication or conference dissemination', lead:'Faculty lead', blocker:null, group:'Dissemination'},
+    {name:'Present at Institute event', lead:'Faculty lead', blocker:null, group:'Dissemination'},
   ],
   m4: [
-    {name:'Review data analysis', lead:'Full team', blocker:null},
-    {name:'Develop plan for second iteration', lead:'Full team', blocker:null},
-    {name:'Plan and implement second pilot (if applicable)', lead:'Piloting instructors', blocker:null},
-    {name:'Develop plan to sustain or scale the intervention', lead:'Faculty lead', blocker:null},
-    {name:'Refine intervention based on findings and faculty feedback', lead:'Faculty lead', blocker:null},
-    {name:'Reflect on lessons learned — what would the team do differently?', lead:'Full team', blocker:null},
+    {name:'Review data analysis', lead:'Full team', blocker:null, group:'Reflection'},
+    {name:'Develop plan for second iteration', lead:'Full team', blocker:null, group:'Iteration'},
+    {name:'Plan and implement second pilot (if applicable)', lead:'Piloting instructors', blocker:null, group:'Iteration'},
+    {name:'Develop plan to sustain or scale the intervention', lead:'Faculty lead', blocker:null, group:'Scaling & Sustainability'},
+    {name:'Refine intervention based on findings and faculty feedback', lead:'Faculty lead', blocker:null, group:'Iteration'},
+    {name:'Reflect on lessons learned — what would the team do differently?', lead:'Full team', blocker:null, group:'Reflection'},
   ],
   m5: [
-    {name:'Complete project report', lead:'Faculty lead', blocker:null},
-    {name:'Submit final report to the Institute team', lead:'Faculty lead', blocker:null},
-    {name:'Share requested resources with the Institute team', lead:'Faculty lead', blocker:null},
-    {name:'Share resources and final findings with the Institute team for broader dissemination', lead:'Faculty lead', blocker:null},
-    {name:'Document sustainability plan or handoff', lead:'Faculty lead', blocker:null},
+    {name:'Complete project report', lead:'Faculty lead', blocker:null, group:'Reporting'},
+    {name:'Submit final report to the Institute team', lead:'Faculty lead', blocker:null, group:'Reporting'},
+    {name:'Share requested resources with the Institute team', lead:'Faculty lead', blocker:null, group:'Reporting'},
+    {name:'Share resources and final findings with the Institute team for broader dissemination', lead:'Faculty lead', blocker:null, group:'Dissemination'},
+    {name:'Document sustainability plan or handoff', lead:'Faculty lead', blocker:null, group:'Closeout'},
   ]
 };
 
@@ -5097,23 +5098,34 @@ function buildDocFilename(docType){
   return `${getFacultyLastName()}_${docType}_${getFileDateStamp()}`;
 }
 
-function renderAIResponse(container, text, filenameBase){
+// Turns a docType like "Budget_Feedback" or "Goals_Changes_Feedback" into the human-readable
+// label used in the printed document's subhead ("Budget", "Goals Changes") — strips the
+// trailing "_Feedback" every feedback docType ends with (and the "Guide_" prefix on the one
+// surface that doesn't, Ask Guide chat's "Guide_Chat"), then turns underscores into spaces.
+function feedbackTypeLabel(docType){
+  if(!docType) return 'Guide';
+  return docType.replace(/_Feedback$/,'').replace(/^Guide_/,'').replace(/_/g,' ');
+}
+
+function renderAIResponse(container, text, filenameBase, docType){
   const id='ai-r-'+Date.now();
   const wrapperId='ai-w-'+Date.now();
   const fnBase = filenameBase || buildDocFilename('Guide_Feedback');
-  container.innerHTML=`<div id="${wrapperId}"><div class="ai-response" id="${id}">${formatAIResponse(text)}</div><div class="ai-actions"><button class="btn-sm" onclick="copyAIResponse('${id}')">📋 Copy</button><button class="btn-sm" onclick="saveAIResponseAsPDF('${id}','${fnBase}')">⬇ Save as PDF</button><button class="btn-sm" onclick="document.getElementById('${wrapperId}').innerHTML=''">✕ Close</button></div></div>`;
+  const dt = (docType||'').replace(/'/g,"\\'");
+  container.innerHTML=`<div id="${wrapperId}"><div class="ai-response" id="${id}">${formatAIResponse(text)}</div><div class="ai-actions"><button class="btn-sm" onclick="copyAIResponse('${id}')">📋 Copy</button><button class="btn-sm" onclick="saveAIResponseAsPDF('${id}','${fnBase}','${dt}')">⬇ Save as PDF</button><button class="btn-sm" onclick="document.getElementById('${wrapperId}').innerHTML=''">✕ Close</button></div></div>`;
 }
 function copyAIResponse(id){
   const el=document.getElementById(id);if(!el)return;
   navigator.clipboard.writeText(el.innerText).then(()=>flashSave()).catch(()=>{});
 }
-function saveAIResponseAsPDF(id, filenameBase){
+function saveAIResponseAsPDF(id, filenameBase, docType){
   const el=document.getElementById(id);if(!el)return;
   const data=loadAll();const title=(data.setup&&data.setup.title)||'Shipley Project';
   const date=new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});
   const fnBase = filenameBase || buildDocFilename('Guide_Feedback');
+  const subhead = `Shipley Project Guide ${feedbackTypeLabel(docType)} Feedback — ${date}`;
   const win=window.open('','_blank');
-  win.document.write(`<!DOCTYPE html><html><head><title>${fnBase}</title><style>body{font-family:Georgia,serif;max-width:680px;margin:40px auto;color:#222;line-height:1.7;font-size:14px;}h1{font-size:18px;color:#1a2744;margin-bottom:4px;}.meta{font-size:12px;color:#888;margin-bottom:24px;border-bottom:1px solid #eee;padding-bottom:12px;}.content{white-space:pre-wrap;}</style></head><body><h1>${title}</h1><div class="meta">Shipley Project Guide feedback — ${date}</div><div class="content">${el.innerText}</div></body></html>`);
+  win.document.write(`<!DOCTYPE html><html><head><title>${fnBase}</title><style>body{font-family:Georgia,serif;max-width:680px;margin:40px auto;color:#222;line-height:1.7;font-size:14px;}h1{font-size:18px;color:#1a2744;margin-bottom:4px;}.meta{font-size:12px;color:#888;margin-bottom:24px;border-bottom:1px solid #eee;padding-bottom:12px;}.content{white-space:pre-wrap;}</style></head><body><h1>${title}</h1><div class="meta">${subhead}</div><div class="content">${el.innerText}</div></body></html>`);
   win.document.close();setTimeout(()=>win.print(),500);
 }
 
@@ -5228,7 +5240,7 @@ WHAT IMPACT WILL THIS PROJECT HAVE IF SELECTED
 - [short bullet, if there's a third distinct point — otherwise omit]`;
   try{
     const r = await callGuide(prompt, {skipCtx:true, maxTokens:3000});
-    renderAIResponse(out, r, buildDocFilename('Proposal_Review_Feedback'));
+    renderAIResponse(out, r, buildDocFilename('Proposal_Review_Feedback'), 'Proposal_Review_Feedback');
     const items = [
       ...extractBulletSection(r, 'ELIGIBILITY SCREEN'),
       ...extractBulletSection(r, 'RED FLAGS'),
@@ -5276,7 +5288,7 @@ Format your response as three short labeled sections — "Misalignment," "Realis
 End your response with a section titled exactly "ACTION ITEMS FOR THE PM:" followed by 0–4 bullet points (each under ~15 words — a PM needs to scan this in a few seconds) naming concrete follow-ups to raise with the faculty lead — or a single bullet "None identified." if there's nothing actionable.`;
   try{
     const r = await callGuide(prompt, {maxTokens:1300});
-    renderAIResponse(out, r, buildDocFilename('Impact_Framework_Review_Feedback'));
+    renderAIResponse(out, r, buildDocFilename('Impact_Framework_Review_Feedback'), 'Impact_Framework_Review_Feedback');
     setFollowUpItems('framework', extractBulletSection(r, 'ACTION ITEMS FOR THE PM:'));
   }catch(e){
     out.innerHTML=`<div class="ai-response" style="border-left-color:var(--red);">Something went wrong.</div>`;
@@ -5335,8 +5347,6 @@ function getAllProjectTasks(){
 
 async function downloadProjectExcel(){
   const {rows, teamRows} = getAllProjectTasks();
-  const data = loadAll();
-  const setup = data.setup || {};
   const wb = new ExcelJS.Workbook();
 
   // Colors by milestone
@@ -5349,13 +5359,21 @@ async function downloadProjectExcel(){
   };
   const statusColors = {'Complete':'C6EFCE','In Progress':'FFEB9C','Not Started':'FFC7CE'};
   const statusFonts = {'Complete':'006100','In Progress':'9C6500','Not Started':'9C0006'};
+  const HEADER_SIZE = 16, MILESTONE_SIZE = 14, BODY_SIZE = 12;
+  const BANDING_FILL = 'F2F2F2';
 
   // ── Sheet 1: Team ──
   const ws1 = wb.addWorksheet('Project Team');
   ws1.columns = [{header:'Role',key:'role',width:25},{header:'Name',key:'name',width:30},{header:'Department',key:'dept',width:30}];
-  ws1.getRow(1).font = {bold:true,color:{argb:'FFFFFF'}};
+  ws1.getRow(1).font = {bold:true,size:HEADER_SIZE,color:{argb:'FFFFFF'}};
   ws1.getRow(1).fill = {type:'pattern',pattern:'solid',fgColor:{argb:'1A2744'}};
-  teamRows.forEach(r=>ws1.addRow(r));
+  ws1.getRow(1).height = 26;
+  teamRows.forEach((r,i)=>{
+    const row = ws1.addRow(r);
+    row.font = {size:BODY_SIZE};
+    if(i % 2 === 1) row.eachCell({includeEmpty:true},cell=>{ cell.fill = {type:'pattern',pattern:'solid',fgColor:{argb:BANDING_FILL}}; });
+  });
+  ws1.views = [{state:'frozen', ySplit:1}];
 
   // ── Sheet 2: Tasks ──
   const ws2 = wb.addWorksheet('Tasks & Timeline');
@@ -5369,28 +5387,45 @@ async function downloadProjectExcel(){
     {header:'Status',key:'status',width:14},
     {header:'Notes',key:'notes',width:30}
   ];
-  ws2.getRow(1).font = {bold:true,color:{argb:'FFFFFF'}};
+  const COL_COUNT = ws2.columns.length;
+  ws2.getRow(1).font = {bold:true,size:HEADER_SIZE,color:{argb:'FFFFFF'}};
   ws2.getRow(1).fill = {type:'pattern',pattern:'solid',fgColor:{argb:'1A2744'}};
+  ws2.getRow(1).height = 28;
 
-  let lastMilestone = '';
+  let lastMilestone = null;
+  let bandIndex = 0;
   rows.forEach(r=>{
-    const row = ws2.addRow(r);
-    // Milestone section color
-    const mc = mColors[r.milestone];
-    if(mc && r.milestone !== lastMilestone){
-      // Section header row
+    // A full color-filled banner row announces each new milestone phase, replacing the
+    // old per-cell Milestone-column coloring (which was easy to miss scanning down the page).
+    if(r.milestone !== lastMilestone){
+      const bannerRow = ws2.addRow({});
+      bannerRow.height = 24;
+      try{ ws2.mergeCells(bannerRow.number, 1, bannerRow.number, COL_COUNT); }catch(e){}
+      const mc = mColors[r.milestone] || '1A2744';
+      bannerRow.getCell(1).value = r.milestone;
+      bannerRow.eachCell({includeEmpty:true}, cell=>{
+        cell.fill = {type:'pattern',pattern:'solid',fgColor:{argb:mc}};
+        cell.font = {color:{argb:'FFFFFF'},bold:true,size:MILESTONE_SIZE};
+        cell.alignment = {vertical:'middle'};
+      });
       lastMilestone = r.milestone;
+      bandIndex = 0;
     }
-    if(mc){
-      row.getCell('milestone').fill = {type:'pattern',pattern:'solid',fgColor:{argb:mc}};
-      row.getCell('milestone').font = {color:{argb:'FFFFFF'},bold:true};
+    const row = ws2.addRow(r);
+    row.font = {size:BODY_SIZE};
+    row.getCell('task').alignment = {wrapText:true, vertical:'top'};
+    row.getCell('notes').alignment = {wrapText:true, vertical:'top'};
+    // Light banding within each phase makes long task lists easier to track across columns
+    if(bandIndex % 2 === 1){
+      row.eachCell({includeEmpty:true},cell=>{ cell.fill = {type:'pattern',pattern:'solid',fgColor:{argb:BANDING_FILL}}; });
     }
+    bandIndex++;
     // Status cell color
     const sc = statusColors[r.status];
     const sf = statusFonts[r.status];
     if(sc){
       row.getCell('status').fill = {type:'pattern',pattern:'solid',fgColor:{argb:sc}};
-      row.getCell('status').font = {color:{argb:sf},bold:true};
+      row.getCell('status').font = {color:{argb:sf},bold:true,size:BODY_SIZE};
     }
     // Borders
     row.eachCell(cell=>{
@@ -5398,20 +5433,9 @@ async function downloadProjectExcel(){
     });
   });
 
-  // Merge consecutive identical milestone cells
-  let mergeStart = 2; let prevM = '';
-  for(let i = 2; i <= ws2.rowCount + 1; i++){
-    const val = i <= ws2.rowCount ? ws2.getRow(i).getCell('milestone').value : null;
-    if(val !== prevM && prevM){
-      if(i - 1 > mergeStart) try{ws2.mergeCells(mergeStart,1,i-1,1);}catch(e){}
-      mergeStart = i;
-    }
-    if(val !== prevM) mergeStart = i;
-    prevM = val;
-  }
-
-  // Auto-filter
-  ws2.autoFilter = {from:'A1',to:'H1'};
+  // Auto-filter and a frozen header row so column labels stay visible while scrolling a long plan
+  ws2.autoFilter = {from:'A1',to:`${String.fromCharCode(64+COL_COUNT)}1`};
+  ws2.views = [{state:'frozen', ySplit:1}];
 
   // Download
   const buffer = await wb.xlsx.writeBuffer();
@@ -5419,75 +5443,221 @@ async function downloadProjectExcel(){
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = `${(setup.title||'Shipley-Project').replace(/\s+/g,'_')}_Project_Plan.xlsx`;
+  a.download = `${buildDocFilename('Project_Plan')}.xlsx`;
   a.click();
   URL.revokeObjectURL(url);
 }
 
-async function downloadFrameworkExcel(){
+// Maps a section's free-text/"rows" content into a flat list of trimmed, bullet-stripped strings.
+function fwBulletList(text){
+  return (text||'').split('\n').map(l=>l.replace(/^[-•]\s*/,'').trim()).filter(Boolean);
+}
+
+async function downloadFrameworkExcel(btn){
   saveFramework();
   const data = loadAll();
   const fw = data.framework || {};
   const setup = data.setup || {};
+  const statusEl = document.getElementById('fw-excel-status');
+
+  const problemsList = fwBulletList(fw.problems);
+  const objectivesList = fwBulletList(fw.objectives);
+  const impactsList = fwBulletList(fw.impacts);
+  const analysisList = fwBulletList(fw.analysis);
+  const measureRows = (fw.measures_rows||[]).filter(r=>r.measure && r.measure.trim());
+  const collectionRows = (fw.collection_rows||[]).filter(r=>r.source && r.source.trim());
+
+  const sectionsFilled = [problemsList, objectivesList, impactsList, measureRows, collectionRows, analysisList].filter(l=>l.length).length;
+  if(sectionsFilled === 0){
+    if(statusEl) statusEl.innerHTML = `<div class="alert alert-amber" style="margin-top:8px;">Fill in at least one Impact Framework section before downloading.</div>`;
+    return;
+  }
+
+  if(btn) setButtonLoading(btn, true);
+  if(statusEl) statusEl.innerHTML = `<div class="alert alert-blue" style="margin-top:8px;">Your guide is mapping the connections across your framework sections…</div>`;
+
+  let connections = [];
+  const unmatched = {problems:[], objectives:[], impacts:[], measures:[], collection:[], analysis:[]};
+
+  // Nothing to connect with only one section filled in — skip the AI call, everything just lands in "unmatched" below.
+  if(sectionsFilled >= 2){
+    const sectionsText = `Problems:\n${problemsList.map(p=>`- ${p}`).join('\n') || '(none entered)'}\n\nObjectives:\n${objectivesList.map(o=>`- ${o}`).join('\n') || '(none entered)'}\n\nImpacts:\n${impactsList.map(i=>`- ${i}`).join('\n') || '(none entered)'}\n\nMeasures & Targets:\n${measureRows.map(r=>`- Measure: ${r.measure} | Target: ${r.target||'(no target entered)'}`).join('\n') || '(none entered)'}\n\nData Collection:\n${collectionRows.map(r=>`- Source: ${r.source} | Frequency: ${r.freq||'(no frequency entered)'}`).join('\n') || '(none entered)'}\n\nData Analysis:\n${analysisList.map(a=>`- ${a}`).join('\n') || '(none entered)'}`;
+
+    const prompt = `You are helping an Institute for Excellence in Teaching & Learning staff member see how the pieces of their Impact Evaluation Framework connect to each other, for a Shipley Academic Innovation project at Boston University.
+
+Below are the six sections of the framework as entered, following backward design (each Problem should lead to an Objective, which leads to an Impact, which is measured by a Measure & Target, collected via a Data Collection source and frequency, and analyzed by a Data Analysis method):
+
+${sectionsText}
+
+Trace the logical chain from each Problem through to its Data Analysis method, using ONLY what the text above actually supports — never invent or force a connection that isn't reasonably implied. It's normal and expected for:
+- one Problem to connect to multiple Objectives, or one Objective to serve multiple Problems (same for every other adjacent pair) — output one row per distinct connection, never collapse multiple real connections into a single row.
+- a chain to be incomplete (e.g. a Measure with no clearly linked Data Collection source yet) — leave that field as an empty string "" rather than guessing at a link that isn't there.
+
+Copy every field's text EXACTLY as written above, verbatim — never paraphrase, summarize, or shorten it.
+
+Return ONLY a valid JSON object, no other text or markdown, in exactly this shape:
+{"connections": [{"problem":"...","objective":"...","impact":"...","measure":"...","target":"...","source":"...","frequency":"...","analysis":"..."}], "unmatched_problems": ["..."], "unmatched_objectives": ["..."], "unmatched_impacts": ["..."], "unmatched_measures": [{"measure":"...","target":"..."}], "unmatched_collection": [{"source":"...","frequency":"..."}], "unmatched_analysis": ["..."]}
+
+Every single bullet/row from every section above must end up EITHER inside at least one "connections" row OR listed in that section's "unmatched_" array — never dropped from both. Keep each Measure paired with its own Target in "unmatched_measures", and each Source paired with its own Frequency in "unmatched_collection" — those pairings are already known from how the data is entered, not something you need to infer.`;
+
+    try{
+      const raw = await callGuide(prompt, {skipCtx:true, maxTokens:3000});
+      const jsonMatch = raw.match(/\{[\s\S]*\}/);
+      if(jsonMatch){
+        const parsed = JSON.parse(jsonMatch[0]);
+        connections = Array.isArray(parsed.connections) ? parsed.connections : [];
+        unmatched.problems = parsed.unmatched_problems || [];
+        unmatched.objectives = parsed.unmatched_objectives || [];
+        unmatched.impacts = parsed.unmatched_impacts || [];
+        unmatched.measures = parsed.unmatched_measures || [];
+        unmatched.collection = parsed.unmatched_collection || [];
+        unmatched.analysis = parsed.unmatched_analysis || [];
+      }
+    }catch(e){
+      // Falls through with no connections — every raw item still lands in "unmatched" below, so nothing is lost.
+    }
+  }
+
+  // If the AI call was skipped, failed, or returned nothing usable, every item still needs to show up
+  // somewhere in the export — put it all in "unmatched" rather than silently dropping it.
+  if(!connections.length){
+    unmatched.problems = unmatched.problems.length ? unmatched.problems : problemsList;
+    unmatched.objectives = unmatched.objectives.length ? unmatched.objectives : objectivesList;
+    unmatched.impacts = unmatched.impacts.length ? unmatched.impacts : impactsList;
+    unmatched.measures = unmatched.measures.length ? unmatched.measures : measureRows.map(r=>({measure:r.measure, target:r.target||''}));
+    unmatched.collection = unmatched.collection.length ? unmatched.collection : collectionRows.map(r=>({source:r.source, frequency:r.freq||''}));
+    unmatched.analysis = unmatched.analysis.length ? unmatched.analysis : analysisList;
+  }
+
   const wb = new ExcelJS.Workbook();
   const ws = wb.addWorksheet('Impact Framework');
-  ws.columns = [{key:'a',width:55},{key:'b',width:35}];
+  const TITLE_SIZE = 16, COL_HEADER_SIZE = 14, BODY_SIZE = 12;
+  // One color per originating section — Measure/Target share the Measures & Targets color,
+  // Source/Frequency share the Data Collection color, so the 6 sections stay visually identifiable.
+  const colColors = {problem:'4472C4', objective:'5B9BD5', impact:'70AD47', measure:'FFC000', target:'FFD966', source:'ED7D31', frequency:'F4B183', analysis:'7030A0'};
+  const keys = ['problem','objective','impact','measure','target','source','frequency','analysis'];
+  const headers = ['Problem','Objective','Impact','Measure','Target','Data Source','Frequency','Data Analysis'];
+  ws.columns = keys.map((key,i)=>({key, width: [32,32,32,28,22,26,20,32][i]}));
+  const COL_COUNT = keys.length;
 
-  function addHeader(title){
-    const row = ws.addRow([title]);
-    row.font = {bold:true,size:13,color:{argb:'FFFFFF'}};
-    row.getCell(1).fill = {type:'pattern',pattern:'solid',fgColor:{argb:'1A2744'}};
-    ws.mergeCells(row.number,1,row.number,2);
+  const titleRow = ws.addRow({problem: setup.title || 'Shipley Project'});
+  titleRow.getCell(1).font = {bold:true, size:TITLE_SIZE, color:{argb:'1A2744'}};
+  ws.mergeCells(titleRow.number,1,titleRow.number,COL_COUNT);
+
+  const subtitleRow = ws.addRow({problem: 'Impact Evaluation Framework — Connections Across Sections'});
+  subtitleRow.getCell(1).font = {italic:true, size:BODY_SIZE, color:{argb:'555555'}};
+  ws.mergeCells(subtitleRow.number,1,subtitleRow.number,COL_COUNT);
+  ws.addRow([]);
+
+  const noteRow = ws.addRow({problem: 'These connections were drafted by the Guide from your framework entries — review and revise them with your faculty lead before relying on them.'});
+  noteRow.height = 32;
+  ws.mergeCells(noteRow.number,1,noteRow.number,COL_COUNT);
+  noteRow.eachCell({includeEmpty:true}, cell=>{
+    cell.fill = {type:'pattern',pattern:'solid',fgColor:{argb:'FFF1E6'}};
+    cell.font = {bold:true, size:BODY_SIZE, color:{argb:'8A3D0F'}};
+    cell.alignment = {wrapText:true, vertical:'middle'};
+  });
+  ws.addRow([]);
+
+  const headerRow = ws.addRow(headers);
+  headerRow.height = 28;
+  headerRow.eachCell((cell, colNumber)=>{
+    const key = keys[colNumber-1];
+    cell.fill = {type:'pattern',pattern:'solid',fgColor:{argb:colColors[key]}};
+    cell.font = {bold:true, size:COL_HEADER_SIZE, color:{argb:'FFFFFF'}};
+    cell.alignment = {wrapText:true, vertical:'middle'};
+  });
+  ws.views = [{state:'frozen', ySplit: headerRow.number}];
+
+  const dataStartRow = headerRow.number + 1;
+  if(connections.length){
+    connections.forEach(c=>{
+      const row = ws.addRow({
+        problem: c.problem||'', objective: c.objective||'', impact: c.impact||'',
+        measure: c.measure||'', target: c.target||'', source: c.source||'',
+        frequency: c.frequency||'', analysis: c.analysis||''
+      });
+      row.font = {size:BODY_SIZE};
+      row.eachCell({includeEmpty:true}, cell=>{
+        cell.alignment = {wrapText:true, vertical:'top'};
+        cell.border = {top:{style:'thin',color:{argb:'D9D9D9'}},bottom:{style:'thin',color:{argb:'D9D9D9'}}};
+      });
+    });
+    const dataEndRow = headerRow.number + connections.length;
+    // Vertically merge repeated Problem/Objective/Impact cells down consecutive rows, so the
+    // sheet reads as the branching tree Laura described rather than repeating the same text on
+    // every row — but only when every column to its left also matches, so two rows never get
+    // merged just because they happen to share the same Objective under different Problems.
+    ['problem','objective','impact'].forEach((key,idx)=>{
+      const colIndex = idx+1;
+      let runStart = dataStartRow;
+      for(let r = dataStartRow+1; r <= dataEndRow+1; r++){
+        const inRange = r <= dataEndRow;
+        const ancestorsMatch = inRange && Array.from({length:colIndex},(_, a)=>a+1).every(c=>
+          ws.getRow(r).getCell(c).value === ws.getRow(r-1).getCell(c).value
+        );
+        if(!ancestorsMatch){
+          if(r-1 > runStart) try{ ws.mergeCells(runStart, colIndex, r-1, colIndex); }catch(e){}
+          runStart = r;
+        }
+      }
+    });
   }
-  function addBullets(text){
-    const lines = (text||'').split('\n').map(l=>l.replace(/^[-•]\s*/,'').trim()).filter(Boolean);
-    if(!lines.length){ ws.addRow(['—']); return; }
-    lines.forEach(l=>ws.addRow(['• '+l]));
+
+  // "Not yet connected" section — anything the Guide couldn't confidently place in a chain still
+  // needs to show up somewhere, so it's never silently missing from the export. Each item stays in
+  // its own originating column (same color-coding as the table above) rather than being pulled out
+  // into a separate generic list, so a PM can see at a glance which section it came from — Laura's
+  // explicit request. A row here has no cross-column meaning (e.g. row 3's leftover Problem and row
+  // 3's leftover Impact are NOT implied to be related) — each column just stacks its own leftovers
+  // top-down independently, except Measure/Target and Source/Frequency, which share a row because
+  // that specific pairing is already known from how the data was entered, not an AI guess.
+  const unmatchedByCol = {
+    problem: unmatched.problems, objective: unmatched.objectives, impact: unmatched.impacts,
+    measure: (unmatched.measures||[]).map(m=>m.measure||''), target: (unmatched.measures||[]).map(m=>m.target||''),
+    source: (unmatched.collection||[]).map(c=>c.source||''), frequency: (unmatched.collection||[]).map(c=>c.frequency||''),
+    analysis: unmatched.analysis
+  };
+  const unmatchedAny = Object.values(unmatchedByCol).some(arr=>arr && arr.length);
+  if(unmatchedAny){
+    ws.addRow([]);
+    const noteRow2 = ws.addRow({problem: 'Not yet connected — review with your faculty lead and decide where each of these fits (or whether it still applies).'});
+    noteRow2.height = 32;
+    ws.mergeCells(noteRow2.number,1,noteRow2.number,COL_COUNT);
+    noteRow2.eachCell({includeEmpty:true}, cell=>{
+      cell.fill = {type:'pattern',pattern:'solid',fgColor:{argb:'FFF1E6'}};
+      cell.font = {bold:true, size:BODY_SIZE, color:{argb:'8A3D0F'}};
+      cell.alignment = {wrapText:true, vertical:'middle'};
+    });
+
+    const maxUnmatched = Math.max(...keys.map(k=>(unmatchedByCol[k]||[]).length));
+    for(let i=0;i<maxUnmatched;i++){
+      const rowData = {};
+      keys.forEach(k=>{ rowData[k] = (unmatchedByCol[k]||[])[i] || ''; });
+      const r = ws.addRow(rowData);
+      r.font = {size:BODY_SIZE};
+      r.eachCell({includeEmpty:true}, cell=>{
+        cell.alignment = {wrapText:true, vertical:'top'};
+        cell.border = {top:{style:'thin',color:{argb:'D9D9D9'}},bottom:{style:'thin',color:{argb:'D9D9D9'}}};
+      });
+    }
   }
-  function addTable(rows, keys, headers){
-    const hdrRow = ws.addRow(headers);
-    hdrRow.font = {bold:true};
-    hdrRow.eachCell(cell=>{ cell.fill = {type:'pattern',pattern:'solid',fgColor:{argb:'F2F2F2'}}; });
-    const realRows = (rows||[]).filter(r=>r[keys[0]] && r[keys[0]].trim());
-    if(!realRows.length){ ws.addRow(['—','']); return; }
-    realRows.forEach(r=>ws.addRow([r[keys[0]], r[keys[1]] || '']));
+
+  try{
+    const buffer = await wb.xlsx.writeBuffer();
+    const blob = new Blob([buffer],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${buildDocFilename('Impact_Framework')}.xlsx`;
+    a.click();
+    URL.revokeObjectURL(url);
+    if(statusEl) statusEl.innerHTML = '';
+  }catch(e){
+    if(statusEl) statusEl.innerHTML = `<div class="alert alert-amber" style="margin-top:8px;">Something went wrong building the file — please try again.</div>`;
+  }finally{
+    if(btn) setButtonLoading(btn, false);
   }
-
-  ws.addRow([setup.title || 'Shipley Project']).font = {bold:true,size:15};
-  ws.addRow(['Impact Evaluation Framework']);
-  ws.addRow([]);
-
-  addHeader('1. Problems');
-  addBullets(fw.problems);
-  ws.addRow([]);
-
-  addHeader('2. Objectives');
-  addBullets(fw.objectives);
-  ws.addRow([]);
-
-  addHeader('3. Impacts');
-  addBullets(fw.impacts);
-  ws.addRow([]);
-
-  addHeader('4. Measures & Targets');
-  addTable(fw.measures_rows, ['measure','target'], ['Measure','Target']);
-  ws.addRow([]);
-
-  addHeader('5. Data Collection');
-  addTable(fw.collection_rows, ['source','freq'], ['Source','Frequency']);
-  ws.addRow([]);
-
-  addHeader('6. Data Analysis');
-  addBullets(fw.analysis);
-
-  const buffer = await wb.xlsx.writeBuffer();
-  const blob = new Blob([buffer],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `${(setup.title||'Shipley-Project').replace(/\s+/g,'_')}_Impact_Framework.xlsx`;
-  a.click();
-  URL.revokeObjectURL(url);
 }
 
 // ═══════════════════════════════════════════════════════
@@ -5976,7 +6146,7 @@ NEXT STEPS — concrete next actions to keep the timeline on track
 End your response with a section titled exactly "ACTION ITEMS FOR THE PM:" followed by 0–4 bullet points (each under ~15 words — a PM needs to scan this in a few seconds) naming concrete follow-ups to raise with the faculty lead — or a single bullet "None identified." if there's nothing actionable.`;
   try{
     const r = await callGuide(prompt);
-    renderAIResponse(out, r, buildDocFilename('Timeline_Feedback'));
+    renderAIResponse(out, r, buildDocFilename('Timeline_Feedback'), 'Timeline_Feedback');
     setFollowUpItems('timeline', extractBulletSection(r, 'ACTION ITEMS FOR THE PM:'));
   }catch(e){
     out.innerHTML=`<div class="ai-response" style="border-left-color:var(--red);">Something went wrong — please try again.</div>`;
@@ -6069,7 +6239,7 @@ End your response with a section titled exactly "ACTION ITEMS FOR THE PM:" follo
     const r = await callGuide(prompt);
     budgetHistory.push({role:'user',content:prompt});
     budgetHistory.push({role:'assistant',content:r});
-    renderAIResponse(out, r, buildDocFilename('Budget_Feedback'));
+    renderAIResponse(out, r, buildDocFilename('Budget_Feedback'), 'Budget_Feedback');
     setFollowUpItems('budget', extractBulletSection(r, 'ACTION ITEMS FOR THE PM:'));
   }catch(e){
     out.innerHTML=`<div class="ai-response" style="border-left-color:var(--red);">Something went wrong.</div>`;
@@ -6116,7 +6286,7 @@ NEXT STEPS — concrete next actions to finish the report
 End your response with a section titled exactly "ACTION ITEMS FOR THE PM:" followed by 0–4 bullet points (each under ~15 words — a PM needs to scan this in a few seconds) naming concrete follow-ups to raise with the faculty lead — or a single bullet "None identified." if there's nothing actionable.`;
   try{
     const r = await callGuide(prompt);
-    renderAIResponse(out, r, buildDocFilename('Final_Report_Feedback'));
+    renderAIResponse(out, r, buildDocFilename('Final_Report_Feedback'), 'Final_Report_Feedback');
     setFollowUpItems('report', extractBulletSection(r, 'ACTION ITEMS FOR THE PM:'));
   }catch(e){
     out.innerHTML=`<div class="ai-response" style="border-left-color:var(--red);">Something went wrong.</div>`;
@@ -6136,7 +6306,7 @@ async function askFieldGuide(fieldId, fieldLabel, shortLabel){
   const prompt = `You are a helpful guide for Institute for Excellence in Teaching & Learning staff supporting a faculty-led Shipley Academic Innovation Fund award at Boston University. Review the following draft for the "${fieldLabel}" section of this project's report. Give specific, constructive feedback on this section only. Do not reference the BU grants office or university policy. If something raises a concern, flag it clearly for follow-up with the faculty lead.\n\n${ctx}\n${fieldLabel}:\n${content}`;
   try{
     const r = await callGuide(prompt);
-    renderAIResponse(out, r, buildDocFilename((shortLabel||'Field')+'_Feedback'));
+    renderAIResponse(out, r, buildDocFilename((shortLabel||'Field')+'_Feedback'), (shortLabel||'Field')+'_Feedback');
   }catch(e){
     out.innerHTML=`<div class="ai-response" style="border-left-color:var(--red);">Something went wrong.</div>`;
   }
@@ -6231,7 +6401,7 @@ async function askGuide(){
   try{
     const guidePrompt = `You are a helpful guide for Institute for Excellence in Teaching & Learning staff supporting a faculty-led Shipley Academic Innovation Fund award at Boston University. Answer the staff member's question below. If the question asks whether something was included in the proposal, or how the team proposes to approach something, answer directly from the full proposal text provided in the project context below — quote or closely paraphrase what it actually says rather than giving generic advice, and say plainly if the proposal doesn't address it. Do not reference the BU grants office or university policy. If the question raises something that needs follow-up, flag it clearly for follow-up with the faculty lead.\n\n${input}`;
     const r = await callGuide(guidePrompt);
-    renderAIResponse(out, r, buildDocFilename('Guide_Chat'));
+    renderAIResponse(out, r, buildDocFilename('Guide_Chat'), 'Guide_Chat');
   }catch(e){
     out.innerHTML=`<div class="ai-response" style="border-left-color:var(--red);">Something went wrong — please try again.</div>`;
   }

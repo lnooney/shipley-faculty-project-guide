@@ -154,7 +154,25 @@ Project → Project Report.**
   Falls back to "Project" if the field is empty. Not bulletproof for every possible name
   format, but handles the common cases correctly (verified against "Dr. Jane Smith",
   "Smith, Jane", "Jane Smith, PhD", "Prof. John A. Doe Jr.", "Jane Smith and Bob Jones",
-  hyphenated last names).
+  hyphenated last names). The downloaded Project Plan Excel (`downloadProjectExcel()`)
+  now follows this convention too (`buildDocFilename('Project_Plan')` — was
+  `{Project Title}_Project_Plan.xlsx`, predating the convention entirely); the standalone
+  Impact Framework Excel export still uses its own pre-convention `{Project Title}_...`
+  name and wasn't touched by this pass — only the file explicitly flagged.
+- **Every AI feedback "Save as PDF" document's printed subhead now names its own
+  feedback type**, not just the filename: `Shipley Project Guide {Type} Feedback —
+  {date}` (e.g. "Shipley Project Guide Budget Feedback — September 17, 2026"), replacing
+  a single generic "Shipley Project Guide feedback — {date}" used identically across all
+  7 surfaces. `feedbackTypeLabel(docType)` (just above `renderAIResponse()`) derives the
+  `{Type}` by stripping a docType's trailing `_Feedback` (and, for Ask Guide chat's
+  `Guide_Chat`, its leading `Guide_`) and turning remaining underscores into spaces —
+  reusing the exact same `docType` string each call site already passes to
+  `buildDocFilename()` for the filename, so the two now come from one source instead of
+  needing separately-maintained text. `renderAIResponse()` takes a 4th `docType`
+  argument threaded through to `saveAIResponseAsPDF()`'s 3rd argument for this purpose;
+  all 7 call sites (Proposal Review, Impact Framework Review, Timeline, Budget, Final
+  Report, all 13 per-field guidance buttons, Ask Guide chat) pass the same docType
+  string they already pass to `buildDocFilename()`.
 
 ## Design decisions and why (by area)
 
@@ -435,6 +453,48 @@ Project → Project Report.**
   constrained to the funding window's first two weeks — deliberately separate from the
   existing Learning-Analytics-group "Complete Impact Evaluation Framework" task, which
   stays where it is.
+- **Milestones 2–5's tasks now carry `group` values** in `MILESTONE_TASKS`, same as
+  Milestone 1 always has (Implementation/Data Collection for M2; Analysis/Dissemination
+  for M3; Reflection/Iteration/Scaling & Sustainability for M4; Reporting/Dissemination/
+  Closeout for M5) — previously only Milestone 1 tasks had a `group`, so the "Group"
+  column in the downloaded Project Plan Excel export was blank for four of the five
+  milestones. This only feeds the Excel export and the Tailor Milestones prompt's task
+  listing (both already read `t.group`) — it deliberately does **not** turn on the
+  grouped-with-subheaders rendering the Milestones tab itself uses for M1
+  (`renderMilestones()`'s `if(m==='m1')` branch is unchanged, so M2–M5 keep rendering as
+  a flat task list on-screen); adding real values to an already-read field, not adding a
+  new UI behavior.
+- **Downloaded Project Plan Excel (`downloadProjectExcel()`), "Tasks & Timeline" sheet,
+  reformatted for readability** (Laura's explicit request — she liked the existing
+  milestone color coding but found the sheet "a bit hard to read"):
+  - Each milestone phase now gets a **full-width, color-filled banner row** (merged
+    across all 8 columns, using the same `mColors` palette as before) inserted right
+    before that phase's task rows, replacing the old per-cell fill on just the
+    "Milestone" column (which was easy to miss scanning down a long sheet). The
+    "Milestone" column itself is still populated on every task row (useful if a PM sorts
+    or filters), just no longer separately colored/bolded now that the banner carries
+    that signal — the old vertical cell-merge logic for that column was removed since it
+    would visually fight with the new banner rows.
+  - Font sizes: 16pt bold white for both sheets' top column-header row, 14pt bold white
+    for the new milestone banner rows, 12pt for all body/task rows — all per Laura's
+    explicit point sizes.
+  - Added while already reformatting, as concrete answers to Laura's open "anything else
+    that would make it easier to use and read?": the header row is frozen
+    (`views:[{state:'frozen',ySplit:1}]`) on both sheets so column labels stay visible
+    scrolling a long plan; light alternating row banding within each phase (between
+    banner rows, so it doesn't fight the phase color-coding); `wrapText` on the Task and
+    Notes columns so long text no longer gets clipped.
+  - **Not yet done, flagged to Laura rather than silently changed**: this file's
+    downloaded name (`{Project Title}_Project_Plan.xlsx`) still predates and doesn't
+    follow the `buildDocFilename()` `{Faculty Last Name}_{Doc Type}_{MMDDYY}` convention
+    every other generated document now uses — worth aligning if she wants it, but out of
+    scope for a formatting-only request.
+  - Verified via a functional in-memory mock of the `ExcelJS` API (real CDN load is
+    blocked in this sandbox, same limitation as the old `.docx` library — see Intake
+    Summary postmortem below) that asserts on the actual object structure `downloadProjectExcel()`
+    builds: 5 banner rows in the right order/color/font size, 16/14/12pt sizes applied
+    where expected, "Group" populated for every M2–M5 row, and both sheets' frozen views
+    — not just that the function runs without throwing.
 
 **Impact Framework tab**
 - Each section (Problems, Objectives, Impacts, Measures & Targets, Data Collection, Data
@@ -467,6 +527,95 @@ Project → Project Report.**
   PM to hand off, separate from the full project-plan download.
 - Data Collection frequency options include "Automatic collection," for trace data or
   AI chat logs that don't fit the other fixed cadences.
+- **Downloaded Framework Excel (`downloadFrameworkExcel()`) redesigned around showing
+  the connections between sections, not just listing each section's items separately**
+  (Laura's explicit request, with a worked example: "Problem A is addressed by Objective
+  1, which will be recognized as successful by Impact M and measured by Measure R via
+  Target 1 which will be collected by Source and frequency C and analyzed by Data
+  Analysis Z"). Previously the sheet was six stacked sections, each just its own bullet
+  list or small table, in one narrow two-column layout — there was no way to see which
+  Objective addressed which Problem, etc.
+  - **The underlying data gap this ran into**: Problems/Objectives/Impacts/Data Analysis
+    are each stored as one free-text blob (a PM types bullet lines into one textarea per
+    section) with no ID linking a specific line in one section to a specific line in
+    another; Measures & Data Collection are the only two sections already structured as
+    row tables, and even those aren't linked to a specific Impact. There was no existing
+    data in the app that says "this Objective addresses that Problem."
+  - **Two ways to close that gap were discussed with Laura**: (1) restructure the
+    Framework tab itself so each item is entered with an explicit "which prior item does
+    this relate to" link as the PM builds it — most accurate, but a real change to how
+    PMs fill out the tab, turning free-text bullets into individually-linked items; or
+    (2) leave the tab exactly as it is and have the Guide infer the connections at
+    export time from the existing free text. Laura chose (2) specifically because the PM
+    already reviews the whole framework with the faculty lead before treating anything
+    as final, so she'd rather keep data entry as free-text bullets and have the PM/
+    faculty team catch and correct any wrong AI-inferred connections during that
+    existing review — explicitly asked that the export "direct PMs to review and revise
+    the connection logic."
+  - Implementation: `downloadFrameworkExcel()` sends all six sections' current content
+    to the Guide (skipped entirely if fewer than 2 sections have anything in them — one
+    section alone has nothing to connect) with a literal-JSON-template prompt (this
+    tool's established reliable pattern for AI output the app needs to act on) asking
+    for one row per distinct Problem→Objective→Impact→Measure→Target→Source→Frequency→
+    Data Analysis chain it can actually trace from the text — explicitly told to leave a
+    field blank rather than force a weak match, to never collapse a real one-to-many
+    branch (one Problem serving multiple Objectives, etc.) into a single row, and to
+    copy every field verbatim rather than paraphrasing. The same prompt also asks for
+    each section's items that didn't fit into any chain (`unmatched_problems`,
+    `unmatched_objectives`, etc.) — every single bullet/row from every section must land
+    in a connection row, an unmatched list, or both; the export never silently drops an
+    item a PM entered. If the AI call is skipped, fails, or returns nothing usable, every
+    item still falls through into "unmatched" rather than vanishing from the file.
+  - The sheet itself: a bold amber disclaimer banner directly above the table — "These
+    connections were drafted by the Guide from your framework entries — review and
+    revise them with your faculty lead before relying on them" — using the same
+    amber alert styling (`--amber-bg`/`--amber-text`) already used for cautionary
+    messages elsewhere in the app, satisfying Laura's explicit ask to direct PMs to
+    review/revise rather than just labeling it quietly. Below that, one 8-column table
+    (Problem/Objective/Impact/Measure/Target/Data Source/Frequency/Data Analysis), one
+    row per connection. Each column is color-coded by its originating section (Measure/
+    Target share one color, Source/Frequency share another, matching the 6 original
+    sections) — the "color-code sections" part of Laura's broader ask, now expressed as
+    column color since the layout moved from stacked sections to columns. Font sizes
+    match the same 16/14/12pt tiers established for the Project Plan export (title/
+    column headers/body). Consecutive rows that share the same Problem (and, one level
+    deeper, the same Problem+Objective) get their leftmost matching cells vertically
+    merged, so a one-to-many branch reads as a visible tree instead of repeating the
+    same Problem text on every row — merging is guarded to require every column to its
+    left to also match, so two rows are never merged just because they coincidentally
+    share the same Objective text under two different Problems. A frozen header row and
+    wrapped text on every column round out the readability pass (also part of Laura's
+    ask).
+  - **Unmatched items stay in their own originating column, not a separate generic
+    list** (Laura's explicit correction to the first version, which had pulled every
+    leftover item into a plain two-column "Section | Item" list below the table). Below
+    the same full-width amber "Not yet connected" banner (the "color filled row label
+    across all columns" she asked for), each column independently stacks its own
+    leftover items top-down — a leftover Problem sits in the Problem column, a leftover
+    Data Analysis method sits in the Data Analysis column, etc. — using the exact same
+    column positions and colors as the connections table above, so nothing changes
+    columns between the two sections. A row here carries no cross-column meaning (row 3's
+    leftover Problem and row 3's leftover Impact are NOT implied to be related) — each
+    column just fills down independently, *except* Measure+Target and Source+Frequency,
+    which do share a row, because that specific pairing is already known from how the
+    data was entered (each is one row in `fwMeasureRows`/`fwCollectionRows`), not
+    something the Guide is guessing at. The prompt's JSON shape reflects this:
+    `unmatched_measures`/`unmatched_collection` are arrays of `{measure,target}`/
+    `{source,frequency}` pairs rather than flat strings, so that known pairing survives
+    into the export; `unmatched_problems`/`unmatched_objectives`/`unmatched_impacts`/
+    `unmatched_analysis` stay plain string arrays since those are genuinely single-column.
+  - Filename now also follows the `buildDocFilename()` convention
+    (`buildDocFilename('Impact_Framework')`, was the older pre-convention
+    `{Project Title}_Impact_Framework.xlsx`), same as the Project Plan export fix above.
+  - Verified the same way as the Project Plan export — a functional in-memory mock of
+    the `ExcelJS` API (real CDN load is blocked in this sandbox) with a mocked `fetch`
+    standing in for the Guide's connection-mapping call, asserting on actual structure:
+    font sizes at each tier, the 8 column header colors, a one-Problem/two-Objective test
+    case producing exactly the expected Problem-column merge (and confirming Objective/
+    Impact correctly do NOT merge when their ancestor chain differs), a mixed unmatched
+    case (a lone leftover Problem plus a leftover Measure/Target pair, from otherwise
+    fully-connected sections) landing in the correct columns on the correct rows below
+    the still-full-width banner, and the corrected filename pattern.
 
 **Ask Guide re: Project tab** (renamed from "Proposal and Project Queries")
 - Seeded question chips are reworded to be unambiguously the PM's own voice, and no
