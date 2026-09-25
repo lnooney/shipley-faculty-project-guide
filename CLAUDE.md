@@ -34,10 +34,13 @@ note below). Keep it updated as work continues; don't let it go stale.
 
 A single-file HTML/CSS/JS web app (`index.html`, no build step, GitHub Pages–deployable)
 for Institute staff who manage Shipley Academic Innovation grant projects on behalf of
-faculty leads. The staff member (PM) is the primary user throughout — faculty lead the
-actual project work, but the tool's voice, feedback, and action items are addressed to
-the PM, never ambiguously to faculty. This distinction has been corrected many times
-across nearly every feature; treat it as a hard constraint on all new copy and AI prompts.
+faculty leads. The staff member (**Lead Consultant, LC** — Laura's corrected terminology;
+this role was called "PM"/"Project Manager" everywhere until that correction, so older
+entries below in this file still use "PM," left as historical record rather than rewritten)
+is the primary user throughout — faculty lead the actual project work, but the tool's
+voice, feedback, and action items are addressed to the LC, never ambiguously to faculty.
+This distinction has been corrected many times across nearly every feature; treat it as a
+hard constraint on all new copy and AI prompts.
 
 Six tabs: **Project Setup → Impact Framework → Milestones → Budget → Ask Guide re:
 Project → Project Report.**
@@ -193,6 +196,23 @@ Project → Project Report.**
   all 7 call sites (Proposal Review, Impact Framework Review, Timeline, Budget, Final
   Report, all 13 per-field guidance buttons, Ask Guide chat) pass the same docType
   string they already pass to `buildDocFilename()`.
+- **The staff-member role is now called "Lead Consultant" (LC), not "Project Manager"/
+  "PM."** Laura's explicit terminology correction. Scope was every AI-prompt-visible
+  occurrence of "PM" — the literal `"ACTION ITEMS FOR THE PM:"` section heading that
+  Impact Framework Review, Timeline Feedback, Budget Feedback, and Final Report Feedback
+  all use (now `"ACTION ITEMS FOR THE LC:"`, updated in lockstep with the matching
+  `extractBulletSection(r, '...')` call site in each of those four surfaces — the parse
+  key has to match the prompt's own heading text exactly or Follow-ups silently stops
+  picking up that surface's action items), the "a busy PM"/"a PM needs to scan this in a
+  few seconds" audience-framing language repeated across those same four prompts plus
+  the Proposal Review rubric prompt and the Tailor Milestones investigate-question
+  prompt, with "a PM" → "an LC" wherever the article directly preceded the word (grammar
+  follows the vowel sound of "LC," not "PM"). Internal code comments referencing "the
+  PM" (implementation rationale, never user-visible) were deliberately left as-is, same
+  treatment as this file's own historical narrative below — both are records of what was
+  true when written, not live product copy, so neither needed retroactive renaming for
+  this fix. If a future session adds a new AI feedback prompt, use "LC," not "PM" — this
+  file's own definition of the role (see "What this tool is" above) was updated to match.
 
 ## Design decisions and why (by area)
 
