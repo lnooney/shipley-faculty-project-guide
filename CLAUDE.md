@@ -235,6 +235,15 @@ Project → Project Report.**
   Dropping a file populates the same hidden `<input>` via a synthesized `DataTransfer`
   and reuses the exact same `handleProposalPdfUpload()`/`handleBudgetSheetUpload()`
   logic as clicking to browse — only *how* a file arrives changes.
+- **The Import card's toggle button reads "Import from Proposal ▼"/"Collapse ▲"**, not a
+  generic "Expand ▼"/"Collapse ▲" (`toggleImportCard()`, plus the button's initial static
+  HTML) — Laura's explicit request; the card's own `.card-title` already said "Import
+  from Proposal," but the collapsed toggle button itself just said the generic "Expand,"
+  which didn't tell a new user what clicking it would do. Laura separately confirmed this
+  function's "Import from Proposal" language should stay exactly as-is in any future
+  proposal→project terminology pass — it refers to the proposal document specifically
+  (that's genuinely what gets imported, regardless of project stage), not the project
+  generally.
 - A Setup field the proposal import successfully fills gets a **green `.auto-filled`
   marker**, distinct from the existing amber `.needs-input` marker for fields that came
   up empty (`markAutoFilled()`, called at every fill site in `applyProposalImport()`) —
@@ -347,9 +356,11 @@ Project → Project Report.**
   `locator.isVisible()`), not just checking the element's presence in the DOM, since a
   `.no-print` element is still present in `#intake-print-clone`, just hidden by CSS.
 - A **"Notes" section** (not part of the official template — a deliberate addition)
-  pulls Timeline Feasibility, Red Flags, Challenges & Suggestions, and Concerns Raised
-  by the Proposal straight out of the "Feedback on Proposal and Scope" response, via the
-  existing `extractBulletSection()` helper — never re-synthesized by a fresh AI call.
+  pulls Crucial, Important, and Good to Consider (previously Timeline Feasibility, Red
+  Flags, Challenges & Suggestions, and Concerns Raised by the Proposal — see the
+  urgency-tier restructure under "Proposal review rubric" below) straight out of the
+  "Feedback on Proposal and Scope" response, via the existing `extractBulletSection()`
+  helper — never re-synthesized by a fresh AI call.
   This required persisting that response's raw text to `data.proposal_review_text` in
   `aiScopeReview()` (it was previously only ever rendered to the DOM, never saved) so
   the Intake Summary generator can read it later, possibly in an entirely different
@@ -390,9 +401,14 @@ Project → Project Report.**
   realistically covers the described costs (mirrors the Budget tab's own realism check).
 - New tech with no IS&T leadership / Wendy Colby sign-off is a named red flag — that
   approval is required before piloting.
-- ELIGIBILITY SCREEN is a dedicated top section of the reply, added because auto-fail
-  eligibility issues were being generated as AI context but had no guaranteed spot in the
-  actual reply — they could get buried in prose and never reach the PM.
+- ELIGIBILITY SCREEN was originally a dedicated top section of the reply, added because
+  auto-fail eligibility issues were being generated as AI context but had no guaranteed
+  spot in the actual reply — they could get buried in prose and never reach the PM.
+  **No longer a separate section** — folded into the CRUCIAL/IMPORTANT/GOOD TO CONSIDER
+  urgency tiers along with RUBRIC SCORES/TOTAL, as part of reframing the whole feature
+  away from a funding decision (see the urgency-tier entry further below for the full
+  story and why that's still safe for auto-fails specifically — CRUCIAL explicitly
+  instructs the AI to include AUTO-FAIL concerns, so they still can't quietly vanish).
 - **TIMELINE FEASIBILITY's per-component bullet template was tightened** after a real
   example bullet came back as a run-on wall of text — a duration estimate, a phase
   breakdown with two sub-date-ranges, an attribution of who does what, and a
@@ -407,6 +423,64 @@ Project → Project Report.**
   exact-caps-over-vague-adjectives fixes (Follow-ups word caps, etc.) — a template shape
   with an unbounded slot will get filled with whatever fits, so the slot itself needs
   the cap, not just a general request to "be concise."
+- **The entire reply is organized by urgency, not by topic, and reframed from a funding
+  decision into retrospective awareness** — this landed in two passes, both Laura's
+  explicit direction, worth understanding in order since the second pass changed a
+  decision made in the first:
+  - **Pass 1** (prompted by "Feedback on Proposal and Scope" being "an overwhelming
+    amount of text for new users," with a concrete suggestion to group by urgency — her
+    examples: "Crucial," "Important," "Good to consider"): collapsed six separate closing
+    sections (TIMELINE FEASIBILITY, RED FLAGS, CHALLENGES & SUGGESTIONS, WHAT CONCERNS
+    DOES THIS PROPOSAL RAISE, WHAT'S EXCITING ABOUT THIS PROPOSAL, WHAT IMPACT WILL THIS
+    PROJECT HAVE IF SELECTED) into three urgency tiers. At this point ELIGIBILITY SCREEN
+    and RUBRIC SCORES/TOTAL were deliberately left as their own separate sections, not
+    folded in — they read as structurally different from urgency-ranked prose advice (a
+    pass/fail gate and a numeric scorecard), and eligibility auto-fails specifically
+    seemed to need their own guaranteed, unmissable spot per the ELIGIBILITY SCREEN
+    entry above (added earlier specifically so auto-fails couldn't get buried in prose).
+  - **Pass 2**, immediately after, prompted by the separate proposal→project terminology
+    review surfacing a much bigger issue with this whole feature: it was built as a
+    **pre-award funding-decision tool** — an eligibility screen with AUTO-FAIL
+    conditions, a 7-criterion 1–4 rubric, and a verdict of "Competitive / Conditionally
+    Competitive — HOLD / Not Competitive." None of that makes sense once a project has
+    already been selected and funded — there's no funding decision left to make. Laura's
+    call: keep the underlying analysis (she called it "useful... awareness of the red
+    flags the proposal may have had wrt the RFP"), but drop the funding-decision framing
+    entirely and fold it into the same urgency ordering as everything else. So the
+    ELIGIBILITY SCREEN and RUBRIC SCORES/TOTAL sections from Pass 1 are now gone too —
+    their *substance* (the `RUBRIC_ELIGIBILITY`/`RUBRIC_CRITERIA`/`RUBRIC_REDFLAGS`
+    reference data and `buildRubricReferenceText()` itself, all left completely
+    untouched as internal grounding the AI still applies as its evaluative lens) gets
+    synthesized directly into CRUCIAL/IMPORTANT/GOOD TO CONSIDER, framed as "what the
+    original RFP review would have flagged" rather than a funding verdict — explicitly
+    told to **never output a numeric score or point total anywhere**. CRUCIAL's cap
+    widened from 0–4 to 0–5 bullets to accommodate the eligibility/rubric content it now
+    absorbs; IMPORTANT stays 0–5; GOOD TO CONSIDER (0–4) now also surfaces genuine
+    rubric-identified strengths (e.g., a strong interdisciplinary team), not just
+    excitement/impact — giving the LC a fuller picture, not just flags.
+  - Both passes needed their downstream consumers updated in lockstep — both
+    `extractBulletSection()`-parse this prompt's literal section headers, so changing a
+    heading without updating its parse-key call site silently breaks whichever consumer
+    reads it:
+    - Follow-ups' `'proposal'` source (`aiScopeReview()`) now pulls `CRUCIAL` +
+      `IMPORTANT` only (Pass 1 was `ELIGIBILITY SCREEN` + `RED FLAGS` +
+      `CHALLENGES & SUGGESTIONS`; Pass 2 dropped `ELIGIBILITY SCREEN` since that header
+      no longer exists) — `GOOD TO CONSIDER` is deliberately excluded throughout, since
+      that tier is positive/low-urgency context, not something to raise with faculty.
+    - The Intake Summary's "Notes" section (`intakeNotesBlock()`'s `notesSections`, see
+      Intake Summary below) has three subsections — Crucial / Important / Good to
+      Consider — instead of the original four (Timeline Feasibility / Red Flags /
+      Challenges & Suggestions / Concerns Raised by the Proposal). This keeps that
+      section's own founding principle intact: it pulls straight from the proposal
+      review response and is never re-synthesized, so when the response's own structure
+      changes, the Notes section has to mirror it rather than silently going stale
+      against a structure that no longer exists in the source text.
+  - **Resolved — these stay as "proposal," no change needed**: "Tailor Milestones/Budget
+    to This Proposal," "Autofill entire framework from proposal," and "Infer from
+    proposal" all name the actual proposal document being pulled from, the same category
+    as Import from Proposal — Laura's explicit confirmation. No code change needed here;
+    this was the last open question from the proposal→project terminology review and is
+    now fully closed out.
 **Budget tab**
 - **"Tailor budget to this proposal" relabels to "Re-tailor budget to this proposal"
   once tailoring has run at least once** — same treatment and reasoning as the
@@ -721,11 +795,39 @@ Project → Project Report.**
   its card label/tab link). Each source's items are wholly replaced on every re-run of
   that feedback (not accumulated/duplicated), and items from other sources are untouched.
 - Every text source that feeds this card — Milestones investigate-questions, Budget
-  "missing" flag messages, and the "ACTION ITEMS FOR THE PM" bullets on all five
-  feedback surfaces — has an explicit word cap (**under ~15 words**) instead of vague
+  "missing" flag messages, and the action-item bullets pulled from all five feedback
+  surfaces (literally "ACTION ITEMS FOR THE LC" on Impact Framework/Timeline/Budget/
+  Final Report; Proposal Review's own CRUCIAL/IMPORTANT tiers since its urgency-tier
+  restructure above) — has an explicit word cap (**under ~15 words**) instead of vague
   "short"/"concise" wording. Reported as hard to scan quickly when the underlying text
   ran long even though each item was technically "one bullet"; matches the same
   exact-caps-over-vague-adjectives principle used throughout this tool.
+
+**Save / Start New Project flow**
+- **The "Start a new project" modal now tracks whether the workspace actually has
+  unsaved changes**, not just whether the active project has ever been saved at all —
+  Laura's explicit bug report: right after saving, the modal still offered "Save first,
+  then start new" alongside "Start new without saving," which is confusing once there's
+  nothing left to protect. Previously `openNewProjectModal()`'s only check was
+  `alreadySaved` (does an active saved project exist?), which stayed true forever once a
+  project had been saved once — it never accounted for edits made *after* that save.
+  - New module-level `workspaceDirtySinceSave` flag, set `true` inside `saveAll()` (the
+    one function every single data mutation in the app already funnels through, so this
+    one hook catches all of them without needing to be set at dozens of individual call
+    sites) and cleared to `false` only by `confirmSaveProject()`, right after the named
+    project snapshot is actually written (`saveProjects()` — a separate localStorage key
+    from `saveAll()`'s, confirmed it doesn't call `saveAll()` internally, so clearing the
+    flag right after it doesn't immediately get clobbered back to `true`).
+  - When `alreadySaved && !workspaceDirtySinceSave` — saved, nothing changed since — the
+    modal now shows just Cancel and a single "Start new project" button (relabeled from
+    "Start new without saving," which reads oddly once there's nothing being skipped),
+    with the "Save first"/"Save changes" button hidden (`display:none`) and the body
+    paragraph cleared, leaving just the amber `.modal-warn` clear-workspace notice above
+    it, per Laura's explicit "it should just be start new project with the brown/beige
+    alert note" spec. The moment any further edit happens, the flag flips back to `true`
+    and the full three-button set (with its explanatory body text) reappears automatically
+    next time the modal opens — verified directly: save → open modal (simplified) → close
+    → make one edit → open modal again (full set back).
 
 **Tab nav / general layout**
 - Tab order is now **Project Setup → Timeline → Budget → Impact Framework → Project

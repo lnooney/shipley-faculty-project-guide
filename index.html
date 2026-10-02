@@ -837,7 +837,7 @@ a:hover{color:var(--navy);}
     <div class="modal-actions">
       <button onclick="closeNewProjectModal()">Cancel</button>
       <button onclick="saveAndStartNew()" id="modal-new-savebtn">Save first, then start new</button>
-      <button class="btn-primary" onclick="confirmStartNew()">Start new without saving</button>
+      <button class="btn-primary" onclick="confirmStartNew()" id="modal-new-startbtn">Start new without saving</button>
     </div>
   </div>
 </div>
@@ -911,7 +911,7 @@ a:hover{color:var(--navy);}
         <div class="card-title">Import from Proposal</div>
         <div class="card-sub">Paste the proposal text. The guide will pre-fill the tool with what it finds.</div>
       </div>
-      <button onclick="toggleImportCard()" style="margin-left:auto;" aria-expanded="false" aria-controls="import-body" id="import-toggle">Expand ▼</button>
+      <button onclick="toggleImportCard()" style="margin-left:auto;" aria-expanded="false" aria-controls="import-body" id="import-toggle">Import from Proposal ▼</button>
     </div>
     <div id="import-body" style="display:none;">
       <div class="alert alert-blue" style="margin-bottom:14px;">
@@ -1999,9 +1999,16 @@ function loadAll(){
   } catch(e){ return {}; }
 }
 
+// Tracks whether the live workspace has changed since the last named-project save — every
+// data mutation in the app already funnels through saveAll(), so this one flag catches all
+// of them without needing to be set at dozens of individual call sites. Cleared only by
+// confirmSaveProject() once the project snapshot is actually written.
+let workspaceDirtySinceSave = true;
+
 function saveAll(data){
   try {
     localStorage.setItem(KEY, JSON.stringify(data));
+    workspaceDirtySinceSave = true;
     flashSave();
   } catch(e){ console.error('Save failed',e); }
 }
@@ -2043,7 +2050,7 @@ function toggleImportCard(){
   const btn = document.getElementById('import-toggle');
   const collapsed = body.style.display==='none';
   body.style.display = collapsed ? 'block' : 'none';
-  btn.textContent = collapsed ? 'Collapse ▲' : 'Expand ▼';
+  btn.textContent = collapsed ? 'Collapse ▲' : 'Import from Proposal ▼';
   btn.setAttribute('aria-expanded', collapsed ? 'true' : 'false');
 }
 
@@ -5187,13 +5194,13 @@ async function aiScopeReview(){
 
 ${proposalTextSection}${sectionMap}
 
-Below is the Institute's RFP scoring rubric for this grant cycle, followed by the project scoping information entered so far. Using the rubric as your evaluative lens and the information provided (including the full proposal text above where included), score this project and give the staff member one combined set of feedback. If there isn't enough information to judge a criterion, say so in that criterion's bullet rather than guessing — do not invent a score.
+This project has already been selected and funded — nothing below is a funding decision. Below is the Institute's RFP rubric for this grant cycle, followed by the project scoping information entered so far. Using the rubric as your evaluative lens and the information provided (including the full proposal text above where included), give the Lead Consultant a retrospective awareness summary: what would the original RFP review have flagged about this proposal that's still useful context for managing the project now? If there isn't enough information to assess something against the rubric, leave it out rather than guessing or inventing a concern.
 
-Only give feedback on what has actually been provided — do not reference or flag omissions for fields that weren't shared with you. Be collegial, specific, and direct. Do not reference the BU grants office or university policy. If something raises a concern that needs follow-up, flag it clearly for follow-up with the faculty lead.
+Only give feedback on what has actually been provided — do not reference or flag omissions for fields that weren't shared with you. Be collegial, specific, and direct. Do not reference the BU grants office or university policy. If something raises a concern the Lead Consultant should know about, flag it clearly.
 
-Score rigorously against the tier definitions as written — do not default toward generosity. Vagueness, missing detail, or an unaddressed dependency on a criterion is a real gap and should be scored accordingly, not given the benefit of the doubt. Keep every score and comment tactical and operational (timeline, budget, staffing, process, risk) — never suggest changes to the pedagogical or academic substance of what faculty are proposing to teach, research, or assess.
+Apply the rubric's tier definitions rigorously when deciding what's worth flagging — do not default toward generosity. Vagueness, missing detail, or an unaddressed dependency against a criterion is a real gap worth surfacing, not something to give the benefit of the doubt. Keep every flag tactical and operational (timeline, budget, staffing, process, risk) — never suggest changes to the pedagogical or academic substance of what faculty are proposing to teach, research, or assess.
 
-If the project includes any digital output (a tool, platform, faculty resource, dataset, or similar), always include, as one of the CHALLENGES & SUGGESTIONS bullets, a question about who will be responsible for maintaining that output after the funding period ends — sustainability planning needs to start at the beginning of the project, not be discovered as a gap at the end.
+If the project includes any digital output (a tool, platform, faculty resource, dataset, or similar), always include, as one of the IMPORTANT bullets, a question about who will be responsible for maintaining that output after the funding period ends — sustainability planning needs to start at the beginning of the project, not be discovered as a gap at the end.
 
 RFP rubric:
 ${buildRubricReferenceText()}
@@ -5201,63 +5208,26 @@ ${buildRubricReferenceText()}
 Project scoping information:
 ${filled.join('\n')}
 
-This feedback is for internal staff use and must be fast to scan, not narrative. Reply using EXACTLY this structure, with nothing added before, after, or between sections, and no narrative outside of it. Fill in every bracketed placeholder. Each criterion bullet is capped at ONE sentence of rationale, under ~15 words — do not exceed it. Each of the three closing sections is capped at 3 short bullets, not prose paragraphs — one point per bullet, under ~15 words each — an LC needs to scan this in a few seconds:
+This feedback is for internal staff use and must be fast to scan, not narrative. Reply using EXACTLY this structure, with nothing added before, after, or between sections, and no narrative outside of it. Every section below is organized by urgency, not by topic — an LC new to a project needs to see what actually requires attention first, not wade through every topic to find it. Frame everything as awareness, not as a funding decision — this project is already selected and funded, so nothing here says whether it should have been funded, only what's worth knowing now. Never output a numeric score or point total anywhere. Each section's bullets are capped as noted, one distinct point per bullet, under ~15 words each:
 
-ELIGIBILITY SCREEN
-- [one bullet per eligibility item from the reference list that is NOT clearly met, including every AUTO-FAIL item — state the concern plainly, and for an AUTO-FAIL item say clearly that this proposal cannot be funded as submitted, including the suggested action from the reference note if one is given. If every item is clearly met or there's no information suggesting a problem, a single bullet: "No eligibility concerns identified."]
+CRUCIAL — worth the Lead Consultant's attention now (0–5 bullets)
+[Include: any eligibility item from the reference list that was a clear AUTO-FAIL concern — frame it as what the original RFP review would have flagged, not a funding verdict, and name why it still matters for managing the project now (e.g., if BU student learning impact was unclear, that affects how impact should be reported); any rubric criterion where the proposal was genuinely weak (Insufficient or Developing tier) in a way that still matters operationally (an unrealistic timeline, an unaddressed sustainability plan, missing IS&T/Wendy Colby sign-off for new technology); any applicable red flag from the reference list severe enough to need attention now; any Timeline Feasibility work component (12-month window — must complete before Fall 2027) that is NOT feasible as scoped — name the component, give a duration estimate as a single figure or range (e.g. "4-6 weeks," never a phase-by-phase breakdown), and state plainly why it can't work in the available window. One distinct point per bullet. If nothing rises to this level, a single bullet: "Nothing identified at this level."]
 
-RUBRIC SCORES
-- Health Education Focus: [1-4]/4 — [one-sentence rationale]
-- Digital Innovation: [1-4]/4 — [one-sentence rationale]
-- Interdisciplinary Collaboration: [1-4]/4 — [one-sentence rationale]
-- Scalability & Transferability: [1-4]/4 — [one-sentence rationale]
-- Assessment & Evaluation: [1-4]/4 — [one-sentence rationale]
-- Implementation Feasibility: [1-4]/4 — [one-sentence rationale]
-- Award Level Alignment: [1-4]/4 — [one-sentence rationale]
+IMPORTANT — should be addressed soon, with a plan in place (0–5 bullets)
+[Include: remaining lower-severity eligibility or rubric concerns worth keeping in mind; remaining applicable red flags from the reference list; tight-but-workable Timeline Feasibility components relevant to this project (component: duration estimate — ONE short feasibility note or question, never both, never more than one distinct point; if a component genuinely has multiple distinct sub-phases or more than one issue worth flagging, split it into a second bullet for that same component rather than one long bullet — never more than 2 bullets per component, never combine two different components into one bullet); and challenges, each paired with a specific, practical suggestion to address it. One distinct point per bullet. If nothing rises to this level, a single bullet: "Nothing identified at this level."]
 
-TOTAL: [total]/28 — [Competitive / Conditionally Competitive — HOLD / Not Competitive]
-(If you could not score all 7 criteria, replace the line above with: TOTAL: Not calculable — [one sentence on what's missing].)
-
-TIMELINE FEASIBILITY (12-month window — must complete before Fall 2027)
-[Include bullets for each of these work components that applies to this project, in this order, skipping any that clearly don't apply. Each bullet must follow this exact shape: "Component: [duration estimate — a single figure or range, e.g. "4-6 weeks", never a phase-by-phase breakdown] — [ONE short clause: either a feasibility note or a specific question for the faculty lead, never both, and never more than one distinct point]." If a component genuinely has multiple distinct sub-phases (e.g., separate development and integration phases handled by different people) or more than one issue worth flagging, split it into a second bullet for that same component rather than combining everything into one long bullet — but never more than 2 bullets for any single component, and never combine two different components into the same bullet.]
-- Student worker hiring: [duration estimate] — [note or question]
-- IRB approval: [duration estimate] — [note or question]
-- Technology development/customization/integration: [duration estimate] — [note or question]
-- Assignment/assessment development: [duration estimate] — [note or question]
-Overall: [Feasible as scoped / Feasible but tight — flag one specific risk / Not feasible within 12 months as scoped]
-[If Overall is "Feasible but tight" or "Not feasible", add one more sentence naming the specific compressed window and stating plainly that the faculty team will be starting behind where they'd need to be, by design, given the proposal's own timeline — e.g. "Given that X needs to be accomplished Sept–Dec, the faculty team will need to hit the ground running as soon as funds arrive — the proposal's own timeline leaves no buffer, so the team starts out behind where they'd need to be to complete the project as proposed." Do not just label the timeline "tight" without explaining the specific bind.]
-
-RED FLAGS
-- [one bullet per applicable red flag from the reference list — if none apply, a single bullet: "None identified."]
-
-CHALLENGES & SUGGESTIONS
-- [one bullet per challenge, each pairing the challenge with a specific, practical suggestion to address it]
-
-WHAT CONCERNS DOES THIS PROPOSAL RAISE
-- [short bullet]
-- [short bullet]
-- [short bullet, if there's a third distinct point — otherwise omit]
-
-WHAT'S EXCITING ABOUT THIS PROPOSAL
-- [short bullet]
-- [short bullet]
-- [short bullet, if there's a third distinct point — otherwise omit]
-
-WHAT IMPACT WILL THIS PROJECT HAVE IF SELECTED
-- [short bullet]
-- [short bullet]
-- [short bullet, if there's a third distinct point — otherwise omit]`;
+GOOD TO CONSIDER — lower urgency, useful context (0–4 bullets)
+[Include genuine strengths the rubric identified (e.g., a strong interdisciplinary team, a credible sustainability plan), what's genuinely exciting about this project, its potential impact, and any minor suggestions that aren't urgent. One distinct point per bullet.]`;
   try{
     const r = await callGuide(prompt, {skipCtx:true, maxTokens:3000});
     renderAIResponse(out, r, buildDocFilename('Proposal_Review_Feedback'), 'Proposal_Review_Feedback');
     const items = [
-      ...extractBulletSection(r, 'ELIGIBILITY SCREEN'),
-      ...extractBulletSection(r, 'RED FLAGS'),
-      ...extractBulletSection(r, 'CHALLENGES & SUGGESTIONS'),
+      ...extractBulletSection(r, 'CRUCIAL'),
+      ...extractBulletSection(r, 'IMPORTANT'),
     ];
     setFollowUpItems('proposal', items);
     // Persisted (not just rendered) so the Intake Summary's Notes section can pull
-    // Timeline Feasibility / Red Flags / Challenges & Suggestions / Concerns later.
+    // Crucial / Important / Good to Consider later.
     const persistData = loadAll();
     persistData.proposal_review_text = r;
     saveAll(persistData);
@@ -5905,10 +5875,9 @@ async function openIntakeSummaryForm(){
       ? 'None identified.'
       : 'Run "Feedback on Proposal and Scope" on the Setup tab to populate this section.';
     const notesSections = [
-      {label:'Timeline Feasibility', bullets: extractBulletSection(reviewText, 'TIMELINE FEASIBILITY')},
-      {label:'Red Flags', bullets: extractBulletSection(reviewText, 'RED FLAGS')},
-      {label:'Challenges & Suggestions', bullets: extractBulletSection(reviewText, 'CHALLENGES & SUGGESTIONS')},
-      {label:'Concerns Raised by the Proposal', bullets: extractBulletSection(reviewText, 'WHAT CONCERNS DOES THIS PROPOSAL RAISE')},
+      {label:'Crucial', bullets: extractBulletSection(reviewText, 'CRUCIAL')},
+      {label:'Important', bullets: extractBulletSection(reviewText, 'IMPORTANT')},
+      {label:'Good to Consider', bullets: extractBulletSection(reviewText, 'GOOD TO CONSIDER')},
     ];
 
     const fields = {
@@ -6587,6 +6556,7 @@ function confirmSaveProject(){
   const currentData = loadAll();
   projects[id] = { id, name, savedAt: Date.now(), data: currentData };
   saveProjects(projects);
+  workspaceDirtySinceSave = false;
   setActiveId(id);
   updateHeaderLabel();
   closeSaveModal();
@@ -6599,12 +6569,19 @@ function openNewProjectModal(){
   const id = getActiveId();
   const projects = loadProjects();
   const alreadySaved = !!(id && projects[id]);
-  document.getElementById('modal-new-body').textContent = alreadySaved
-    ? "Save changes you've made to this project before starting a new project."
+  const noUnsavedChanges = alreadySaved && !workspaceDirtySinceSave;
+  const bodyEl = document.getElementById('modal-new-body');
+  const saveBtn = document.getElementById('modal-new-savebtn');
+  const startBtn = document.getElementById('modal-new-startbtn');
+  // Once the project has just been saved with nothing changed since, there's nothing left
+  // to protect — showing a "save first" option alongside it is confusing, not reassuring.
+  // Just the single "start new" action plus the clear-workspace warning above it.
+  saveBtn.style.display = noUnsavedChanges ? 'none' : '';
+  bodyEl.textContent = noUnsavedChanges ? ''
+    : alreadySaved ? "Save changes you've made to this project before starting a new project."
     : 'Save your current project first if you want to be able to return to it.';
-  document.getElementById('modal-new-savebtn').textContent = alreadySaved
-    ? 'Save changes, then start new'
-    : 'Save first, then start new';
+  saveBtn.textContent = alreadySaved ? 'Save changes, then start new' : 'Save first, then start new';
+  startBtn.textContent = noUnsavedChanges ? 'Start new project' : 'Start new without saving';
   document.getElementById('modal-new').classList.remove('hidden');
 }
 function closeNewProjectModal(){ document.getElementById('modal-new').classList.add('hidden'); }
