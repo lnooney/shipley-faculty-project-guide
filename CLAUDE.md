@@ -594,6 +594,60 @@ Project → Project Report.**
   constrained to the funding window's first two weeks — deliberately separate from the
   existing Learning-Analytics-group "Complete Impact Evaluation Framework" task, which
   stays where it is.
+- **Dependency-conflict awareness**: Laura asked whether editing one task's dates, once a
+  project is underway, would alert her to other tasks whose dates become inconsistent as
+  a result. The honest answer before this was no — there was no stored dependency data
+  anywhere in the app at all (the only dependency reasoning that ever happened was a
+  one-time instruction inside the Tailor Milestones prompt, used only to *guess* initial
+  dates and never persisted), and "Feedback on Timeline" didn't even see per-task dates
+  in its prompt context, so it couldn't have caught this either. Addressed with two
+  pieces, both confirmed with Laura before building (her choice at each fork):
+  - **Where the dependency knowledge comes from**: `tailorMilestonesToProposal()`'s
+    existing "dependency work-back rule" (already reasoning about predecessors once, just
+    to compute initial dates) now also returns a `"dependencies"` map (`{taskId:
+    predecessorTaskId}`) in its JSON response, persisted to `data.task_dependencies` in
+    `applyMilestoneTailoring()` — merged in, not overwritten, since custom-task
+    dependencies (see below) live in a disjoint ID namespace (`custom_...` vs `m1_0` etc.)
+    and can never collide with what a re-tailor run returns. **Plus (Laura's follow-up
+    ask) a manual "Depends on" picker for custom tasks** — the one case Tailor
+    Milestones can never know about, since it only ever reasons about the default
+    checklist. Added to both places a custom task can be created: the per-milestone
+    inline "+ Add a task" row (`buildAddRow()`/`saveInlineTask()`) and the standalone
+    "Add a custom task" card (`addCustomTask()`) — both populated from the same
+    `allTaskIndex` (every currently-visible task across all 5 milestones, not just the
+    one being added to, since a custom task can reasonably depend on a task in an
+    earlier milestone). The standalone card's dropdown is static HTML, so unlike the
+    inline row (rebuilt fresh every render) it has to be explicitly refreshed at the end
+    of `renderMilestones()` whenever the task list changes.
+  - **How a conflict reaches the LC**: immediately and inline, via a plain date
+    comparison — no AI call, so it's instant and can't be wrong due to a model
+    misjudging what depends on what. `getDependencyWarning(t)` (computed fresh inside
+    `renderMilestones()` on every render, never stored, so it can never go stale against
+    an edited date) checks, for any task with a recorded predecessor, whether its own
+    start date now falls on or before that predecessor's due date — if so, a warning
+    renders in the task row using the same `.task-blocker` style already used for
+    pre-written hint text. **Required widening `saveTaskMeta()`'s re-render trigger from
+    `due`-only to `due` or `start`** — it previously only called `renderMilestones()` on
+    a due-date edit (editing a task's own start date didn't re-render the list before, a
+    real bug exposed by this feature: without it, a dependent task's own start-date edit
+    would show no warning until something else happened to trigger a render). Because
+    `renderMilestones()` re-evaluates every task's warning on every call, this one fix
+    makes the check correctly reactive from *either* direction — editing a task's own
+    start date, or editing its predecessor's due date — without needing separate wiring
+    for each.
+  - Deliberately silent (no warning, not an error) for any task with no recorded
+    dependency — most tasks, and the honest limitation of the Tailor-Milestones-sourced
+    half of this: a plan built entirely by hand, or any task added before this feature
+    existed, has no dependency data unless a custom task's "Depends on" picker was used.
+  - Verified directly: a mocked Tailor Milestones run with a `dependencies` entry
+    persists correctly; editing the dependent task's own start date into conflict shows
+    the warning, editing it back out clears it; independently, editing the
+    *predecessor's* due date later (without touching the dependent task at all) also
+    correctly re-triggers the same warning — confirming the fix is reactive from both
+    directions, not just the one that happened to be tested first. Both custom-task
+    entry points (standalone card, inline per-milestone row) verified to populate their
+    dropdown with every visible task and to correctly persist and flag a conflict on the
+    newly created task.
 - **Milestones 2–5's tasks now carry `group` values** in `MILESTONE_TASKS`, same as
   Milestone 1 always has (Implementation/Data Collection for M2; Analysis/Dissemination
   for M3; Reflection/Iteration/Scaling & Sustainability for M4; Reporting/Dissemination/
