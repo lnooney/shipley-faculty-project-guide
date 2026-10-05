@@ -367,6 +367,46 @@ Project → Project Report.**
   session. If no proposal review has been run yet, each subsection shows a placeholder
   telling the PM to run "Feedback on Proposal and Scope" first, rather than a misleading
   "None identified." (which would imply a review ran and found nothing).
+- **Edits now autosave, and a "Regenerate from Current Info" button re-syncs the form
+  with the rest of the project without clobbering an LC's own edits.** Laura asked
+  whether a Lead Consultant could reference and revise the Intake Summary after
+  conferring with faculty — the honest answer at the time was no: every field in this
+  form was discarded the instant the modal closed (nothing under `data.intake_*`
+  existed anywhere), so reopening it always regenerated from scratch, silently
+  discarding any in-modal edit. Fixed with three pieces, all her explicit direction:
+  - **Autosave**: every edit to a `contenteditable` field or checkbox, and every edit
+    to a Next Steps row, is captured and persisted (debounced ~400ms, plus a flush on
+    modal close so a quick close right after typing can't lose it) to a new
+    `data.intake_summary` object (`fields`, `edited_fields`, `next_steps`). Reopening
+    the modal with an existing draft just redisplays it as-is — no AI call, no
+    recomputation of anything — so an LC can close the form mid-edit and pick up
+    exactly where they left off, including in a later session.
+  - **"Regenerate from Current Info"** (new button next to Print/Close) explicitly
+    re-synthesizes the six AI narrative fields and re-pulls every directly-sourced
+    field (Lead(s), Team, Challenge, etc.) fresh from whatever the rest of the tool
+    currently holds — for when the underlying project data has moved on since the
+    form was first generated.
+  - **The "never overwrite a manual correction" principle, adapted**: Laura asked for
+    this too, and — per her invitation to push back if it didn't make sense — a
+    literal "only fill empty fields" version would have made Regenerate permanently
+    useless after its very first run, since every field is non-empty the moment it's
+    first populated. Instead, each field (keyed by a stable `data-field` attribute
+    added to every row, checkbox, and Notes/Support-Needs subsection) tracks whether
+    the LC has *specifically edited* it since it was last (re)generated
+    (`intakeEditedFields`, persisted as `edited_fields`) — modeled directly on the
+    Setup tab's existing `auto_filled_fields`/`import_completed` pattern. Regenerate
+    recomputes every field that isn't in that set and leaves every field that is
+    untouched; a plain reopen doesn't recompute anything at all, edited or not, since
+    recomputing on every open would let the Notes section (sourced from the proposal
+    review) or other direct fields quietly drift out from under an LC between visits
+    without them asking for it. Next Steps rows have no project-data source at all, so
+    they're always preserved verbatim and never touched by Regenerate.
+  - Verified end-to-end with Playwright (mocked `fetch` for the narrative call): first
+    open synthesizes fresh and calls the AI once; editing a field and reopening shows
+    the edit with zero additional AI calls; changing the underlying Setup data and
+    clicking Regenerate updates the untouched fields (including a direct field like
+    Challenge) while leaving the LC-edited field exactly as they left it; a Next Steps
+    row added and filled in survives both a close/reopen and a Regenerate.
 - **Postmortem on the abandoned `.docx` approach:** Laura's exact error text confirmed
   `window.docx` was undefined when the button was clicked. A CDN fallback (jsdelivr →
   unpkg) didn't change the outcome — she got the identical generic error again, which
@@ -837,6 +877,23 @@ Project → Project Report.**
   real Word bullets via `textToDocxParagraphs()`, reusing the same bullet-vs-paragraph
   line-detection logic as `formatAIResponse()` (on-page AI feedback) — one detection
   approach, two output targets (HTML vs. docx), kept deliberately consistent.
+- **Final Report `.docx` only (not Milestone Snapshot): each section heading is now
+  followed by that field's guiding question**, as an italic gray paragraph
+  (`color:'666666'`, matching the existing muted-gray styling already used for the
+  generated-date line), before the pre-filled content paragraphs — `finalFieldDescriptions`
+  in `downloadReportDocx()`, one entry per `r-*` field id, copied verbatim from that
+  field's `.prompt` div text on the Final Report tab (not re-derived or paraphrased, so
+  the two can never drift apart silently). Renders even when the field is still empty —
+  a faculty reviewer seeing a blank section should see what question it was meant to
+  answer, not just a blank. Also retitled the document itself to "Final Project
+  Report — Draft for Faculty Review" (was "Final Project Report") — Laura's explicit
+  wording, to make clear to whoever receives it that this is a draft going to the
+  faculty lead for review, not a finished/submitted report. The Milestone Snapshot's own
+  title ("Milestone Snapshot") and its generation path are completely untouched — the
+  `finalFieldDescriptions` lookup is gated on `mode==='final'` specifically, and the
+  title string itself is only swapped in the `mode==='final'` branch of the existing
+  ternary. Filename convention unchanged (`buildDocFilename('Final_Report')`) — only the
+  document's own displayed title changed, not what it saves as.
 
 **Follow-ups With Your Faculty Team (Setup tab)**
 - Consolidates everything the PM needs to raise with faculty into one place, surfaced on

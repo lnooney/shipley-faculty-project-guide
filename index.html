@@ -764,15 +764,16 @@ a:hover{color:var(--navy);}
      nothing ever appeared — same root cause class as the print-clone element above). -->
 <div id="intake-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:9999;overflow:auto;padding:20px;">
   <div id="intake-modal-box" style="background:#fff;border-radius:12px;max-width:900px;margin:0 auto;padding:28px;position:relative;max-height:90vh;overflow:auto;">
-    <div class="no-print" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+    <div class="no-print" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:10px;">
       <h2 style="margin:0;font-size:17px;color:var(--navy);">Intake Summary</h2>
-      <div style="display:flex;gap:10px;">
+      <div style="display:flex;gap:10px;flex-wrap:wrap;">
+        <button class="btn-sm" onclick="openIntakeSummaryForm(true)">🔄 Regenerate from Current Info</button>
         <button class="btn-primary" onclick="printIntakeSummary()">🖨 Print / Save as PDF</button>
         <button class="btn-sm" onclick="closeIntakeModal()">✕ Close</button>
       </div>
     </div>
     <div class="alert alert-blue no-print" style="margin-bottom:14px;">
-      Review and edit any field below — click directly on the text to change it — then use "Print / Save as PDF" and choose "Save as PDF" as the destination in the print dialog.
+      Edits here save automatically, so you can close this and come back to keep refining it with the faculty team. Click "Regenerate from Current Info" to refresh any field from the latest project data — fields you've edited yourself are never overwritten. When ready, use "Print / Save as PDF."
     </div>
     <div id="intake-print-area"></div>
   </div>
@@ -5854,37 +5855,151 @@ function formatIntakeValue(value){
   if(parts.length <= 1) return escapeHtml(v);
   return '<ul>' + parts.map(p=>`<li>${escapeHtml(p)}</li>`).join('') + '</ul>';
 }
-function intakeFieldRow(label, value){
-  return `<div class="intake-row"><div class="intake-label">${escapeHtml(label)}</div><div class="intake-value" contenteditable="true">${formatIntakeValue(value)}</div></div>`;
+// fieldKey tags the row with a stable data-field attribute so autosave and Regenerate
+// (see intakeEditedFields below) can target this exact field across re-renders.
+function intakeFieldRow(label, fieldKey, html){
+  return `<div class="intake-row"><div class="intake-label">${escapeHtml(label)}</div><div class="intake-value" contenteditable="true" data-field="${fieldKey}">${html}</div></div>`;
 }
 
-function intakeSupportNeedsBlock(rows){
+function intakeSupportNeedsBlock(rows, needsFreshData){
   return `<div class="intake-section-title">Support Needs (check all that apply)</div>` +
-    rows.map(r=>`<div class="intake-checkbox-row"><label><input type="checkbox" ${r.checked?'checked':''}/> ${escapeHtml(r.label)}</label><div class="intake-value" contenteditable="true">${escapeHtml(r.details||'')}</div></div>`).join('');
+    rows.map((r,i)=>{
+      const checkKey = `sn_checked_${i}`, detailKey = `sn_details_${i}`;
+      const checked = resolveIntakeField(checkKey, r.checked, needsFreshData);
+      const detailsHtml = resolveIntakeField(detailKey, escapeHtml(r.details||''), needsFreshData);
+      return `<div class="intake-checkbox-row"><label><input type="checkbox" data-field="${checkKey}" ${checked?'checked':''}/> ${escapeHtml(r.label)}</label><div class="intake-value" contenteditable="true" data-field="${detailKey}">${detailsHtml}</div></div>`;
+    }).join('');
 }
 
+// Next Steps is pure manual content with no project-data source to regenerate from —
+// it always shows whatever was last saved (intakeSavedNextSteps), never recomputed.
 function intakeNextStepsBlock(){
-  const row = () => `<tr><td contenteditable="true"></td><td contenteditable="true"></td></tr>`;
-  return `<div class="intake-section-title">Next Steps</div><table class="intake-table" id="intake-nextsteps-table"><thead><tr><th>What</th><th>Who</th></tr></thead><tbody>${row()}${row()}</tbody></table><button class="btn-sm no-print" style="margin-top:6px;" onclick="addIntakeNextStepRow()">+ Add row</button>`;
+  const rows = (Array.isArray(intakeSavedNextSteps) && intakeSavedNextSteps.length) ? intakeSavedNextSteps : [['',''],['','']];
+  const rowHtml = (vals) => `<tr><td contenteditable="true">${vals[0]||''}</td><td contenteditable="true">${vals[1]||''}</td></tr>`;
+  return `<div class="intake-section-title">Next Steps</div><table class="intake-table" id="intake-nextsteps-table"><thead><tr><th>What</th><th>Who</th></tr></thead><tbody>${rows.map(rowHtml).join('')}</tbody></table><button class="btn-sm no-print" style="margin-top:6px;" onclick="addIntakeNextStepRow()">+ Add row</button>`;
 }
 function addIntakeNextStepRow(){
   const tbody = document.querySelector('#intake-nextsteps-table tbody');
   if(!tbody) return;
   tbody.insertAdjacentHTML('beforeend', '<tr><td contenteditable="true"></td><td contenteditable="true"></td></tr>');
+  if(!intakeSuppressAutosave) saveIntakeDraft();
 }
 
 // Not part of the official template — an intentional addition pulling proposal-review
 // content forward into the intake form, so it doesn't have to be re-derived from
 // scratch. Each subsection's bullets come straight out of the "Feedback on Proposal
 // and Scope" response via extractBulletSection(), never re-synthesized by a fresh AI call.
-function intakeNotesBlock(sections, placeholderText){
+function intakeNotesBlock(sections, placeholderText, needsFreshData){
   return `<div class="intake-section-title">Notes</div>` + sections.map(sec=>{
-    const content = sec.bullets.length
+    const key = `notes_${sec.key}`;
+    const fresh = sec.bullets.length
       ? '<ul>' + sec.bullets.map(b=>`<li>${escapeHtml(b)}</li>`).join('') + '</ul>'
       : `<span style="color:#999;font-style:italic;">${escapeHtml(placeholderText)}</span>`;
-    return `<div class="intake-row"><div class="intake-label">${escapeHtml(sec.label)}</div><div class="intake-value" contenteditable="true">${content}</div></div>`;
+    const html = resolveIntakeField(key, fresh, needsFreshData);
+    return `<div class="intake-row"><div class="intake-label">${escapeHtml(sec.label)}</div><div class="intake-value" contenteditable="true" data-field="${key}">${html}</div></div>`;
   }).join('');
 }
+
+// ── Intake Summary persistence: autosave + "never overwrite a manual edit" on Regenerate ──
+// data.intake_summary = { fields: {<data-field key>: html|bool}, edited_fields: [keys], next_steps: [[what,who],...] }
+// A field in edited_fields holds an LC's own edit and is never silently replaced when
+// "Regenerate from Current Info" recomputes everything else — same principle as the Setup
+// tab's auto_filled_fields, but adapted: unlike a one-time import, this form is meant to be
+// regenerated repeatedly over a project's life, so tracking mere non-emptiness (rather than
+// "has the LC specifically edited this since it was last (re)generated") would make the
+// Regenerate button permanently inert after its first use, since every field would already
+// be non-empty. On a plain (non-regenerate) open, every field — edited or not — simply shows
+// whatever was last saved; only Regenerate recomputes anything.
+let intakeEditedFields = new Set();
+let intakeSavedFields = {};
+let intakeSavedNextSteps = null;
+let intakeSuppressAutosave = false;
+let intakeAutosaveTimer = null;
+
+function resolveIntakeField(key, freshValue, needsFreshData){
+  if(!needsFreshData) return (intakeSavedFields[key] !== undefined) ? intakeSavedFields[key] : freshValue;
+  if(intakeEditedFields.has(key) && intakeSavedFields[key] !== undefined) return intakeSavedFields[key];
+  return freshValue;
+}
+
+// Computed fresh from live project data every time the form opens — cheap/synchronous,
+// unlike the six AI-synthesized narrative fields handled separately in openIntakeSummaryForm.
+function computeDirectIntakeFields(data){
+  const s = data.setup || {};
+  const fw = data.framework || {};
+  const fmtDate = (d)=>{
+    if(!d) return '';
+    const dt = new Date(d+'T00:00:00');
+    return isNaN(dt) ? d : dt.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});
+  };
+  const timeline = (s.start||s.end) ? `${fmtDate(s.start)} – ${fmtDate(s.end)}` : '';
+  const irbLabels = {yes:'Yes — plans to collect student data and publish findings.', maybe:'Not yet determined — data collection scope still being decided.', no:'No — purely a teaching improvement project with no data collection.'};
+  const irbText = [irbLabels[data.irb_status]||'', s.irb_notes||''].filter(Boolean).join(' ');
+  const evalStrategies = [fw.measures, fw.collection].filter(Boolean).join(' ');
+  const reviewText = data.proposal_review_text || '';
+  const notesSections = [
+    {label:'Crucial', key:'crucial', bullets: extractBulletSection(reviewText, 'CRUCIAL')},
+    {label:'Important', key:'important', bullets: extractBulletSection(reviewText, 'IMPORTANT')},
+    {label:'Good to Consider', key:'good', bullets: extractBulletSection(reviewText, 'GOOD TO CONSIDER')},
+  ];
+  return {
+    title: s.title || '[Project Name]',
+    leads: s.lead || '',
+    team: s.team || '',
+    challenge: s.challenge || '',
+    innovation: s.vision || '',
+    targetLearners: s.audience || '',
+    impact: fw.impacts || '',
+    supportNeedsRows: getIntakeSupportNeeds(s),
+    timeline,
+    evalStrategies,
+    irb: irbText,
+    reviewText,
+    notesSections,
+  };
+}
+
+function captureIntakeFieldsFromDOM(){
+  const area = document.getElementById('intake-print-area');
+  if(!area) return;
+  area.querySelectorAll('[data-field]').forEach(el=>{
+    const key = el.getAttribute('data-field');
+    intakeSavedFields[key] = (el.tagName === 'INPUT' && el.type === 'checkbox') ? el.checked : el.innerHTML;
+  });
+  intakeSavedNextSteps = Array.from(area.querySelectorAll('#intake-nextsteps-table tbody tr')).map(tr=>{
+    const tds = tr.querySelectorAll('td');
+    return [tds[0] ? tds[0].innerHTML : '', tds[1] ? tds[1].innerHTML : ''];
+  });
+}
+function saveIntakeDraft(){
+  captureIntakeFieldsFromDOM();
+  const data = loadAll();
+  data.intake_summary = {
+    fields: intakeSavedFields,
+    edited_fields: Array.from(intakeEditedFields),
+    next_steps: intakeSavedNextSteps,
+  };
+  saveAll(data);
+}
+function scheduleIntakeAutosave(){
+  clearTimeout(intakeAutosaveTimer);
+  intakeAutosaveTimer = setTimeout(saveIntakeDraft, 400);
+}
+// Delegated listeners (the modal's content is rebuilt on every open/regenerate, so a
+// delegated listener on document is simpler and more robust than wiring each field).
+// contenteditable divs fire 'input'; checkboxes fire 'change'. Any field with a
+// data-field key gets marked edited the moment the LC touches it, including Next Steps
+// cells (which carry no data-field and are always saved verbatim regardless).
+['input','change'].forEach(evt=>{
+  document.addEventListener(evt, e=>{
+    if(intakeSuppressAutosave) return;
+    const area = document.getElementById('intake-print-area');
+    if(!area || !e.target || !area.contains(e.target)) return;
+    const field = e.target.closest && e.target.closest('[data-field]');
+    if(field) intakeEditedFields.add(field.getAttribute('data-field'));
+    scheduleIntakeAutosave();
+  });
+});
 
 async function synthesizeIntakeNarrative(){
   const data = loadAll();
@@ -5915,99 +6030,83 @@ Return ONLY a valid JSON object with no other text, explanation, or markdown, in
   return JSON.parse(jsonMatch[0]);
 }
 
-async function openIntakeSummaryForm(){
+// forceRegenerate (true when called from the modal's "Regenerate from Current Info"
+// button) recomputes every field fresh from current project data/AI narrative, except
+// any field the LC has specifically edited (intakeEditedFields) — see the data-model
+// comment above intakeEditedFields. A plain open (forceRegenerate falsy) with an
+// existing saved draft just redisplays that draft as-is and never calls the AI.
+async function openIntakeSummaryForm(forceRegenerate){
   const btn = document.getElementById('intake-summary-btn');
   const statusEl = document.getElementById('intake-summary-status');
   if(!btn || !statusEl) return;
   setButtonLoading(btn, true);
-  statusEl.innerHTML = `<div class="alert alert-blue">Your guide is drafting the narrative sections…</div>`;
 
   try{
     const data = loadAll();
-    const s = data.setup || {};
-    let narrative;
-    try{
-      narrative = await synthesizeIntakeNarrative();
-    }catch(e){
-      narrative = {budget_rationale:'',dissemination:'',risks:'',timeline_flexibility:'',timeline_risk:'',institute_support:''};
+    const draft = data.intake_summary;
+    const hasSavedDraft = !!(draft && draft.fields);
+    intakeEditedFields = new Set(hasSavedDraft && Array.isArray(draft.edited_fields) ? draft.edited_fields : []);
+    intakeSavedFields = hasSavedDraft ? Object.assign({}, draft.fields) : {};
+    intakeSavedNextSteps = hasSavedDraft && Array.isArray(draft.next_steps) ? draft.next_steps : null;
+    const needsFreshData = !hasSavedDraft || !!forceRegenerate;
+
+    const direct = computeDirectIntakeFields(data);
+
+    let narrative = {budget_rationale:'',dissemination:'',risks:'',timeline_flexibility:'',timeline_risk:'',institute_support:''};
+    if(needsFreshData){
+      statusEl.innerHTML = forceRegenerate
+        ? `<div class="alert alert-blue">Your guide is regenerating from current project info…</div>`
+        : `<div class="alert alert-blue">Your guide is drafting the narrative sections…</div>`;
+      try{
+        narrative = await synthesizeIntakeNarrative();
+      }catch(e){
+        // Leave narrative blank for untouched fields; any LC-edited field still falls
+        // back to its saved value via resolveIntakeField regardless of this failure.
+      }
     }
 
-    const fmtDate = (d)=>{
-      if(!d) return '';
-      const dt = new Date(d+'T00:00:00');
-      return isNaN(dt) ? d : dt.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});
-    };
-    const timeline = (s.start||s.end) ? `${fmtDate(s.start)} – ${fmtDate(s.end)}` : '';
-    const irbLabels = {yes:'Yes — plans to collect student data and publish findings.', maybe:'Not yet determined — data collection scope still being decided.', no:'No — purely a teaching improvement project with no data collection.'};
-    const irbText = [irbLabels[data.irb_status]||'', s.irb_notes||''].filter(Boolean).join(' ');
-    const fw = data.framework || {};
-    const evalStrategies = [fw.measures, fw.collection].filter(Boolean).join(' ');
-
-    const reviewText = data.proposal_review_text || '';
-    const notesPlaceholder = reviewText
+    const resolve = (key, freshPlainText) => resolveIntakeField(key, formatIntakeValue(freshPlainText), needsFreshData);
+    const notesPlaceholder = direct.reviewText
       ? 'None identified.'
       : 'Run "Feedback on Proposal and Scope" on the Setup tab to populate this section.';
-    const notesSections = [
-      {label:'Crucial', bullets: extractBulletSection(reviewText, 'CRUCIAL')},
-      {label:'Important', bullets: extractBulletSection(reviewText, 'IMPORTANT')},
-      {label:'Good to Consider', bullets: extractBulletSection(reviewText, 'GOOD TO CONSIDER')},
-    ];
-
-    const fields = {
-      title: s.title || '[Project Name]',
-      intakeDate: new Date().toLocaleDateString('en-US',{month:'2-digit',day:'2-digit',year:'numeric'}),
-      leads: s.lead || '',
-      team: s.team || '',
-      challenge: s.challenge || '',
-      innovation: s.vision || '',
-      budgetRationale: narrative.budget_rationale || '',
-      targetLearners: s.audience || '',
-      impact: (data.framework && data.framework.impacts) || '',
-      dissemination: narrative.dissemination || '',
-      risks: narrative.risks || '',
-      supportNeeds: getIntakeSupportNeeds(s),
-      timeline,
-      timelineFlex: narrative.timeline_flexibility || '',
-      timelineRisk: narrative.timeline_risk || '',
-      evalStrategies,
-      irb: irbText,
-      instituteSupport: narrative.institute_support || '',
-    };
 
     const html = `
       <div class="intake-header">
         <img src="data:image/png;base64,${BU_LOGO_BASE64}" style="width:380px;" alt="BU logo"/>
         <div>
-          <div class="intake-title">${escapeHtml(fields.title)} — Intake Summary</div>
-          <div class="intake-subtitle">Intake date: ${escapeHtml(fields.intakeDate)}</div>
+          <div class="intake-title">${escapeHtml(direct.title)} — Intake Summary</div>
+          <div class="intake-subtitle">Intake date: ${escapeHtml(new Date().toLocaleDateString('en-US',{month:'2-digit',day:'2-digit',year:'numeric'}))}</div>
         </div>
       </div>
       <div class="intake-section-title">Project Team</div>
-      ${intakeFieldRow('Lead(s)', fields.leads)}
-      ${intakeFieldRow('Other team members', fields.team)}
+      ${intakeFieldRow('Lead(s)', 'leads', resolve('leads', direct.leads))}
+      ${intakeFieldRow('Other team members', 'team', resolve('team', direct.team))}
       <div class="intake-section-title">Project Summary</div>
-      ${intakeFieldRow('Teaching & Learning Challenge/Opportunity', fields.challenge)}
-      ${intakeFieldRow('Proposed Academic Innovation', fields.innovation)}
-      ${intakeFieldRow('Budget Rationale', fields.budgetRationale)}
-      ${intakeFieldRow('Target Learners', fields.targetLearners)}
-      ${intakeFieldRow('Anticipated Impact', fields.impact)}
-      ${intakeFieldRow('Scaling/Dissemination', fields.dissemination)}
-      ${intakeFieldRow('Anticipated concerns/risks', fields.risks)}
-      ${intakeSupportNeedsBlock(fields.supportNeeds)}
+      ${intakeFieldRow('Teaching & Learning Challenge/Opportunity', 'challenge', resolve('challenge', direct.challenge))}
+      ${intakeFieldRow('Proposed Academic Innovation', 'innovation', resolve('innovation', direct.innovation))}
+      ${intakeFieldRow('Budget Rationale', 'budgetRationale', resolve('budgetRationale', narrative.budget_rationale))}
+      ${intakeFieldRow('Target Learners', 'targetLearners', resolve('targetLearners', direct.targetLearners))}
+      ${intakeFieldRow('Anticipated Impact', 'impact', resolve('impact', direct.impact))}
+      ${intakeFieldRow('Scaling/Dissemination', 'dissemination', resolve('dissemination', narrative.dissemination))}
+      ${intakeFieldRow('Anticipated concerns/risks', 'risks', resolve('risks', narrative.risks))}
+      ${intakeSupportNeedsBlock(direct.supportNeedsRows, needsFreshData)}
       <div class="intake-section-title">Timeline</div>
-      ${intakeFieldRow('Anticipated project timeline', fields.timeline)}
-      ${intakeFieldRow('Timeline flexibility', fields.timelineFlex)}
-      ${intakeFieldRow('Timeline risk factors (anticipated)', fields.timelineRisk)}
+      ${intakeFieldRow('Anticipated project timeline', 'timeline', resolve('timeline', direct.timeline))}
+      ${intakeFieldRow('Timeline flexibility', 'timelineFlex', resolve('timelineFlex', narrative.timeline_flexibility))}
+      ${intakeFieldRow('Timeline risk factors (anticipated)', 'timelineRisk', resolve('timelineRisk', narrative.timeline_risk))}
       <div class="intake-section-title">Assessment/Evaluation Plan</div>
-      ${intakeFieldRow('Proposed evaluation strategies', fields.evalStrategies)}
-      ${intakeFieldRow('IRB needed? If so, plan for submission', fields.irb)}
-      ${intakeFieldRow('Institute support needs', fields.instituteSupport)}
-      ${intakeNotesBlock(notesSections, notesPlaceholder)}
+      ${intakeFieldRow('Proposed evaluation strategies', 'evalStrategies', resolve('evalStrategies', direct.evalStrategies))}
+      ${intakeFieldRow('IRB needed? If so, plan for submission', 'irb', resolve('irb', direct.irb))}
+      ${intakeFieldRow('Institute support needs', 'instituteSupport', resolve('instituteSupport', narrative.institute_support))}
+      ${intakeNotesBlock(direct.notesSections, notesPlaceholder, needsFreshData)}
       ${intakeNextStepsBlock()}
     `;
+    intakeSuppressAutosave = true;
     document.getElementById('intake-print-area').innerHTML = html;
     document.getElementById('intake-modal').style.display = 'block';
     statusEl.innerHTML = '';
+    saveIntakeDraft();
+    intakeSuppressAutosave = false;
   }catch(e){
     statusEl.innerHTML = `<div class="alert alert-amber">Something went wrong preparing the Intake Summary — please try again. ${e && e.message ? `(${escapeHtml(e.message)})` : ''}</div>`;
   }finally{
@@ -6016,6 +6115,8 @@ async function openIntakeSummaryForm(){
 }
 
 function closeIntakeModal(){
+  clearTimeout(intakeAutosaveTimer);
+  if(!intakeSuppressAutosave) saveIntakeDraft();
   document.getElementById('intake-modal').style.display = 'none';
 }
 function printIntakeSummary(){
@@ -6406,7 +6507,7 @@ async function downloadReportDocx(mode){
   try{
     const data = loadAll();
     const s = data.setup||{};
-    const title = mode==='snapshot' ? 'Milestone Snapshot' : 'Final Project Report';
+    const title = mode==='snapshot' ? 'Milestone Snapshot' : 'Final Project Report — Draft for Faculty Review';
     const projectTitle = s.title||'Shipley Project';
     const date = new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});
     const metaBits = [s.lead, s.dept].filter(Boolean).join(' · ');
@@ -6419,6 +6520,18 @@ async function downloadReportDocx(mode){
          ['Milestones & Outcomes Achieved','r-milestones'],['Impact','r-impact'],
          ['Challenges','r-challenges'],['Lessons Learned','r-lessons'],
          ['Next Steps & Future Plans','r-next']];
+
+    // Same guiding-question text shown in each field's ".prompt" div on the Final Report
+    // tab — only used for the Final Report doc, never the Milestone Snapshot.
+    const finalFieldDescriptions = {
+      'r-team': 'List all team members, their titles, and their roles within the project.',
+      'r-goals': 'Describe the need addressed and how the intervention led to improved learning for students.',
+      'r-milestones': 'What was achieved across the major areas of this project? Note anything that changed from the original plan.',
+      'r-impact': 'What changed as a result of this project? Describe changes observed by the course team or reported by students. Reference the Impact Evaluation Framework data.',
+      'r-challenges': 'What operational or logistical challenges arose? How were they addressed?',
+      'r-lessons': "What pedagogical insights emerged from this project? What worked or didn't work in the classroom? What would the faculty lead do differently in course design? What are the best practices for teaching with this innovation?",
+      'r-next': 'How will the impact of this project continue beyond its funding period? Will it be sustained, scaled to other courses or departments, adapted for other contexts, or published?',
+    };
 
     const children = [
       docxLogoParagraph(),
@@ -6437,6 +6550,12 @@ async function downloadReportDocx(mode){
         spacing:{before:200, after:80},
         children:[ new docx.TextRun({text:label}) ]
       }));
+      if(mode==='final' && finalFieldDescriptions[id]){
+        children.push(new docx.Paragraph({
+          spacing:{after:120},
+          children:[ new docx.TextRun({text:finalFieldDescriptions[id], italics:true, color:'666666', size:20}) ]
+        }));
+      }
       children.push(...textToDocxParagraphs(val));
     });
 
