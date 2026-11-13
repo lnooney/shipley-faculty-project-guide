@@ -51,10 +51,14 @@ Project → Project Report.**
   keyed separately from the single "live" working document). No backend, no accounts —
   see "Future direction" below for the discussed-but-not-yet-detailed multi-user version.
 - **AI calls:** `callGuide(userMsg, opts)` posts to a Val.town relay wrapping Claude
-  (`claude-sonnet-4-5`). `opts.skipCtx` skips automatic project-context injection;
+  (`claude-sonnet-5-5`). `opts.skipCtx` skips automatic project-context injection;
   `opts.maxTokens` overrides the 1000-token default. Every call's system prompt gets
   today's real date appended — this exists because the AI cannot infer "today" on its
   own and previously produced wrong "N months into the project" claims.
+  Model switched from `claude-sonnet-4-5` to `claude-sonnet-5-5` on 2026-11-13, because
+  Anthropic retires Sonnet 4.5 on 2026-11-30 and requests to it fail after that. The model
+  string lives in one place in `callGuide()`. If the Val.town relay hardcodes its own
+  model, the relay needs the same change.
 - **Structured AI output pattern:** any AI call whose result needs to drive app logic
   (not just be displayed) asks for a literal JSON shape and parses it with
   `raw.match(/\{[\s\S]*\}/)` + `JSON.parse()`. Free-text/descriptive instructions to the
